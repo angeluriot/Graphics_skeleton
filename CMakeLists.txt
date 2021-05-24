@@ -17,7 +17,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_RE
 target_include_directories(${PROJECT_NAME} PUBLIC includes)
 
 # linker flags
-add_link_options("-lmingw32" "-lgdi32" "-luser32" "-lkernel32")
+add_link_options("-lmingw32" "-lgdi32" "-luser32" "-lkernel32" "-ladvapi32" "-lshell32" "-lgcc" "-lmoldname" "-lmingwex" "-lmsvcrt")
 
 # Set VS properties
 if(MSVC)
