@@ -16,6 +16,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_RE
 # Includes
 target_include_directories(${PROJECT_NAME} PUBLIC includes)
 
+# linker flags
+add_link_options("-lmingw32" "-lgdi32" "-luser32" "-lkernel32")
+
 # Set VS properties
 if(MSVC)
 	target_compile_options(${PROJECT_NAME} PUBLIC "/Zc:__cplusplus")
