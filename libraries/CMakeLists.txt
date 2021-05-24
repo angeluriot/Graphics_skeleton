@@ -12,6 +12,9 @@ target_include_directories(Libraries PUBLIC ImGui)
 target_include_directories(Libraries PUBLIC ImGui-SFML)
 target_include_directories(Libraries PUBLIC Dimension3D/includes)
 
+# linker flags
+set(CMAKE_EXE_LINKER_FLAGS "-lmingw32 -lgdi32 -luser32 -lkernel32")
+
 # SFML
 if(MSVC)
 
