@@ -13,7 +13,7 @@ target_include_directories(Libraries PUBLIC ImGui-SFML)
 target_include_directories(Libraries PUBLIC Dimension3D/includes)
 
 # linker flags
-add_link_options("-lmingw32" "-lgdi32" "-luser32" "-lkernel32" "-ladvapi32" "-lshell32" "-lgcc" "-lmoldname" "-lmingwex" "-lmsvcrt")
+add_link_options(-lmingw32 -lgdi32 -luser32 -lkernel32 -ladvapi32 -lshell32 -lgcc -lmoldname -lmingwex -lmsvcrt -lwinspool -lcomdlg32 -lole32 -loleaut32 -luuid -lodbc32 -lodbccp32)
 
 # SFML
 if(MSVC)
