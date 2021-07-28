@@ -1,4 +1,4 @@
-#include "Simulation.h"
+#include <dim/dimension3D.h>
 
 int main()
 {
@@ -73,24 +73,28 @@ int main()
 	vertex_object_2.add_texture("texture_2");
 	*/
 
-	dim::Camera camera(dim::Camera::Mode::Rotation);
+	dim::Scene scene("My_scene");
+	dim::Scene scene_2("My_scene_2");
+
+	dim::Camera camera(scene, dim::Camera::Mode::Rotation);
+	dim::Camera camera_2(scene_2, dim::Camera::Mode::Rotation);
 	dim::Light light_1(dim::Light::Type::Directional, sf::Color(255, 50, 50), 1., dim::Vector3(-1.f, -1.f, -1.f).get_normalized());
 	dim::Light light_2(dim::Light::Type::Directional, sf::Color(50, 50, 255), 1., dim::Vector3(1.f, 1.f, -1.f).get_normalized());
 
 	dim::Object object_1(dim::Mesh::cube, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
 	object_1.set_texture("texture_3");
-	object_1.set_local_scale(dim::Vector3(1.f, 1.f, 1.f));
+	object_1.set_size(dim::Vector3(1.f, 1.f, 1.f));
 	object_1.move(dim::Vector3(0.f, 0.f, 0.f));
 
 	dim::Object object_2(dim::Mesh::sphere_64, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
 	object_2.set_texture("texture_1");
-	object_2.set_local_scale(dim::Vector3(1.f, 1.f, 1.f));
-	object_2.move(dim::Vector3(2.f, 0.f, 0.f));
+	object_2.set_size(dim::Vector3(1.f, 1.f, 1.f));
+	object_2.move(dim::Vector3(1.f, 0.f, 0.f));
 
 	dim::Object object_3(dim::Mesh::sphere_64, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
 	object_3.set_texture("texture_2");
-	object_3.set_local_scale(dim::Vector3(1.f, 1.f, 1.f));
-	object_3.move(dim::Vector3(-2.f, 0.f, 0.f));
+	object_3.set_size(dim::Vector3(1.f, 1.f, 1.f));
+	object_3.move(dim::Vector3(-1.f, 0.f, 0.f));
 
 	dim::VertexBuffer vbo_test("screen");
 	vbo_test.send_data(dim::Mesh::screen);
@@ -114,17 +118,24 @@ int main()
 		{
 			dim::Window::check_events(sf_event);
 			camera.check_events(sf_event);
+			camera_2.check_events(sf_event);
 		}
 
 		dim::Window::clear();
 
 		// Dimension3D
 
-		camera.update();
+		scene.clear();
+		scene_2.clear();
 
-		object_1.draw(camera, { &light_1, &light_2 }, type);
-		object_2.draw(camera, { &light_1, &light_2 }, type);
-		object_3.draw(camera, { &light_1, &light_2 }, type);
+		camera.update();
+		camera_2.update();
+
+		object_1.draw(scene, camera, { light_1, light_2 }, type);
+		object_2.draw(scene_2, camera_2, { light_1, light_2 }, type);
+		object_3.draw(scene_2, camera_2, { light_1, light_2 }, type);
+		scene.display();
+		scene_2.display();
 
 		// ----------
 
@@ -166,7 +177,7 @@ int main()
 	}
 
 	dim::shut_down();
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 /*

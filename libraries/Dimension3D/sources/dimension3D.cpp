@@ -27,7 +27,6 @@ namespace dim
 		init_opengl();
 		init_imgui();
 		Shader::load_default();
-		FrameBuffer::init();
 	}
 
 	void unbind_all()

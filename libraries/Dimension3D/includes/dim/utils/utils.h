@@ -1,9 +1,13 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "dim/libraries.h"
-#include "dim/Vector2.h"
+#include "dim/utils/libraries.h"
+#include "dim/vectors/Vector2.h"
 
+namespace dim
+{
+	constexpr float	PI = 3.14159265359f; // Pi
+}
 
 /*
 class Simulation;

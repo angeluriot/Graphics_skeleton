@@ -7,12 +7,6 @@ namespace dim
 	bool				Window::running			= false;
 	sf::Clock			Window::clock;
 	float				Window::elapsed_time	= 1.f / 60.f;
-	sf::Vector2i		Window::scene_size		= sf::Vector2i(10, 10);
-	sf::Vector2i		Window::scene_min		= sf::Vector2i(0, 0);
-	sf::Vector2i		Window::scene_max		= sf::Vector2i(10, 10);
-	bool				Window::is_resized		= false;
-	bool				Window::scene_active	= false;
-	bool				Window::scene_moving	= false;
 
 	void Window::create_relative(const std::string& project_name, float screen_ratio, float window_ratio, bool resizable, const std::string& icon_path)
 	{
@@ -118,10 +112,10 @@ namespace dim
 		window->setActive(true);
 		window->clear(color);
 
-		if (is_resized)
-			FrameBuffer::default_frame_buffer.reload();
-
-		FrameBuffer::clear_default(color);
+		glViewport(0, 0, Window::get_width(), Window::get_height());
+		glEnable(GL_DEPTH_TEST);
+		glClearColor(14.f / 255.f, 14.f / 255.f, 14.f / 255.f, 1.f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		ImGui::SFML::Update(dim::Window::get_window(), sf::seconds(Window::elapsed_time));
 
@@ -159,50 +153,9 @@ namespace dim
 
 	void Window::display()
 	{
-		static bool first_frame = true;
-
-		ImGui::Begin("Scene");
-
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-
-		sf::Vector2i temp = scene_size;
-
-		if (first_frame || scene_size.x != viewportPanelSize.x || scene_size.y != viewportPanelSize.y)
-		{
-			scene_size.x = viewportPanelSize.x;
-			scene_size.y = viewportPanelSize.y;
-
-			is_resized = true;
-		}
-
-		else
-			is_resized = false;
-
-		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
-		ImVec2 vPos = ImGui::GetWindowPos();
-
-		scene_moving = scene_min.x != vMin.x + vPos.x || scene_min.y != vMin.y + vPos.y || scene_max.x != vMax.x + vPos.x || scene_max.y != vMax.y + vPos.y;
-
-		scene_min.x = vMin.x + vPos.x;
-		scene_min.y = vMin.y + vPos.y;
-		scene_max.x = vMax.x + vPos.x;
-		scene_max.y = vMax.y + vPos.y;
-
-		scene_active = ImGui::IsWindowFocused();
-
-		uint64_t textureID = FrameBuffer::default_frame_buffer.get_texture().get_id();
-		ImGui::Image(textureID, ImVec2{ (float)temp.x, (float)temp.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-
-		ImGui::End();
-
 		ImGui::SFML::Render(get_window());
-
 		window->display();
-
 		elapsed_time = clock.restart().asSeconds();
-
-		first_frame = false;
 	}
 
 	void Window::close()
@@ -227,11 +180,6 @@ namespace dim
 			running = false;
 	}
 
-	sf::Vector2i Window::get_scene_size()
-	{
-		return scene_size;
-	}
-
 	sf::RenderWindow& get_window()
 	{
 		return Window::get_window();
@@ -251,10 +199,5 @@ namespace dim
 	{
 		return (position.x >= -2 && position.x <= 2) || (position.x >= Window::get_width() - 2 && position.x <= Window::get_width() + 2) ||
 			(position.y >= -2 && position.y <= 2) || (position.y >= Window::get_height() - 2 && position.y <= Window::get_height() + 2);
-	}
-
-	bool is_in_scene(const Vector2& position)
-	{
-		return position.x >= Window::scene_min.x && position.x <= Window::scene_max.x && position.y >= Window::scene_min.y && position.y <= Window::scene_max.y;
 	}
 }

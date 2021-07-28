@@ -1,7 +1,7 @@
 #ifndef VECTOR2_H
 #define VECTOR2_H
 
-#include "dim/libraries.h"
+#include "dim/utils/libraries.h"
 
 namespace dim
 {

@@ -1,7 +1,7 @@
 #ifndef VECTOR4_H
 #define VECTOR4_H
 
-#include "dim/libraries.h"
+#include "dim/utils/libraries.h"
 
 namespace dim
 {

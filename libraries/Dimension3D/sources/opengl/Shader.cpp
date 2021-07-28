@@ -3,7 +3,6 @@
 namespace dim
 {
 	std::vector<Shader> Shader::shaders = {};
-	int64_t Shader::current = -1;
 
 	void Shader::load_default()
 	{
@@ -47,22 +46,6 @@ namespace dim
 			"}");
 
 		shaders.push_back(shader);
-	}
-
-	void Shader::change_current(const Shader& new_shader)
-	{
-		if (current != new_shader.get_id())
-		{
-			glUseProgram(0);
-			current = new_shader.get_id();
-			glUseProgram(current);
-		}
-	}
-
-	void Shader::unbind()
-	{
-		glUseProgram(0);
-		current = -1;
 	}
 
 	Shader::Shader()
@@ -125,6 +108,16 @@ namespace dim
 	bool Shader::is_valid() const
 	{
 		return valid;
+	}
+
+	void Shader::bind() const
+	{
+		glUseProgram(get_id());
+	}
+
+	void Shader::unbind()
+	{
+		glUseProgram(0);
 	}
 
 	bool Shader::add_shader(const Shader& shader)

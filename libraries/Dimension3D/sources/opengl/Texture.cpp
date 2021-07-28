@@ -2,46 +2,15 @@
 
 namespace dim
 {
-	std::vector<Texture> Texture::textures = {};
-	std::vector<int64_t> Texture::current = {};
-
-	void Texture::change_current(const std::vector<const Texture*>& textures)
-	{
-		std::vector<int64_t> textures_id;
-
-		for (auto& texture : textures)
-			textures_id.push_back(texture->id);
-
-		if (current != textures_id)
-		{
-			for (auto& texture_id : current)
-				glBindTexture(GL_TEXTURE_2D, 0);
-
-			uint16_t index = 0;
-			current = textures_id;
-
-			for (auto& texture_id : current)
-			{
-				glActiveTexture(GL_TEXTURE0 + index);
-				glBindTexture(GL_TEXTURE_2D, texture_id);
-				index++;
-			}
-		}
-	}
-
-	void Texture::unbind()
-	{
-		for (auto& texture_id : current)
-			glBindTexture(GL_TEXTURE_2D, 0);
-
-		current = {};
-	}
+	std::vector<Texture>	Texture::textures = {};
+	int						Texture::max_unit = -1;
 
 	Texture::Texture()
 	{
 		name.clear();
 		id = 0;
 		valid = false;
+		unit = -1;
 		nb_copies = std::make_shared<bool>();
 	}
 
@@ -67,11 +36,13 @@ namespace dim
 		name = other.name;
 		id = other.id;
 		valid = other.valid;
+		unit = other.unit;
 		nb_copies = other.nb_copies;
 	}
 
 	bool Texture::load(const std::string& name, const std::string& path, Filtering filtering, Warpping warpping)
 	{
+		unit = -1;
 		this->name = name;
 		sf::Image image;
 		if (!image.loadFromFile(path))
@@ -106,6 +77,25 @@ namespace dim
 	bool Texture::is_valid() const
 	{
 		return valid;
+	}
+
+	int Texture::get_unit() const
+	{
+		return unit;
+	}
+
+	void Texture::bind()
+	{
+		unit = max_unit + 1;
+		glActiveTexture(GL_TEXTURE0 + unit);
+		glBindTexture(GL_TEXTURE_2D, id);
+		max_unit++;
+	}
+
+	void Texture::unbind()
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+		max_unit = std::max(-1, max_unit - 1);
 	}
 
 	bool Texture::add_texture(const Texture& texture)

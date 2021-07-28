@@ -2,18 +2,7 @@
 
 namespace dim
 {
-	int64_t FrameBuffer::current = -1;
-	FrameBuffer FrameBuffer::default_frame_buffer(true, true);
-
-	FrameBuffer::FrameBuffer(bool priv_1, bool priv_2)
-	{
-		fbo = 0;
-		rbo = 0;
-		valid = false;
-		nb_copies = std::make_shared<bool>();
-	}
-
-	void FrameBuffer::create()
+	void FrameBuffer::create(unsigned int witdh, unsigned int height)
 	{
 		if (nb_copies.unique())
 		{
@@ -29,13 +18,15 @@ namespace dim
 			rbo = 0;
 		}
 
+		size = sf::Vector2i(witdh, height);
+
 		glGenFramebuffers(1, &fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		{
 			glGenTextures(1, &texture.id);
 			glBindTexture(GL_TEXTURE_2D, texture.id);
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Window::get_scene_size().x, Window::get_scene_size().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -49,7 +40,7 @@ namespace dim
 			glGenRenderbuffers(1, &rbo);
 			glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 			{
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Window::get_scene_size().x, Window::get_scene_size().y);
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.x, size.y);
 				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 			}
 			glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -61,51 +52,24 @@ namespace dim
 		nb_copies = std::make_shared<bool>();
 	}
 
-	void FrameBuffer::change_current(const FrameBuffer& frame_buffer)
-	{
-		if (current != frame_buffer.fbo)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			current = frame_buffer.fbo;
-			glBindFramebuffer(GL_FRAMEBUFFER, current);
-		}
-	}
-
-	void FrameBuffer::unbind()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		current = -1;
-	}
-
-	void FrameBuffer::clear_default(const sf::Color& color)
-	{
-		unbind();
-		glViewport(0, 0, Window::get_width(), Window::get_height());
-		glEnable(GL_DEPTH_TEST);
-		glClearColor(14.f / 255.f, 14.f / 255.f, 14.f / 255.f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-		change_current(default_frame_buffer);
-		current;
-		glViewport(0, 0, Window::get_scene_size().x, Window::get_scene_size().y);
-		glEnable(GL_DEPTH_TEST);
-		glClearColor(color.r / 255.f, color.g / 255.f, color.b / 255.f, color.a / 255.f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	}
-
-	void FrameBuffer::init()
-	{
-		default_frame_buffer.create();
-	}
-
 	FrameBuffer::FrameBuffer()
 	{
-		create();
+		fbo = 0;
+		rbo = 0;
+		valid = false;
+		size = sf::Vector2i(0, 0);
+		nb_copies = std::make_shared<bool>();
 	}
 
-	FrameBuffer::FrameBuffer(const FrameBuffer& other)
+	FrameBuffer::FrameBuffer(unsigned int witdh, unsigned int height)
 	{
-		*this = other;
+		fbo = 0;
+		rbo = 0;
+		valid = false;
+		size = sf::Vector2i(0, 0);
+		nb_copies = std::make_shared<bool>();
+
+		create(witdh, height);
 	}
 
 	FrameBuffer::~FrameBuffer()
@@ -118,15 +82,16 @@ namespace dim
 		}
 	}
 
-	FrameBuffer& FrameBuffer::operator=(const FrameBuffer& other)
+	void FrameBuffer::bind()
 	{
-		fbo = other.fbo;
-		texture = other.texture;
-		rbo = other.rbo;
-		valid = other.valid;
-		nb_copies = other.nb_copies;
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glViewport(0, 0, size.x, size.y);
+	}
 
-		return *this;
+	void FrameBuffer::unbind()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, Window::get_width(), Window::get_height());
 	}
 
 	Texture FrameBuffer::get_texture() const
@@ -134,7 +99,7 @@ namespace dim
 		return texture;
 	}
 
-	void FrameBuffer::reload()
+	void FrameBuffer::set_size(unsigned int witdh, unsigned int height)
 	{
 		if (nb_copies.unique())
 		{
@@ -148,12 +113,14 @@ namespace dim
 			rbo = 0;
 		}
 
+		size = sf::Vector2i(witdh, height);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		{
 			glGenTextures(1, &texture.id);
 			glBindTexture(GL_TEXTURE_2D, texture.id);
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Window::get_scene_size().x, Window::get_scene_size().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -165,7 +132,7 @@ namespace dim
 			glGenRenderbuffers(1, &rbo);
 			glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 			{
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Window::get_scene_size().x, Window::get_scene_size().y);
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size.x, size.y);
 				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 			}
 			glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -175,11 +142,11 @@ namespace dim
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void FrameBuffer::clear()
+	void FrameBuffer::clear(const sf::Color& color)
 	{
-		change_current(*this);
+		glViewport(0, 0, size.x, size.y);
 		glEnable(GL_DEPTH_TEST);
-		glClearColor(0.f, 0.f, 0.f, 1.f);
+		glClearColor(color.r / 255.f, color.g / 255.f, color.b / 255.f, color.a / 255.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 }

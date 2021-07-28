@@ -2,32 +2,6 @@
 
 namespace dim
 {
-	std::array<int64_t, 2> VertexBuffer::current = { -1, -1 };
-
-	void VertexBuffer::change_current(const std::array<int64_t, 2>& new_vertex_object) const
-	{
-		Shader::change_current(*shader);
-		Texture::change_current(textures);
-
-		if (current[0] != new_vertex_object[0] || current[1] != new_vertex_object[1])
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindVertexArray(0);
-
-			current = new_vertex_object;
-
-			glBindVertexArray(current[1]);
-			glBindBuffer(GL_ARRAY_BUFFER, current[0]);
-		}
-	}
-
-	void VertexBuffer::unbind()
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		current = { -1, -1 };
-	}
-
 	VertexBuffer::VertexBuffer()
 	{
 		shader = Shader::get_shader("default");
@@ -106,8 +80,6 @@ namespace dim
 
 	void VertexBuffer::send_data(const Mesh& mesh)
 	{
-		unbind_all();
-
 		if (nb_copies.unique())
 		{
 			glDeleteBuffers(1, &vbo);
@@ -178,191 +150,145 @@ namespace dim
 		return true;
 	}
 
-	void VertexBuffer::add_texture(const Texture& texture)
+	void VertexBuffer::add_texture(Texture& texture)
 	{
 		textures.push_back(&texture);
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, float number) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform1f(value, number);
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, int number) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform1i(value, number);
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, unsigned int number) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform1ui(value, number);
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const std::vector<float>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform1fv(value, numbers.size(), numbers.data());
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const std::vector<int>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform1iv(value, numbers.size(), numbers.data());
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const std::vector<unsigned int>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform1uiv(value, numbers.size(), numbers.data());
 	}
 
 	void VertexBuffer::send_uniform_2(const std::string& name, const std::vector<float>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform2fv(value, numbers.size() / 2, numbers.data());
 	}
 
 	void VertexBuffer::send_uniform_2(const std::string& name, const std::vector<int>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform2iv(value, numbers.size() / 2, numbers.data());
 	}
 
 	void VertexBuffer::send_uniform_2(const std::string& name, const std::vector<unsigned int>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform2uiv(value, numbers.size() / 2, numbers.data());
 	}
 
 	void VertexBuffer::send_uniform_3(const std::string& name, const std::vector<float>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform3fv(value, numbers.size() / 3, numbers.data());
 	}
 
 	void VertexBuffer::send_uniform_3(const std::string& name, const std::vector<int>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform3iv(value, numbers.size() / 3, numbers.data());
 	}
 
 	void VertexBuffer::send_uniform_3(const std::string& name, const std::vector<unsigned int>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform3uiv(value, numbers.size() / 3, numbers.data());
 	}
 
 	void VertexBuffer::send_uniform_4(const std::string& name, const std::vector<float>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform4fv(value, numbers.size() / 4, numbers.data());
 	}
 
 	void VertexBuffer::send_uniform_4(const std::string& name, const std::vector<int>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform4iv(value, numbers.size() / 4, numbers.data());
 	}
 
 	void VertexBuffer::send_uniform_4(const std::string& name, const std::vector<unsigned int>& numbers) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform4uiv(value, numbers.size() / 4, numbers.data());
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const Vector2& vector) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform2f(value, vector.x, vector.y);
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const Vector3& vector) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform3f(value, vector.x, vector.y, vector.z);
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const Vector4& vector) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform4f(value, vector.x, vector.y, vector.z, vector.w);
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const sf::Color& color) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform4f(value, color.r / 255.f, color.g / 255.f, color.b / 255.f, color.a / 255.f);
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const std::vector<Vector2>& vectors) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform2fv(value, vectors.size(), reinterpret_cast<const float*>(vectors.data()));
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const std::vector<Vector3>& vectors) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform3fv(value, vectors.size(), reinterpret_cast<const float*>(vectors.data()));
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const std::vector<Vector4>& vectors) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniform4fv(value, vectors.size(), reinterpret_cast<const float*>(vectors.data()));
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const std::vector<sf::Color>& colors) const
 	{
-		change_current({ vbo, vao });
-
 		std::vector<Vector4> vectors;
 
 		for (auto& color : colors)
@@ -374,32 +300,36 @@ namespace dim
 
 	void VertexBuffer::send_uniform(const std::string& name, const glm::mat2& matrix) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniformMatrix2fv(value, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const glm::mat3& matrix) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniformMatrix3fv(value, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	void VertexBuffer::send_uniform(const std::string& name, const glm::mat4& matrix) const
 	{
-		change_current({ vbo, vao });
-
 		GLint value = glGetUniformLocation(shader->get_id(), name.data());
 		glUniformMatrix4fv(value, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
+	void VertexBuffer::bind() const
+	{
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	}
+
+	void VertexBuffer::unbind()
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+
 	void VertexBuffer::draw(DrawType draw_type) const
 	{
-		change_current({ vbo, vao });
-
 		for (uint16_t i = 0; i < textures.size(); i++)
 		{
 			GLint value = glGetUniformLocation(shader->get_id(), textures[i]->name.data());

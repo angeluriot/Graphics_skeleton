@@ -1,7 +1,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include "dim/libraries.h"
+#include "dim/utils/libraries.h"
 
 namespace dim
 {
@@ -22,12 +22,10 @@ namespace dim
 		GLuint						id;
 		bool						valid;
 		std::shared_ptr<bool>		nb_copies;
+		int							unit;
 
 		static std::vector<Texture>	textures;
-		static std::vector<int64_t>	current;
-
-		static void					change_current(const std::vector<const Texture*>& textures);
-		static void					unbind();
+		static int					max_unit;
 
 	public:
 
@@ -41,6 +39,9 @@ namespace dim
 		bool						load(const std::string& name, const std::string& path, Filtering filtering = Filtering::Linear, Warpping warpping = Warpping::Repeat);
 		GLuint						get_id() const;
 		bool						is_valid() const;
+		int							get_unit() const;
+		void						bind();
+		static void					unbind();
 
 		static bool					add_texture(const Texture& texture);
 		static bool					add_texture(const std::string& name, const std::string& path, Filtering filtering = Filtering::Linear, Warpping warpping = Warpping::Repeat);

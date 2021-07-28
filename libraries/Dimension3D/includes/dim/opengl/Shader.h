@@ -1,11 +1,11 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "dim/libraries.h"
-#include "dim/Vector2.h"
-#include "dim/Vector3.h"
-#include "dim/Vector4.h"
-#include "dim/Texture.h"
+#include "dim/utils/libraries.h"
+#include "dim/vectors/Vector2.h"
+#include "dim/vectors/Vector3.h"
+#include "dim/vectors/Vector4.h"
+#include "dim/opengl/Texture.h"
 
 namespace dim
 {
@@ -23,11 +23,8 @@ namespace dim
 		bool						valid;
 
 		static std::vector<Shader>	shaders;
-		static int64_t				current;
 
 		static void					load_default();
-		static void					change_current(const Shader& new_shader);
-		static void					unbind();
 
 	public:
 
@@ -42,6 +39,8 @@ namespace dim
 		bool						load(const std::string& name, const std::string& vert_path, const std::string& frag_path);
 		GLuint						get_id() const;
 		bool						is_valid() const;
+		void						bind() const;
+		static void					unbind();
 
 		static bool					add_shader(const Shader& shader);
 		static bool					add_shader(const std::string& name, const std::string& folder_path);

@@ -1,11 +1,11 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "dim/libraries.h"
-#include "dim/Vector2.h"
-#include "dim/Vector3.h"
-#include "dim/Vector4.h"
-#include "dim/Shader.h"
+#include "dim/utils/libraries.h"
+#include "dim/vectors/Vector2.h"
+#include "dim/vectors/Vector3.h"
+#include "dim/vectors/Vector4.h"
+#include "dim/opengl/Shader.h"
 
 namespace dim
 {

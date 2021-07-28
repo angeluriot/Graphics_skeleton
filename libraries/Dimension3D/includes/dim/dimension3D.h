@@ -1,23 +1,23 @@
 #ifndef DIMENSION3D_H
 #define DIMENSION3D_H
 
-#include "dim/libraries.h"
-#include "dim/Mesh.h"
-#include "dim/Light.h"
-#include "dim/Material.h"
+#include "dim/utils/libraries.h"
+#include "dim/utils/Mesh.h"
+#include "dim/objects/Light.h"
+#include "dim/utils/Material.h"
 #include "dim/Menu.h"
-#include "dim/Object.h"
-#include "dim/Shader.h"
-#include "dim/Texture.h"
-#include "dim/Vector2.h"
-#include "dim/Vector3.h"
-#include "dim/Vector4.h"
-#include "dim/VertexBuffer.h"
-#include "dim/Window.h"
-#include "dim/Camera.h"
-#include "dim/utils.h"
-#include "dim/FrameBuffer.h"
-#include "dim/Scene.h"
+#include "dim/objects/Object.h"
+#include "dim/opengl/Shader.h"
+#include "dim/opengl/Texture.h"
+#include "dim/vectors/Vector2.h"
+#include "dim/vectors/Vector3.h"
+#include "dim/vectors/Vector4.h"
+#include "dim/opengl/VertexBuffer.h"
+#include "dim/windows/Window.h"
+#include "dim/objects/Camera.h"
+#include "dim/utils/utils.h"
+#include "dim/opengl/FrameBuffer.h"
+#include "dim/windows/Scene.h"
 
 namespace dim
 {
@@ -27,8 +27,6 @@ namespace dim
 
 	void			unbind_all();
 	void			shut_down();
-
-	constexpr float	PI = 3.14159265359f; // Pi
 }
 
 #endif

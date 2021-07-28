@@ -1,7 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "dim/libraries.h"
+#include "dim/utils/libraries.h"
 
 namespace dim
 {
