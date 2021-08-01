@@ -1,12 +1,13 @@
 #ifndef VECTOR4_H
 #define VECTOR4_H
 
-#include "dim/utils/libraries.h"
+#include "dim/utils/libraries.hpp"
 
 namespace dim
 {
 	class Vector2;
 	class Vector3;
+	class Color;
 
 	// Classe d�finissant un vecteur
 
@@ -32,13 +33,13 @@ namespace dim
 								Vector4(float x, const Vector3& vector);
 								Vector4(const std::array<float, 4>& vector);
 								Vector4(const glm::vec4& vector);
-								Vector4(const sf::Color& color);
+								Vector4(const Color& color);
 
 		Vector4&				operator=(const Vector4& vector);
 		Vector4&				operator=(float number);
 		Vector4&				operator=(const std::array<float, 4>& vector);
 		Vector4&				operator=(const glm::vec4& vector);
-		Vector4&				operator=(const sf::Color& color);
+		Vector4&				operator=(const Color& color);
 
 		Vector4&				operator+=(const Vector4& vector);
 		Vector4&				operator-=(const Vector4& vector);

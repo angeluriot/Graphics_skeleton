@@ -1,7 +1,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "dim/utils/libraries.h"
+#include "dim/utils/libraries.hpp"
+#include "dim/utils/Color.hpp"
 
 namespace dim
 {
@@ -9,7 +10,7 @@ namespace dim
 	{
 	private:
 
-		sf::Color			color;
+		Color				color;
 		float				ambient;
 		float				diffuse;
 		float				specular;
@@ -20,13 +21,13 @@ namespace dim
 		static Material		default_material;
 
 							Material();
-							Material(const Material& other);
-							Material(const sf::Color& color, float ambient, float diffuse, float specular, float shininess);
+							Material(const Material& other) = default;
+							Material(const Color& color, float ambient, float diffuse, float specular, float shininess);
 
-		void				operator=(const Material& other);
+		Material&			operator=(const Material& other) = default;
 
-		sf::Color			get_color() const;
-		void				set_color(const sf::Color& color);
+		Color				get_color() const;
+		void				set_color(const Color& color);
 		float				get_ambient() const;
 		void				set_ambient(float ambient);
 		float				get_diffuse() const;

@@ -1,4 +1,4 @@
-#include "dim/dimension3D.h"
+#include "dim/dimension3D.hpp"
 
 namespace dim
 {
@@ -6,7 +6,6 @@ namespace dim
 
 	Camera::Camera(bool null)
 	{
-		scene = nullptr;
 		mode = Mode::Free;
 		position = Vector3(0.f, 0.f, 0.f);
 		sensitivity = 0.f;
@@ -78,18 +77,19 @@ namespace dim
 		}
 	}
 
-	void Camera::rotation_move()
+	void Camera::rotation_move(const Scene& scene)
 	{
-		if ((!prev_mouse_click && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && (!scene->is_in(sf::Mouse::getPosition(Window::get_window())) || !scene->is_active())) || scene->is_moving())
+		if ((!prev_mouse_click && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && (!scene.is_in(sf::Mouse::getPosition(Window::get_window())) ||
+			!scene.is_active())) || scene.is_moving())
 			rotation_forbidden = true;
 
-		else if (!scene->is_moving() && prev_mouse_click && !sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+		else if (!scene.is_moving() && prev_mouse_click && !sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 			rotation_forbidden = false;
 
-		if (!scene->is_moving() && scene->is_active() && scene->is_in(sf::Mouse::getPosition(Window::get_window())))
+		if (!scene.is_moving() && scene.is_active() && scene.is_in(sf::Mouse::getPosition(Window::get_window())))
 			rotation_forbidden = false;
 
-		if (!scene->is_active())
+		if (!scene.is_active())
 			rotation_forbidden = true;
 
 		if (!rotation_forbidden && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
@@ -97,7 +97,7 @@ namespace dim
 			Vector2 move = Vector2(sf::Mouse::getPosition()) - prev_mouse_pos;
 
 			position.set_theta(position.get_theta() - move.x * sensitivity);
-			position.set_phi(std::min(std::max(position.get_phi() - move.y * sensitivity, 0.01f), PI - 0.01f));
+			position.set_phi(std::min(std::max(position.get_phi() - move.y * sensitivity, 0.01f), pi - 0.01f));
 
 			view = glm::lookAt(position.to_glm(), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 		}
@@ -106,9 +106,8 @@ namespace dim
 		prev_mouse_click = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
 	}
 
-	Camera::Camera(Scene& scene, Mode mode, float sensitivity, float fov, float near, float far)
+	Camera::Camera(Mode mode, float sensitivity, float fov, float near, float far)
 	{
-		this->scene = &scene;
 		sensitivity = std::max(sensitivity, 0.f);
 		fov = std::max(fov, 0.f);
 		near = std::max(near, 0.f);
@@ -150,10 +149,10 @@ namespace dim
 		down = default_down;
 	}
 
-	void Camera::check_events(const sf::Event& sf_event)
+	void Camera::check_events(const sf::Event& sf_event, const Scene& scene)
 	{
 		if (mode == Mode::Free && ((sf_event.type == sf::Event::KeyReleased && sf_event.key.code == sf::Keyboard::Escape)
-			|| (!moving && sf_event.type == sf::Event::MouseButtonReleased && scene->is_in(sf::Mouse::getPosition(Window::get_window())))))
+			|| (!moving && sf_event.type == sf::Event::MouseButtonReleased && scene.is_in(sf::Mouse::getPosition(Window::get_window())))))
 		{
 			moving = !moving;
 			sf::Mouse::setPosition(sf::Vector2i(dim::Window::get_width() / 2.f, dim::Window::get_height() / 2.f), dim::Window::get_window());
@@ -163,29 +162,23 @@ namespace dim
 				ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 		}
 
-		if (mode == Mode::Rotation && sf_event.type == sf::Event::MouseWheelMoved && scene->is_in(sf::Mouse::getPosition(Window::get_window())))
+		if (mode == Mode::Rotation && sf_event.type == sf::Event::MouseWheelMoved && scene.is_in(sf::Mouse::getPosition(Window::get_window())))
 		{
 			position.set_norm(std::max(position.get_norm() - sf_event.mouseWheel.delta * speed, 0.01f));
 			view = glm::lookAt(position.to_glm(), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 		}
 	}
 
-	void Camera::update()
+	void Camera::update(const Scene& scene)
 	{
-		if (scene->is_resized())
-		{
-			if (*scene == Scene::window)
-				set_resolution(Window::get_width(), Window::get_height());
-
-			else
-				set_resolution(scene->get_size().x, scene->get_size().y);
-		}
+		if (scene.is_resized())
+			set_resolution(scene.get_width(), scene.get_height());
 
 		if (mode == Mode::Free)
 			free_move();
 
 		else
-			rotation_move();
+			rotation_move(scene);
 	}
 
 	glm::mat4 Camera::get_matrix() const

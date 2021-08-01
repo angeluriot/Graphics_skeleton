@@ -1,4 +1,4 @@
-#include "dim/dimension3D.h"
+#include "dim/dimension3D.hpp"
 
 // Construit un vecteur
 namespace dim
@@ -367,6 +367,12 @@ namespace dim
 	Vector3 operator*(const Vector3& vector_1, const Vector3& vector_2)
 	{
 		return Vector3(vector_1.x * vector_2.x, vector_1.y * vector_2.y, vector_1.z * vector_2.z);
+	}
+
+	Vector3 operator*(const glm::mat4& matrix, const Vector3& vector)
+	{
+		glm::vec4 result = matrix * glm::vec4(vector.x, vector.y, vector.z, 1.f);
+		return glm::vec3(result.x, result.y, result.z);
 	}
 
 	// Division

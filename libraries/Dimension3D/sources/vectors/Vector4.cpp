@@ -1,4 +1,4 @@
-#include "dim/dimension3D.h"
+#include "dim/dimension3D.hpp"
 
 // Construit un vecteur
 namespace dim
@@ -81,7 +81,7 @@ namespace dim
 		*this = vector;
 	}
 
-	Vector4::Vector4(const sf::Color& color)
+	Vector4::Vector4(const Color& color)
 	{
 		*this = color;
 	}
@@ -128,7 +128,7 @@ namespace dim
 		return *this;
 	}
 
-	Vector4& Vector4::operator=(const sf::Color& color)
+	Vector4& Vector4::operator=(const Color& color)
 	{
 		x = color.r;
 		y = color.g;

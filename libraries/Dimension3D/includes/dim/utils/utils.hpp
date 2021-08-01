@@ -1,12 +1,12 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "dim/utils/libraries.h"
-#include "dim/vectors/Vector2.h"
+#include "dim/utils/libraries.hpp"
+#include "dim/vectors/Vector2.hpp"
 
 namespace dim
 {
-	constexpr float	PI = 3.14159265359f; // Pi
+	constexpr float	pi = 3.14159265359f; // Pi
 }
 
 /*

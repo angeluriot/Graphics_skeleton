@@ -1,85 +1,25 @@
-#include <dim/dimension3D.h>
+#include <dim/dimension3D.hpp>
 
 int main()
 {
 	dim::Window::create_relative("app", 3.f / 4.f, 16.f / 9.f, true, "resources/icons/icon.png");
 
-	std::vector<float> positions_1 =
-	{
-		-1.f,  -0.5f, 0.f,
-		 0.f,  -0.5f, 0.f,
-		-0.5f,  0.5f, 0.f
-	};
+	dim::Shader::add("default", "shaders/color.vert", "shaders/color.frag");
+	dim::Shader::add("screen", "shaders/screen.vert", "shaders/screen.frag");
 
-	std::vector<float> normals_1 =
-	{
-		0.f, 0.f, 1.f,
-		0.f, 0.f, 1.f,
-		0.f, 0.f, 1.f
-	};
+	dim::Texture::add("texture_1", "resources/textures/jojo.jpg");
+	dim::Texture::add("texture_2", "resources/textures/rem.png");
+	dim::Texture::add("texture_3", "resources/textures/pessi.jpg");
 
-	std::vector<float> uvs_1 =
-	{
-		0.f,  1.f,
-		0.5f, 0.f,
-		1.f,  1.f
-	};
-
-	std::vector<float> positions_2 =
-	{
-		 0.f,  -0.5f, 0.f,
-		 1.0f, -0.5f, 0.f,
-		 0.5f,  0.5f, 0.f
-	};
-
-	std::vector<float> normals_2 =
-	{
-		0.f, 0.f, 1.f,
-		0.f, 0.f, 1.f,
-		0.f, 0.f, 1.f
-	};
-
-	std::vector<float> uvs_2 =
-	{
-		0.f,  1.f,
-		0.5f, 0.f,
-		1.f,  1.f
-	};
-
-	dim::Shader::add_shader("default", "shaders/color.vert", "shaders/color.frag");
-	dim::Shader::add_shader("screen", "shaders/screen.vert", "shaders/screen.frag");
-
-	dim::Texture::add_texture("texture_1", "resources/textures/jojo.jpg");
-	dim::Texture::add_texture("texture_2", "resources/textures/rem.png");
-	dim::Texture::add_texture("texture_3", "resources/textures/pessi.jpg");
-
-	/*
-	dim::Mesh geometry_1;
-	geometry_1.set_positions(positions_1);
-	geometry_1.set_normals(normals_1);
-	geometry_1.set_uvs(uvs_1);
-
-	dim::Mesh geometry_2;
-	geometry_2.set_positions(positions_2);
-	geometry_2.set_normals(normals_2);
-	geometry_2.set_uvs(uvs_2);
-
-	dim::VertexBuffer vertex_object_1("color");
-	vertex_object_1.send_data(geometry_1);
-	vertex_object_1.add_texture("texture_1");
-
-	dim::VertexBuffer vertex_object_2("color");
-	vertex_object_2.send_data(geometry_2);
-	vertex_object_2.add_texture("texture_2");
-	*/
-
-	dim::Scene scene("My_scene");
+	dim::Scene scene_1("My_scene_1");
 	dim::Scene scene_2("My_scene_2");
 
-	dim::Camera camera(scene, dim::Camera::Mode::Rotation);
-	dim::Camera camera_2(scene_2, dim::Camera::Mode::Rotation);
 	dim::Light light_1(dim::Light::Type::Directional, sf::Color(255, 50, 50), 1., dim::Vector3(-1.f, -1.f, -1.f).get_normalized());
 	dim::Light light_2(dim::Light::Type::Directional, sf::Color(50, 50, 255), 1., dim::Vector3(1.f, 1.f, -1.f).get_normalized());
+
+	scene_1.lights = { light_1, light_2 };
+	scene_2.lights = { light_1, light_2 };
+	scene_2.set_shader(dim::Shader::get("default"));
 
 	dim::Object object_1(dim::Mesh::cube, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
 	object_1.set_texture("texture_3");
@@ -96,17 +36,9 @@ int main()
 	object_3.set_size(dim::Vector3(1.f, 1.f, 1.f));
 	object_3.move(dim::Vector3(-1.f, 0.f, 0.f));
 
-	dim::VertexBuffer vbo_test("screen");
-	vbo_test.send_data(dim::Mesh::screen);
-
 	sf::Clock clock;
 	clock.restart();
 	int fps = 0;
-
-	//object_1.add_child(object_2);
-	//object_2.add_child(object_3);
-
-	//glm::mat4 model = glm::mat4(1.f);
 
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dim::DrawType type = dim::DrawType::Triangles;
@@ -117,33 +49,37 @@ int main()
 		while (dim::Window::get_window().pollEvent(sf_event))
 		{
 			dim::Window::check_events(sf_event);
-			camera.check_events(sf_event);
-			camera_2.check_events(sf_event);
+			//scene_1.check_events(sf_event);
+			scene_2.check_events(sf_event);
 		}
 
 		dim::Window::clear();
 
 		// Dimension3D
 
-		scene.clear();
+		scene_2.bind();
+
+		//scene_1.clear();
 		scene_2.clear();
 
-		camera.update();
-		camera_2.update();
+		//scene_1.update();
+		scene_2.update();
 
-		object_1.draw(scene, camera, { light_1, light_2 }, type);
-		object_2.draw(scene_2, camera_2, { light_1, light_2 }, type);
-		object_3.draw(scene_2, camera_2, { light_1, light_2 }, type);
-		scene.display();
+		sf::RectangleShape test;
+		test.setPosition(50, 50);
+		test.setSize(sf::Vector2f(200, 200));
+		test.setFillColor(sf::Color::Blue);
+
+		//scene_1.draw(object_1, type);
+		scene_2.draw(object_2, type);
+		scene_2.draw(object_3, type);
+
+		//scene_1.draw(test);
+
+		//scene_1.display();
 		scene_2.display();
 
-		// ----------
-
-		dim::unbind_all();
-
-		// SFML
-
-
+		scene_2.unbind();
 
 		// ImGui
 
@@ -169,6 +105,7 @@ int main()
 		}
 
 		ImGui::Text(std::to_string(fps).data());
+		ImGui::Text(("(" + std::to_string(scene_1.get_width()) + " " + std::to_string(scene_1.get_height()) + ")").data());
 		ImGui::End();
 
 		// ----------

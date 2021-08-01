@@ -1,7 +1,7 @@
 #ifndef VECTOR3_H
 #define VECTOR3_H
 
-#include "dim/utils/libraries.h"
+#include "dim/utils/libraries.hpp"
 
 namespace dim
 {
@@ -87,6 +87,7 @@ namespace dim
 	Vector3					operator*(float number, const Vector3& vector_2);
 	Vector3					operator*(const Vector3& vector_1, float number);
 	Vector3					operator*(const Vector3& vector_1, const Vector3& vector_2);
+	Vector3					operator*(const glm::mat4& matrix, const Vector3& vector);
 	Vector3					operator/(float number, const Vector3& vector_2);
 	Vector3					operator/(const Vector3& vector, float number);
 	Vector3					operator/(const Vector3& vector_1, const Vector3& vector_2);

@@ -1,8 +1,8 @@
-#include "dim/dimension3D.h"
+#include "dim/dimension3D.hpp"
 
 namespace dim
 {
-	Light::Light(Type type, const sf::Color& color, float intensity, const Vector3& vector)
+	Light::Light(Type type, const Color& color, float intensity, const Vector3& vector)
 	{
 		set_type(type);
 		set_color(color);
@@ -37,17 +37,17 @@ namespace dim
 			this->vector = vector;
 	}
 
-	sf::Color Light::get_color() const
+	Color Light::get_color() const
 	{
 		return color;
 	}
 
-	void Light::set_color(const sf::Color& color)
+	void Light::set_color(const Color& color)
 	{
-		this->color.r = color.r * (color.a / 255.f);
-		this->color.g = color.g * (color.a / 255.f);
-		this->color.b = color.b * (color.a / 255.f);
-		this->color.a = 255;
+		this->color.r = color.r * color.a;
+		this->color.g = color.g * color.a;
+		this->color.b = color.b * color.a;
+		this->color.a = 1.f;
 	}
 
 	float Light::get_intensity() const

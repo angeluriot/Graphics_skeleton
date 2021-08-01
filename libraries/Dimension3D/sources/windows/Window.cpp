@@ -1,4 +1,4 @@
-#include "dim/dimension3D.h"
+#include "dim/dimension3D.hpp"
 
 namespace dim
 {
@@ -50,9 +50,7 @@ namespace dim
 			window->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 		}
 
-		window->setActive(true);
 		init();
-
 		running = true;
 	}
 
@@ -86,9 +84,7 @@ namespace dim
 			window->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 		}
 
-		window->setActive(true);
 		init();
-
 		running = true;
 	}
 
@@ -107,14 +103,13 @@ namespace dim
 		return window->getSize().y;
 	}
 
-	void Window::clear(const sf::Color& color)
+	void Window::clear(const Color& color)
 	{
-		window->setActive(true);
-		window->clear(color);
+		window->clear(color.to_sf());
 
 		glViewport(0, 0, Window::get_width(), Window::get_height());
 		glEnable(GL_DEPTH_TEST);
-		glClearColor(14.f / 255.f, 14.f / 255.f, 14.f / 255.f, 1.f);
+		glClearColor(color.r, color.g, color.b, color.a);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		ImGui::SFML::Update(dim::Window::get_window(), sf::seconds(Window::elapsed_time));
@@ -153,7 +148,7 @@ namespace dim
 
 	void Window::display()
 	{
-		ImGui::SFML::Render(get_window());
+		ImGui::SFML::Render(*window);
 		window->display();
 		elapsed_time = clock.restart().asSeconds();
 	}

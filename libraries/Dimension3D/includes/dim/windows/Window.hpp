@@ -1,11 +1,12 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "dim/utils/libraries.h"
+#include "dim/utils/libraries.hpp"
 
 namespace dim
 {
 	class Camera;
+	class Light;
 
 	class Window // RAJOUTER DE QUOI faire sa propre fen�tre !!!!!!!
 	{
@@ -29,7 +30,7 @@ namespace dim
 		static sf::RenderWindow&	get_window();
 		static uint16_t				get_width();
 		static uint16_t				get_height();
-		static void					clear(const sf::Color& color = sf::Color::Transparent);
+		static void					clear(const Color& color = Color(0.05f, 0.05f, 0.05f, 1.f));
 		static void					draw(const sf::Drawable& drawable);
 		static void					display();
 		static void					close();

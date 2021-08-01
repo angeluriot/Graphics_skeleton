@@ -1,4 +1,4 @@
-#include "dim/dimension3D.h"
+#include "dim/dimension3D.hpp"
 
 // Construit un vecteur
 namespace dim
@@ -203,7 +203,7 @@ namespace dim
 			return acos(x / get_norm());
 
 		else
-			return 2.f * PI - acos(x / get_norm());
+			return 2.f * pi - acos(x / get_norm());
 	}
 
 	Vector2 Vector2::get_normalized() const

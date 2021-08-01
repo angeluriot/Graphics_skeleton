@@ -1,58 +1,41 @@
-#include "dim/dimension3D.h"
+#include "dim/dimension3D.hpp"
 
 namespace dim
 {
-	std::vector<Texture>	Texture::textures = {};
-	int						Texture::max_unit = -1;
+	std::map<std::string, Texture>	Texture::textures = {};
+	int								Texture::max_unit = -1;
 
 	Texture::Texture()
 	{
-		name.clear();
-		id = 0;
-		valid = false;
-		unit = -1;
-		nb_copies = std::make_shared<bool>();
+		id = std::make_shared<GLuint>(0);
+		unit = std::make_shared<unsigned int>(-1);
 	}
 
-	Texture::Texture(const Texture& other)
+	Texture::Texture(const std::string& path, Filtering filtering, Warpping warpping)
 	{
-		*this = other;
-	}
-
-	Texture::Texture(const std::string& name, const std::string& path, Filtering filtering, Warpping warpping)
-	{
-		nb_copies = std::make_shared<bool>();
-		load(name, path, filtering, warpping);
+		id = std::make_shared<GLuint>(0);
+		unit = std::make_shared<unsigned int>(-1);
+		load(path, filtering, warpping);
 	}
 
 	Texture::~Texture()
 	{
-		if (nb_copies.unique())
-			glDeleteTextures(1, &id);
+		if (id.unique())
+			glDeleteTextures(1, &(*id));
 	}
 
-	void Texture::operator=(const Texture& other)
+	void Texture::load(const std::string& path, Filtering filtering, Warpping warpping)
 	{
-		name = other.name;
-		id = other.id;
-		valid = other.valid;
-		unit = other.unit;
-		nb_copies = other.nb_copies;
-	}
+		glDeleteTextures(1, &(*id));
+		*unit = -1;
 
-	bool Texture::load(const std::string& name, const std::string& path, Filtering filtering, Warpping warpping)
-	{
-		unit = -1;
-		this->name = name;
 		sf::Image image;
-		if (!image.loadFromFile(path))
-		{
-			valid = false;
-			return false;
-		}
 
-		glGenTextures(1, &id);
-		glBindTexture(GL_TEXTURE_2D, id);
+		if (!image.loadFromFile(path))
+			throw std::runtime_error("The texture could not be loaded");
+
+		glGenTextures(1, &(*id));
+		glBindTexture(GL_TEXTURE_2D, *id);
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLenum)filtering);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLenum)filtering);
@@ -64,85 +47,61 @@ namespace dim
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		glBindTexture(GL_TEXTURE_2D, 0);
-
-		valid = true;
-		return true;
 	}
 
 	GLuint Texture::get_id() const
 	{
-		return id;
+		return *id;
 	}
 
-	bool Texture::is_valid() const
+	unsigned int Texture::get_unit() const
 	{
-		return valid;
+		return *unit;
 	}
 
-	int Texture::get_unit() const
+	void Texture::bind() const
 	{
-		return unit;
-	}
-
-	void Texture::bind()
-	{
-		unit = max_unit + 1;
-		glActiveTexture(GL_TEXTURE0 + unit);
-		glBindTexture(GL_TEXTURE_2D, id);
+		*unit = max_unit + 1;
+		glActiveTexture(GL_TEXTURE0 + *unit);
+		glBindTexture(GL_TEXTURE_2D, *id);
 		max_unit++;
 	}
 
-	void Texture::unbind()
+	void Texture::unbind() const
 	{
+		*unit = -1;
 		glBindTexture(GL_TEXTURE_2D, 0);
 		max_unit = std::max(-1, max_unit - 1);
 	}
 
-	bool Texture::add_texture(const Texture& texture)
+	void Texture::add(const std::string& name, const Texture& texture)
 	{
-		if (std::any_of(textures.begin(), textures.end(), [&](Texture& i) -> bool { return i.name == texture.name; }) || !texture.is_valid())
-			return false;
-
-		textures.push_back(texture);
-		return true;
+		if (!textures.insert(std::make_pair(name, texture)).second)
+			throw std::invalid_argument("This name is already used");
 	}
 
-	bool Texture::add_texture(const std::string& name, const std::string& path, Filtering filtering, Warpping warpping)
+	void Texture::add(const std::string& name, const std::string& path, Filtering filtering, Warpping warpping)
 	{
-		if (std::any_of(textures.begin(), textures.end(), [&](Texture& i) -> bool { return i.name == name; }))
-			return false;
-
-		Texture texture(name, path, filtering, warpping);
-
-		if (!texture.is_valid())
-			return false;
-
-		textures.push_back(texture);
-		return true;
+		if (!textures.insert(std::make_pair(name, Texture(path, filtering, warpping))).second)
+			throw std::invalid_argument("This name is already used");
 	}
 
-	Texture* Texture::get_texture(const std::string& name)
+	void Texture::remove(const std::string& name)
 	{
-		auto texture = std::find_if(textures.begin(), textures.end(), [&](Texture& i) -> bool { return i.name == name; });
-
-		if (texture == textures.end())
-			return NULL;
-
-		return &(*texture);
+		if (!textures.erase(name))
+			throw std::invalid_argument("This name does not exit");
 	}
 
-	GLuint Texture::get_id(const std::string& name)
+	Texture Texture::get(const std::string& name)
 	{
-		Texture* texture = get_texture(name);
+		try
+		{
+			return textures.at(name);
+		}
 
-		if (texture == NULL)
-			return 0;
-
-		return texture->get_id();
-	}
-
-	void Texture::clear()
-	{
-		textures.clear();
+		catch (const std::out_of_range& e)
+		{
+			throw std::invalid_argument("This name does not exit");
+		}
 	}
 }

@@ -1,24 +1,19 @@
-#include "dim/dimension3D.h"
+#include "dim/dimension3D.hpp"
 
 namespace dim
 {
-	Material Material::default_material = Material(sf::Color(1.f, 1.f, 1.f, 1.f), 0.4f, 0.6f, 0.4f, 50.f);
+	Material Material::default_material = Material(Color(1.f, 1.f, 1.f, 1.f), 0.4f, 0.6f, 0.4f, 50.f);
 
 	Material::Material()
 	{
-		color = sf::Color(0.f, 0.f, 0.f, 0.f);
+		color = Color(0.f, 0.f, 0.f, 0.f);
 		ambient = 0.f;
 		diffuse = 0.f;
 		specular = 0.f;
 		shininess = 1.f;
 	}
 
-	Material::Material(const Material& other)
-	{
-		*this = other;
-	}
-
-	Material::Material(const sf::Color& color, float ambient, float diffuse, float specular, float shininess)
+	Material::Material(const Color& color, float ambient, float diffuse, float specular, float shininess)
 	{
 		this->color = color;
 		this->ambient = ambient;
@@ -27,21 +22,12 @@ namespace dim
 		this->shininess = shininess;
 	}
 
-	void Material::operator=(const Material& other)
-	{
-		color = other.color;
-		ambient = other.ambient;
-		diffuse = other.diffuse;
-		specular = other.specular;
-		shininess = other.shininess;
-	}
-
-	sf::Color Material::get_color() const
+	Color Material::get_color() const
 	{
 		return color;
 	}
 
-	void Material::set_color(const sf::Color& color)
+	void Material::set_color(const Color& color)
 	{
 		this->color = color;
 	}

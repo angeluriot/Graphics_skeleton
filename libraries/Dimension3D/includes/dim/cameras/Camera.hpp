@@ -1,13 +1,14 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "dim/utils/libraries.h"
-#include "dim/utils/utils.h"
-#include "dim/windows/Window.h"
-#include "dim/windows/Scene.h"
+#include "dim/utils/libraries.hpp"
+#include "dim/utils/utils.hpp"
+#include "dim/windows/Window.hpp"
 
 namespace dim
 {
+	class Scene;
+
 	class Camera
 	{
 	public:
@@ -16,7 +17,6 @@ namespace dim
 
 	private:
 
-		Scene*				scene;
 		Mode				mode;
 		Vector3				position;
 		float				sensitivity;
@@ -45,7 +45,7 @@ namespace dim
 		void				move();
 		void				look();
 		void				free_move();
-		void				rotation_move();
+		void				rotation_move(const Scene& scene);
 
 	public:
 
@@ -63,12 +63,12 @@ namespace dim
 		static Camera null;
 
 					Camera(const Camera& other) = default;
-					Camera(Scene& scene = Scene::window, Mode mode = Mode::Rotation, float sensitivity = default_sensitivity, float fov = default_fov, float near = default_near, float far = default_far);
+					Camera(Mode mode = Mode::Rotation, float sensitivity = default_sensitivity, float fov = default_fov, float near = default_near, float far = default_far);
 
 		Camera&		operator=(const Camera& other) = default;
 
-		void		check_events(const sf::Event& sf_event);
-		void		update();
+		void		check_events(const sf::Event& sf_event, const Scene& scene);
+		void		update(const Scene& scene);
 		glm::mat4	get_matrix() const;
 		Mode		get_mode() const;
 		void		set_mode(Mode mode);

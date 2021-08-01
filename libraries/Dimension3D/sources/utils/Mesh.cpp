@@ -1,324 +1,166 @@
-#include "dim/dimension3D.h"
+#include "dim/dimension3D.hpp"
 
 namespace dim
 {
-	const Mesh	Mesh::screen		= Mesh::Screen();
 	const Mesh	Mesh::circle_64		= Mesh::Circle(64);
 	const Mesh	Mesh::cone_64		= Mesh::Cone(64);
 	const Mesh	Mesh::cube			= Mesh::Cube();
+	const Mesh	Mesh::empty_cube	= Mesh::EmptyCube();
 	const Mesh	Mesh::cylinder_64	= Mesh::Cylinder(64);
 	const Mesh	Mesh::null			= Mesh();
 	const Mesh	Mesh::sphere_64		= Mesh::Sphere(64, 64);
 	const Mesh	Mesh::square		= Mesh::Square();
-
-	Mesh::Vertex::Vertex()
-	{
-		name.clear();
-		vertices.clear();
-		nb_dimensions = 0;
-	}
-
-	Mesh::Vertex::Vertex(const Vertex& other)
-	{
-		*this = other;
-	}
-
-	Mesh::Vertex::Vertex(const std::string& name, const std::vector<float>& vertices, uint16_t nb_dimensions)
-	{
-		this->name = name;
-		this->vertices = vertices;
-		this->nb_dimensions = nb_dimensions;
-	}
-
-	Mesh::Vertex::Vertex(const std::string& name, const std::vector<Vector2>& vertices)
-	{
-		this->name = name;
-		nb_dimensions = 2;
-
-		for (auto& vertex : vertices)
-		{
-			this->vertices.push_back(vertex.x);
-			this->vertices.push_back(vertex.y);
-		}
-	}
-
-	Mesh::Vertex::Vertex(const std::string& name, const std::vector<Vector3>& vertices)
-	{
-		this->name = name;
-		nb_dimensions = 3;
-
-		for (auto& vertex : vertices)
-		{
-			this->vertices.push_back(vertex.x);
-			this->vertices.push_back(vertex.y);
-			this->vertices.push_back(vertex.z);
-		}
-	}
-
-	Mesh::Vertex::Vertex(const std::string& name, const std::vector<Vector4>& vertices)
-	{
-		this->name = name;
-		nb_dimensions = 4;
-
-		for (auto& vertex : vertices)
-		{
-			this->vertices.push_back(vertex.x);
-			this->vertices.push_back(vertex.y);
-			this->vertices.push_back(vertex.z);
-			this->vertices.push_back(vertex.w);
-		}
-	}
-
-	Mesh::Vertex& Mesh::Vertex::operator=(const Vertex& other)
-	{
-		name = other.name;
-		vertices = other.vertices;
-		nb_dimensions = other.nb_dimensions;
-
-		return *this;
-	}
-
-	Mesh Mesh::Screen()
-	{
-		std::vector<float> positions;
-		std::vector<float> uvs;
-
-		positions =
-		{
-			-1.f, -1.f,  0.f,
-			 1.f,  1.f,  0.f,
-			 1.f, -1.f,  0.f,
-			-1.f, -1.f,  0.f,
-			-1.f,  1.f,  0.f,
-			 1.f,  1.f,  0.f
-		};
-
-		uvs =
-		{
-			0.f, 0.f,
-			1.f, 1.f,
-			1.f, 0.f,
-			0.f, 0.f,
-			0.f, 1.f,
-			1.f, 1.f
-		};
-
-		Mesh mesh;
-		mesh.set_positions(positions);
-		mesh.set_uvs(uvs);
-		return mesh;
-	}
+	const Mesh	Mesh::screen		= Mesh::Screen();
 
 	Mesh::Mesh()
 	{
-		vertex_array.clear();
+		positions.clear();
+		normals.clear();
+		texcoords.clear();
 	}
 
-	Mesh::Mesh(const Mesh& other)
+	Mesh& Mesh::operator+=(const Mesh& other)
 	{
-		*this = other;
-	}
+		for (auto& position : other.positions)
+			positions.push_back(position);
 
-	Mesh& Mesh::operator=(const Mesh& other)
-	{
-		vertex_array = other.vertex_array;
+		for (auto& normal : other.normals)
+			normals.push_back(normal);
+
+		for (auto& texcoord : other.texcoords)
+			texcoords.push_back(texcoord);
 
 		return *this;
 	}
 
-	void Mesh::set_vertices(const std::string& name, const std::vector<float>& vertices, uint16_t nb_dimensions)
+	Mesh Mesh::operator+(const Mesh& other)
 	{
-		auto vertex = std::find_if(vertex_array.begin(), vertex_array.end(), [&](Vertex& i) -> bool { return i.name == name; });
+		Mesh mesh;
 
-		if (vertex == vertex_array.end())
-			vertex_array.emplace_back(name, vertices, nb_dimensions);
+		for (auto& position : positions)
+			mesh.positions.push_back(position);
 
-		else
-		{
-			vertex->name = name;
-			vertex->vertices = vertices;
-			vertex->nb_dimensions = nb_dimensions;
-		}
+		for (auto& normal : normals)
+			mesh.normals.push_back(normal);
+
+		for (auto& texcoord : texcoords)
+			mesh.texcoords.push_back(texcoord);
+
+		for (auto& position : other.positions)
+			mesh.positions.push_back(position);
+
+		for (auto& normal : other.normals)
+			mesh.normals.push_back(normal);
+
+		for (auto& texcoord : other.texcoords)
+			mesh.texcoords.push_back(texcoord);
+
+		return mesh;
 	}
 
-	void Mesh::set_vertices(const std::string& name, const std::vector<Vector2>& vertices)
+	unsigned int Mesh::get_data_size() const
 	{
-		auto vertex = std::find_if(vertex_array.begin(), vertex_array.end(), [&](Vertex& i) -> bool { return i.name == name; });
-
-		if (vertex == vertex_array.end())
-			vertex_array.emplace_back(name, vertices);
-
-		else
-		{
-			vertex->name = name;
-			vertex->vertices.clear();
-			vertex->nb_dimensions = 2;
-
-			for (auto& v : vertices)
-			{
-				vertex->vertices.push_back(v.x);
-				vertex->vertices.push_back(v.y);
-			}
-		}
+		return positions.size() * sizeof(Vector3) + normals.size() * sizeof(Vector3) + texcoords.size() * sizeof(Vector2);
 	}
 
-	void Mesh::set_vertices(const std::string& name, const std::vector<Vector3>& vertices)
+	unsigned int Mesh::get_positions_size() const
 	{
-		auto vertex = std::find_if(vertex_array.begin(), vertex_array.end(), [&](Vertex& i) -> bool { return i.name == name; });
-
-		if (vertex == vertex_array.end())
-			vertex_array.emplace_back(name, vertices);
-
-		else
-		{
-			vertex->name = name;
-			vertex->vertices.clear();
-			vertex->nb_dimensions = 3;
-
-			for (auto& v : vertices)
-			{
-				vertex->vertices.push_back(v.x);
-				vertex->vertices.push_back(v.y);
-				vertex->vertices.push_back(v.z);
-			}
-		}
+		return positions.size() * sizeof(Vector3);
 	}
 
-	void Mesh::set_vertices(const std::string& name, const std::vector<Vector4>& vertices)
+	unsigned int Mesh::get_normals_size() const
 	{
-		auto vertex = std::find_if(vertex_array.begin(), vertex_array.end(), [&](Vertex& i) -> bool { return i.name == name; });
-
-		if (vertex == vertex_array.end())
-			vertex_array.emplace_back(name, vertices);
-
-		else
-		{
-			vertex->name = name;
-			vertex->vertices.clear();
-			vertex->nb_dimensions = 4;
-
-			for (auto& v : vertices)
-			{
-				vertex->vertices.push_back(v.x);
-				vertex->vertices.push_back(v.y);
-				vertex->vertices.push_back(v.z);
-				vertex->vertices.push_back(v.w);
-			}
-		}
+		return normals.size() * sizeof(Vector3);
 	}
 
-	void Mesh::set_positions(const std::vector<float>& positions)
+	unsigned int Mesh::get_texcoords_size() const
 	{
-		set_vertices("positions", positions, 3);
+		return texcoords.size() * sizeof(Vector2);
 	}
 
-	void Mesh::set_positions(const std::vector<Vector3>& positions)
+	unsigned int Mesh::get_nb_vertices() const
 	{
-		set_vertices("positions", positions);
+		return positions.size();
 	}
 
-	void Mesh::set_normals(const std::vector<float>& normals)
+	void Mesh::clear()
 	{
-		set_vertices("normals", normals, 3);
+		positions.clear();
+		normals.clear();
+		texcoords.clear();
 	}
 
-	void Mesh::set_normals(const std::vector<Vector3>& normals)
-	{
-		set_vertices("normals", normals);
-	}
-
-	void Mesh::set_uvs(const std::vector<float>& uvs)
-	{
-		set_vertices("uvs", uvs, 2);
-	}
-
-	void Mesh::set_uvs(const std::vector<Vector2>& uvs)
-	{
-		set_vertices("uvs", uvs);
-	}
-
-	uint32_t Mesh::get_data_size() const
-	{
-		uint32_t data_size = 0;
-
-		for (auto& vertex : vertex_array)
-			data_size += vertex.vertices.size();
-
-		return data_size;
-	}
-
-	uint32_t Mesh::get_nb_vertices() const
-	{
-		if (vertex_array.size() == 0)
-			return 0;
-
-		return (float)vertex_array.front().vertices.size() / (float)vertex_array.front().nb_dimensions;
-	}
-
-	Mesh Mesh::Circle(uint32_t nb_edges)
+	Mesh Mesh::Circle(unsigned int nb_edges)
 	{
 		std::vector<float> positions;
 		std::vector<float> normals;
-		std::vector<float> uvs;
+		std::vector<float> texcoords;
 
 		positions.resize(9 * nb_edges, 0.f);
 		normals.resize(9 * nb_edges, 0.f);
-		uvs.resize(6 * nb_edges, 0.f);
+		texcoords.resize(6 * nb_edges, 0.f);
 
-		for (uint32_t i = 0; i < nb_edges; i++)
+		for (uint16_t i = 0; i < nb_edges; i++)
 		{
 			float pos[] =
 			{
-				(float)cos(i * 2.f * PI / nb_edges), (float)sin(i * 2.f * PI / nb_edges), 0.f,
+				(float)cos(i * 2.f * pi / nb_edges), (float)sin(i * 2.f * pi / nb_edges), 0.f,
 				0.f, 0.f, 0.f,
-				(float)cos((i + 1) * 2.f * PI / nb_edges), (float)sin((i + 1) * 2.f * PI / nb_edges), 0.f
+				(float)cos((i + 1) * 2.f * pi / nb_edges), (float)sin((i + 1) * 2.f * pi / nb_edges), 0.f
 			};
 
-			for (uint32_t j = 0; j < 9; j++)
+			for (uint16_t j = 0; j < 9; j++)
 				positions[9 * i + j] = 0.5f * pos[j];
 
-			for (uint32_t j = 0; j < 3; j++)
-				for (uint32_t k = 0; k < 2; k++)
-					uvs[6 * i + 2 * j + k] = positions[9 * i + 3 * j + k] + 0.5f;
+			for (uint16_t j = 0; j < 3; j++)
+				for (uint16_t k = 0; k < 2; k++)
+					texcoords[6 * i + 2 * j + k] = positions[9 * i + 3 * j + k] + 0.5f;
 
-			for (uint32_t j = 0; j < 3; j++)
+			for (uint16_t j = 0; j < 3; j++)
 			{
 				float normal[] = { 0.f, 0.f, 1.f };
 
-				for (uint32_t k = 0; k < 3; k++)
+				for (uint16_t k = 0; k < 3; k++)
 					normals[9 * i + 3 * j + k] = normal[k];
 			}
 		}
 
 		Mesh mesh;
-		mesh.set_positions(positions);
-		mesh.set_normals(normals);
-		mesh.set_uvs(uvs);
+
+		for (int i = 0; i < positions.size(); i += 3)
+		{
+			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
+			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+		}
+
+		for (int i = 0; i < texcoords.size(); i += 2)
+			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+
 		return mesh;
 	}
 
-	Mesh Mesh::Cone(uint32_t nb_lattitudes)
+	Mesh Mesh::Cone(unsigned int nb_lattitudes)
 	{
 		std::vector<float> positions;
 		std::vector<float> normals;
-		std::vector<float> uvs;
+		std::vector<float> texcoords;
 
 		float radius = 0.5f;
 		positions.resize(3 * 6 * nb_lattitudes, 0.f);
 		normals.resize(3 * 6 * nb_lattitudes, 0.f);
-		uvs.resize(2 * 6 * nb_lattitudes, 0.f);
+		texcoords.resize(2 * 6 * nb_lattitudes, 0.f);
 
-		for (uint32_t i = 0; i < nb_lattitudes; i++)
+		for (uint16_t i = 0; i < nb_lattitudes; i++)
 		{
 			double pos[] =
 			{
-				radius * cos(i * 2.f * PI / nb_lattitudes), radius * sin(i * 2.f * PI / nb_lattitudes), -1.f / 2.f,
-				radius * cos((i + 1) * 2.f * PI / nb_lattitudes), radius * sin((i + 1) * 2.f * PI / nb_lattitudes), -1.f / 2.f,
-				cos((i + 1) * 2.f * PI / nb_lattitudes), sin((i + 1) * 2.f * PI / nb_lattitudes), 1.f / 2.f,
+				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
+				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2.f * pi / nb_lattitudes), -1.f / 2.f,
+				cos((i + 1) * 2.f * pi / nb_lattitudes), sin((i + 1) * 2.f * pi / nb_lattitudes), 1.f / 2.f,
 
-				radius * cos(i * 2.f * PI / nb_lattitudes), radius * sin(i * 2.f * PI / nb_lattitudes), -1.f / 2.f,
-				cos((i + 1) * 2.f * PI / nb_lattitudes), sin((i + 1) * 2 * PI / nb_lattitudes), 1.f / 2.f,
-				cos(i * 2.f * PI / nb_lattitudes), sin(i * 2.f * PI / nb_lattitudes), 1.f / 2.f
+				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
+				cos((i + 1) * 2.f * pi / nb_lattitudes), sin((i + 1) * 2 * pi / nb_lattitudes), 1.f / 2.f,
+				cos(i * 2.f * pi / nb_lattitudes), sin(i * 2.f * pi / nb_lattitudes), 1.f / 2.f
 			};
 
 			double uvPos[] =
@@ -332,17 +174,17 @@ namespace dim
 				i / (double)nb_lattitudes, 1.f
 			};
 
-			for (uint32_t j = 0; j < 18; j++)
+			for (uint16_t j = 0; j < 18; j++)
 				positions[18 * i + j] = pos[j];
 
-			for (uint32_t j = 0; j < 12; j++)
-				uvs[12 * i + j] = uvPos[j];
+			for (uint16_t j = 0; j < 12; j++)
+				texcoords[12 * i + j] = uvPos[j];
 
-			float angle = PI / 4.f;
-			glm::vec3 normalI = glm::rotate(glm::mat4(1.f), (float)(i * 2.f * PI / nb_lattitudes), glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(cos(angle), 0.f, sin(angle), 1.f);
-			glm::vec3 normalI2 = glm::rotate(glm::mat4(1.f), (float)((i + 1.f) * 2.f * PI / nb_lattitudes), glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(cos(angle), 0.f, sin(angle), 1.f);
+			float angle = pi / 4.f;
+			glm::vec3 normalI = glm::rotate(glm::mat4(1.f), (float)(i * 2.f * pi / nb_lattitudes), glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(cos(angle), 0.f, sin(angle), 1.f);
+			glm::vec3 normalI2 = glm::rotate(glm::mat4(1.f), (float)((i + 1.f) * 2.f * pi / nb_lattitudes), glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(cos(angle), 0.f, sin(angle), 1.f);
 
-			for (uint32_t j = 0; j < 3; j++)
+			for (uint16_t j = 0; j < 3; j++)
 			{
 				normals[18 * i + 0 + j] = normalI[j];
 				normals[18 * i + 3 + j] = normalI2[j];
@@ -354,9 +196,16 @@ namespace dim
 		}
 
 		Mesh mesh;
-		mesh.set_positions(positions);
-		mesh.set_normals(normals);
-		mesh.set_uvs(uvs);
+
+		for (int i = 0; i < positions.size(); i += 3)
+		{
+			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
+			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+		}
+
+		for (int i = 0; i < texcoords.size(); i += 2)
+			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+
 		return mesh;
 	}
 
@@ -364,57 +213,57 @@ namespace dim
 	{
 		std::vector<float> positions;
 		std::vector<float> normals;
-		std::vector<float> uvs;
+		std::vector<float> texcoords;
 
 		positions =
 		{
 			//Back
-			-0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
 			-0.5f,  0.5f, -0.5f,
-
-			//Front
-			-0.5f, -0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
-			 0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
-
-			 //Left
-			-0.5f, -0.5f,  0.5f,
+			0.5f,  0.5f, -0.5f,
 			-0.5f, -0.5f, -0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f,  0.5f,  0.5f,
-
-			//Right
-			0.5f, -0.5f,  0.5f,
 			0.5f,  0.5f, -0.5f,
 			0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+
+			//Front
+			0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,
 			0.5f, -0.5f,  0.5f,
 			0.5f,  0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,
+
+			//Left
+			-0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f, -0.5f,
+			-0.5f, -0.5f,  0.5f,
+			-0.5f,  0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f,  0.5f,
+
+			//Right
 			0.5f,  0.5f, -0.5f,
+			0.5f,  0.5f,  0.5f,
+			0.5f, -0.5f,  0.5f,
+			0.5f, -0.5f, -0.5f,
+			0.5f,  0.5f, -0.5f,
+			0.5f, -0.5f,  0.5f,
 
 			//Top
 			0.5f,  0.5f, -0.5f,
-		   -0.5f,  0.5f, -0.5f,
-		   -0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f, -0.5f,
+			-0.5f,  0.5f,  0.5f,
 			0.5f,  0.5f, -0.5f,
-		   -0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
 			0.5f,  0.5f,  0.5f,
 
 			//Bottom
-		   0.5f, -0.5f, -0.5f,
-		  -0.5f, -0.5f,  0.5f,
-		  -0.5f, -0.5f, -0.5f,
-		   0.5f, -0.5f, -0.5f,
-		   0.5f, -0.5f,  0.5f,
-		  -0.5f, -0.5f,  0.5f
+			0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f,  0.5f,
+			-0.5f, -0.5f, -0.5f,
+			0.5f, -0.5f, -0.5f,
+			0.5f, -0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f
 		};
 
 		normals =
@@ -468,39 +317,39 @@ namespace dim
 			0.f, -1.f, 0.f
 		};
 
-		uvs =
+		texcoords =
 		{
 			//Back
-			1.f, 1.f,
-			0.f, 1.f,
-			0.f, 0.f,
-			1.f, 1.f,
-			0.f, 0.f,
 			1.f, 0.f,
+			0.f, 0.f,
+			1.f, 1.f,
+			0.f, 0.f,
+			0.f, 1.f,
+			1.f, 1.f,
 
 			//Front
-			0.f, 1.f,
 			1.f, 0.f,
-			1.f, 1.f,
-			0.f, 1.f,
 			0.f, 0.f,
+			0.f, 1.f,
+			1.f, 1.f,
 			1.f, 0.f,
+			0.f, 1.f,
 
 			//Left
-			1.f, 1.f,
-			0.f, 1.f,
-			0.f, 0.f,
-			1.f, 1.f,
-			0.f, 0.f,
 			1.f, 0.f,
+			0.f, 0.f,
+			1.f, 1.f,
+			0.f, 0.f,
+			0.f, 1.f,
+			1.f, 1.f,
 
 			//Right
-			0.f, 1.f,
 			1.f, 0.f,
-			1.f, 1.f,
-			0.f, 1.f,
 			0.f, 0.f,
+			0.f, 1.f,
+			1.f, 1.f,
 			1.f, 0.f,
+			0.f, 1.f,
 
 			//Top
 			1.f, 0.f,
@@ -520,35 +369,167 @@ namespace dim
 		};
 
 		Mesh mesh;
-		mesh.set_positions(positions);
-		mesh.set_normals(normals);
-		mesh.set_uvs(uvs);
+
+		for (int i = 0; i < positions.size(); i += 3)
+		{
+			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
+			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+		}
+
+		for (int i = 0; i < texcoords.size(); i += 2)
+			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+
 		return mesh;
 	}
 
-	Mesh Mesh::Cylinder(uint32_t nb_lattitudes)
+	Mesh Mesh::EmptyCube()
 	{
 		std::vector<float> positions;
 		std::vector<float> normals;
-		std::vector<float> uvs;
+		std::vector<float> texcoords;
+
+		positions =
+		{
+			//Back
+			0.5f, -0.5f, -0.5f,
+			0.5f,  0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,
+			-0.5f,  0.5f, -0.5f,
+
+			//Front
+			0.5f, -0.5f,  0.5f,
+			0.5f,  0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+
+			//Top
+			-0.5f,  0.5f, -0.5f,
+			-0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f, -0.5f,
+			0.5f,  0.5f, -0.5f,
+			0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f,
+			0.5f,  0.5f,  0.5f,
+			0.5f,  0.5f, -0.5f,
+
+			//Bottom
+			-0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f,  0.5f,
+			-0.5f, -0.5f, -0.5f,
+			0.5f, -0.5f, -0.5f,
+			0.5f, -0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,
+			0.5f, -0.5f,  0.5f,
+			0.5f, -0.5f, -0.5f
+		};
+
+		normals =
+		{
+			//Back
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+
+			//Front
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+
+			//Top
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+
+			//Bottom
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f,
+			1.f, 0.f, 0.f
+		};
+
+		texcoords =
+		{
+			//Back
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+
+			//Front
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+
+			//Top
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+
+			//Bottom
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f,
+			0.f, 0.f
+		};
+
+		Mesh mesh;
+
+		for (int i = 0; i < positions.size(); i += 3)
+		{
+			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
+			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+		}
+
+		for (int i = 0; i < texcoords.size(); i += 2)
+			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+
+		return mesh;
+	}
+
+	Mesh Mesh::Cylinder(unsigned int nb_lattitudes)
+	{
+		std::vector<float> positions;
+		std::vector<float> normals;
+		std::vector<float> texcoords;
 
 		float radius = 0.5f;
 
 		positions.resize(3 * 6 * nb_lattitudes, 0.f);
 		normals.resize(3 * 6 * nb_lattitudes, 0.f);
-		uvs.resize(2 * 6 * nb_lattitudes, 0.f);
+		texcoords.resize(2 * 6 * nb_lattitudes, 0.f);
 
-		for (uint32_t i = 0; i < nb_lattitudes; i++)
+		for (uint16_t i = 0; i < nb_lattitudes; i++)
 		{
 			double pos[] =
 			{
-				radius * cos(i * 2.f * PI / nb_lattitudes), radius * sin(i * 2.f * PI / nb_lattitudes), -1.f / 2.f,
-				radius * cos((i + 1) * 2.f * PI / nb_lattitudes), radius * sin((i + 1) * 2 * PI / nb_lattitudes), -1.f / 2.f,
-				radius * cos((i + 1) * 2.f * PI / nb_lattitudes), radius * sin((i + 1) * 2 * PI / nb_lattitudes), 1.f / 2.f,
+				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
+				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2 * pi / nb_lattitudes), -1.f / 2.f,
+				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2 * pi / nb_lattitudes), 1.f / 2.f,
 
-				radius * cos(i * 2.f * PI / nb_lattitudes), radius * sin(i * 2.f * PI / nb_lattitudes), -1.f / 2.f,
-				radius * cos((i + 1) * 2.f * PI / nb_lattitudes), radius * sin((i + 1) * 2.f * PI / nb_lattitudes), 1.f / 2.f,
-				radius * cos(i * 2.f * PI / nb_lattitudes), radius * sin(i * 2.f * PI / nb_lattitudes), 1.f / 2.f
+				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
+				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2.f * pi / nb_lattitudes), 1.f / 2.f,
+				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), 1.f / 2.f
 			};
 
 			double uvPos[] =
@@ -562,15 +543,15 @@ namespace dim
 				i / (double)nb_lattitudes, 1.f
 			};
 
-			for (uint32_t j = 0; j < 18; j++)
+			for (uint16_t j = 0; j < 18; j++)
 				positions[18 * i + j] = pos[j];
 
-			for (uint32_t j = 0; j < 12; j++)
-				uvs[12 * i + j] = uvPos[j];
+			for (uint16_t j = 0; j < 12; j++)
+				texcoords[12 * i + j] = uvPos[j];
 
-			for (uint32_t j = 0; j < 6; j++)
+			for (uint16_t j = 0; j < 6; j++)
 			{
-				for (uint32_t k = 0; k < 2; k++)
+				for (uint16_t k = 0; k < 2; k++)
 					normals[18 * i + 3 * j + k] = pos[3 * j + k];
 
 				normals[18 * i + 3 * j + 2] = 0.f;
@@ -578,17 +559,24 @@ namespace dim
 		}
 
 		Mesh mesh;
-		mesh.set_positions(positions);
-		mesh.set_normals(normals);
-		mesh.set_uvs(uvs);
+
+		for (int i = 0; i < positions.size(); i += 3)
+		{
+			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
+			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+		}
+
+		for (int i = 0; i < texcoords.size(); i += 2)
+			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+
 		return mesh;
 	}
 
-	Mesh Mesh::Sphere(uint32_t nb_latitudes, uint32_t nb_longitudes)
+	Mesh Mesh::Sphere(unsigned int nb_latitudes, unsigned int nb_longitudes)
 	{
 		std::vector<float> positions;
 		std::vector<float> normals;
-		std::vector<float> uvs;
+		std::vector<float> texcoords;
 
 		float radius = 0.5f;
 
@@ -596,65 +584,72 @@ namespace dim
 		glm::vec3* vertexCoord = (glm::vec3*)malloc(nb_longitudes * nb_latitudes * sizeof(glm::vec3));
 		glm::vec2* uvCoord = (glm::vec2*)malloc(nb_longitudes * nb_latitudes * sizeof(glm::vec2));
 
-		for (unsigned int i = 0; i < nb_longitudes; i++)
+		for (uint16_t i = 0; i < nb_longitudes; i++)
 		{
-			double theta = 2.f * PI / (nb_longitudes - 1) * i;
+			double theta = 2.f * pi / (nb_longitudes - 1) * i;
 
-			for (unsigned int j = 0; j < nb_latitudes; j++)
+			for (uint16_t j = 0; j < nb_latitudes; j++)
 			{
-				double phi = PI / (nb_latitudes - 1) * j;
+				double phi = pi / (nb_latitudes - 1) * j;
 				double pos[] = { sin(phi) * sin(theta), cos(phi), cos(theta) * sin(phi) };
 				double uvs[] = { i / (double)(nb_longitudes), j / (double)(nb_latitudes) };
 
-				for (unsigned int k = 0; k < 3; k++)
+				for (uint16_t k = 0; k < 3; k++)
 					vertexCoord[i * nb_latitudes + j][k] = radius * pos[k];
 
-				for (unsigned int k = 0; k < 2; k++)
+				for (uint16_t k = 0; k < 2; k++)
 					uvCoord[i * nb_latitudes + j][k] = uvs[k];
 			}
 		}
 
 		// Determine draw orders
-		unsigned int* order = (unsigned int*)malloc(nb_longitudes * (nb_latitudes - 1) * sizeof(unsigned int) * 6);
+		uint16_t* order = (uint16_t*)malloc(nb_longitudes * (nb_latitudes - 1) * sizeof(uint16_t) * 6);
 
-		for (unsigned int i = 0; i < nb_longitudes; i++)
+		for (uint16_t i = 0; i < nb_longitudes; i++)
 		{
-			for (unsigned int j = 0; j < nb_latitudes - 1; j++)
+			for (uint16_t j = 0; j < nb_latitudes - 1; j++)
 			{
-				unsigned int o[] =
+				uint16_t o[] =
 				{
 					i * nb_latitudes + j, (i + 1) * (nb_latitudes) % (nb_latitudes * nb_longitudes) + (j + 1) % nb_latitudes, (i + 1) * (nb_latitudes) % (nb_latitudes * nb_longitudes) + j,
 					i * nb_latitudes + j, i * (nb_latitudes)+(j + 1) % nb_latitudes, (i + 1) * (nb_latitudes) % (nb_latitudes * nb_longitudes) + (j + 1) % nb_latitudes
 				};
 
-				for (unsigned int k = 0; k < 6; k++)
+				for (uint16_t k = 0; k < 6; k++)
 					order[(nb_latitudes - 1) * i * 6 + j * 6 + k] = o[k];
 			}
 		}
 
 		// Merge everything
-		positions.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 3, 0.);
-		normals.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 3, 0.);
-		uvs.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 2, 0.);
+		positions.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 3, 0.f);
+		normals.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 3, 0.f);
+		texcoords.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 2, 0.f);
 
-		for (uint32_t i = 0; i < nb_latitudes * (nb_longitudes - 1) * 6; i++)
+		for (uint16_t i = 0; i < nb_latitudes * (nb_longitudes - 1) * 6; i++)
 		{
-			uint32_t indice = order[i];
+			uint16_t indice = order[i];
 
-			for (uint32_t j = 0; j < 3; j++)
+			for (uint16_t j = 0; j < 3; j++)
 			{
 				positions[3 * i + j] = vertexCoord[indice][j];
 				normals[3 * i + j] = glm::normalize(vertexCoord[indice])[j];
 			}
 
-			for (uint32_t j = 0; j < 2; j++)
-				uvs[2 * i + j] = uvCoord[indice][j];
+			for (uint16_t j = 0; j < 2; j++)
+				texcoords[2 * i + j] = uvCoord[indice][j];
 		}
 
 		Mesh mesh;
-		mesh.set_positions(positions);
-		mesh.set_normals(normals);
-		mesh.set_uvs(uvs);
+
+		for (int i = 0; i < positions.size(); i += 3)
+		{
+			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
+			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+		}
+
+		for (int i = 0; i < texcoords.size(); i += 2)
+			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+
 		return mesh;
 	}
 
@@ -662,16 +657,16 @@ namespace dim
 	{
 		std::vector<float> positions;
 		std::vector<float> normals;
-		std::vector<float> uvs;
+		std::vector<float> texcoords;
 
 		positions =
 		{
-			-0.5f, -0.5f,  0.f,
-			 0.5f,  0.5f,  0.f,
-			 0.5f, -0.5f,  0.f,
-			-0.5f, -0.5f,  0.f,
+			0.5f,  0.5f,  0.f,
 			-0.5f,  0.5f,  0.f,
-			 0.5f,  0.5f,  0.f
+			-0.5f, -0.5f,  0.f,
+			0.5f, -0.5f,  0.f,
+			0.5f,  0.5f,  0.f,
+			-0.5f, -0.5f,  0.f
 		};
 
 		normals =
@@ -684,20 +679,94 @@ namespace dim
 			0.f, 0.f, 1.f
 		};
 
-		uvs =
+		texcoords =
 		{
-			0.f, 1.f,
 			1.f, 0.f,
-			1.f, 1.f,
-			0.f, 1.f,
 			0.f, 0.f,
-			1.f, 0.f
+			0.f, 1.f,
+			1.f, 1.f,
+			1.f, 0.f,
+			0.f, 1.f
 		};
 
 		Mesh mesh;
-		mesh.set_positions(positions);
-		mesh.set_normals(normals);
-		mesh.set_uvs(uvs);
+
+		for (int i = 0; i < positions.size(); i += 3)
+		{
+			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
+			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+		}
+
+		for (int i = 0; i < texcoords.size(); i += 2)
+			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+
 		return mesh;
+	}
+
+	Mesh Mesh::Screen()
+	{
+		std::vector<float> positions;
+		std::vector<float> normals;
+		std::vector<float> texcoords;
+
+		positions =
+		{
+			1.f,  1.f,  0.f,
+			-1.f,  1.f,  0.f,
+			-1.f, -1.f,  0.f,
+			1.f, -1.f,  0.f,
+			1.f,  1.f,  0.f,
+			-1.f, -1.f,  0.f
+		};
+
+		normals =
+		{
+			0.f, 0.f, -1.f,
+			0.f, 0.f, -1.f,
+			0.f, 0.f, -1.f,
+			0.f, 0.f, -1.f,
+			0.f, 0.f, -1.f,
+			0.f, 0.f, -1.f
+		};
+
+		texcoords =
+		{
+			1.f, 1.f,
+			0.f, 1.f,
+			0.f, 0.f,
+			1.f, 0.f,
+			1.f, 1.f,
+			0.f, 0.f
+		};
+
+		Mesh mesh;
+
+		for (int i = 0; i < positions.size(); i += 3)
+		{
+			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
+			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+		}
+
+		for (int i = 0; i < texcoords.size(); i += 2)
+			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+
+		return mesh;
+	}
+
+	Mesh operator*(const glm::mat4& matrix, const Mesh& mesh)
+	{
+		Mesh result;
+
+		for (auto& position : mesh.positions)
+			result.positions.push_back(Vector3(matrix * position));
+
+		glm::mat3 normals_matrix = glm::transpose(glm::inverse(glm::mat3(matrix)));
+
+		for (auto& normal : mesh.normals)
+			result.normals.push_back(normalized(Vector3(normals_matrix * normal)));
+
+		result.texcoords = mesh.texcoords;
+
+		return result;
 	}
 }
