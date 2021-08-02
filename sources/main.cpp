@@ -14,12 +14,16 @@ int main()
 	dim::Scene scene_1("My_scene_1");
 	dim::Scene scene_2("My_scene_2");
 
+	scene_1.set_controller(dim::DragController());
+	scene_2.set_controller(dim::DragController());
+
+	scene_1.camera.set_direction(dim::Vector3(0.f, -1.f, -1.f));
+
 	dim::Light light_1(dim::Light::Type::Directional, sf::Color(255, 50, 50), 1., dim::Vector3(-1.f, -1.f, -1.f).get_normalized());
 	dim::Light light_2(dim::Light::Type::Directional, sf::Color(50, 50, 255), 1., dim::Vector3(1.f, 1.f, -1.f).get_normalized());
 
 	scene_1.lights = { light_1, light_2 };
 	scene_2.lights = { light_1, light_2 };
-	scene_2.set_shader(dim::Shader::get("default"));
 
 	dim::Object object_1(dim::Mesh::cube, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
 	object_1.set_texture("texture_3");
@@ -49,7 +53,7 @@ int main()
 		while (dim::Window::get_window().pollEvent(sf_event))
 		{
 			dim::Window::check_events(sf_event);
-			//scene_1.check_events(sf_event);
+			scene_1.check_events(sf_event);
 			scene_2.check_events(sf_event);
 		}
 
@@ -57,29 +61,37 @@ int main()
 
 		// Dimension3D
 
-		scene_2.bind();
-
-		//scene_1.clear();
+		scene_1.clear();
 		scene_2.clear();
 
-		//scene_1.update();
+		scene_1.update();
 		scene_2.update();
 
-		sf::RectangleShape test;
-		test.setPosition(50, 50);
-		test.setSize(sf::Vector2f(200, 200));
-		test.setFillColor(sf::Color::Blue);
+		sf::RectangleShape test_1;
+		test_1.setPosition(0, 0);
+		test_1.setSize(sf::Vector2f(200, 200));
+		test_1.setFillColor(sf::Color::Blue);
 
-		//scene_1.draw(object_1, type);
+		sf::RectangleShape test_2;
+		test_2.setPosition(400, 400);
+		test_2.setSize(sf::Vector2f(200, 200));
+		test_2.setFillColor(sf::Color::Red);
+
+		sf::RectangleShape test_3;
+		test_3.setPosition(800, 200);
+		test_3.setSize(sf::Vector2f(200, 200));
+		test_3.setFillColor(sf::Color::Green);
+
+		scene_1.draw(object_1, type);
 		scene_2.draw(object_2, type);
 		scene_2.draw(object_3, type);
 
-		//scene_1.draw(test);
+		scene_1.draw(test_1);
+		scene_1.draw(test_2, true);
+		scene_1.draw(test_3);
 
-		//scene_1.display();
+		scene_1.display();
 		scene_2.display();
-
-		scene_2.unbind();
 
 		// ImGui
 

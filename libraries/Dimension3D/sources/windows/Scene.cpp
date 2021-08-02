@@ -5,7 +5,8 @@ namespace dim
 	Scene::Scene(std::string name)
 	{
 		frame_buffer.create(100, 100);
-		render_texutre.create(100, 100);
+		render_texture.create(100, 100);
+		controller = nullptr;
 		this->name = name;
 		size = sf::Vector2i(100, 100);
 		min  = sf::Vector2i(0, 0);
@@ -19,14 +20,34 @@ namespace dim
 		binded = false;
 	}
 
+	Scene::~Scene()
+	{
+		delete controller;
+		controller = nullptr;
+	}
+
 	void Scene::check_events(const sf::Event& sf_event)
 	{
-		camera.check_events(sf_event, *this);
+		if (controller != nullptr)
+			controller->check_events(sf_event, *this);
 	}
 
 	void Scene::update()
 	{
-		camera.update(*this);
+		if (resized)
+		{
+			frame_buffer.set_size(size.x, size.y);
+			render_texture.create(size.x, size.y);
+			camera.set_resolution(size.x, size.y);
+
+			camera2D.set_resolution(size.x, size.y);
+			render_texture.setView(camera2D.get_view());
+
+			fixed_camera2D.set_resolution(size.x, size.y);
+		}
+
+		if (controller != nullptr)
+			controller->update(*this);
 
 		if (unique_shader)
 		{
@@ -47,6 +68,11 @@ namespace dim
 	{
 		frame_buffer.unbind();
 		binded = false;
+	}
+
+	void Scene::set_controller(const Controller& controller)
+	{
+		this->controller = controller.clone();
 	}
 
 	unsigned int Scene::get_width() const
@@ -90,6 +116,11 @@ namespace dim
 		return position.x >= min.x && position.x <= max.x && position.y >= min.y && position.y <= max.y;
 	}
 
+	sf::Vector2i Scene::get_center() const
+	{
+		return sf::Vector2i((min.x + max.x) / 2, (min.y + max.y) / 2);
+	}
+
 	void Scene::clear(const Color& color)
 	{
 		if (!binded)
@@ -98,21 +129,21 @@ namespace dim
 		frame_buffer.clear(color);
 		frame_buffer.unbind();
 
-		render_texutre.clear(color.to_sf());
-
-		if (resized)
-		{
-			frame_buffer.set_size(size.x, size.y);
-			render_texutre.create(size.x, size.y);
-		}
+		render_texture.clear(color.to_sf());
 
 		if (binded)
 			frame_buffer.bind();
 	}
 
-	void Scene::draw(const sf::Drawable& drawable)
+	void Scene::draw(const sf::Drawable& drawable, bool fixed)
 	{
-		render_texutre.draw(drawable);
+		if (fixed)
+			render_texture.setView(fixed_camera2D.get_view());
+
+		render_texture.draw(drawable);
+
+		if (fixed)
+			render_texture.setView(camera2D.get_view());
 	}
 
 	void Scene::draw(const Object& object, DrawType draw_type)
@@ -144,7 +175,7 @@ namespace dim
 
 		// SFML
 
-		render_texutre.display();
+		render_texture.display();
 
 		// ImGui
 
@@ -185,8 +216,8 @@ namespace dim
 
 		ImGui::SetCursorPos(ImVec2(8, 27));
 
-		ImGui::Image(render_texutre.getTexture().getNativeHandle(),
-			ImVec2{ (float)render_texutre.getTexture().getSize().x, (float)render_texutre.getTexture().getSize().y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		ImGui::Image(render_texture.getTexture().getNativeHandle(),
+			ImVec2{ (float)render_texture.getTexture().getSize().x, (float)render_texture.getTexture().getSize().y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 		ImGui::End();
 

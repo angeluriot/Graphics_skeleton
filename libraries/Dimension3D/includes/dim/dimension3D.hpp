@@ -19,6 +19,13 @@
 #include "dim/opengl/FrameBuffer.hpp"
 #include "dim/windows/Scene.hpp"
 #include "dim/utils/Color.hpp"
+#include "dim/controllers/Controller.hpp"
+#include "dim/controllers/OrbitController.hpp"
+#include "dim/controllers/FlyController.hpp"
+#include "dim/controllers/DragController.hpp"
+#include "dim/cameras/Camera2D.hpp"
+#include "dim/cameras/OrthographicCamera.hpp"
+#include "dim/cameras/PerspectiveCamera.hpp"
 
 namespace dim
 {
