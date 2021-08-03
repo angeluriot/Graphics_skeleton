@@ -44,7 +44,7 @@ namespace dim
 
 		void						send_uniform(const std::string& name, const Texture& texture) const;
 		void						send_uniform(const std::string& name, const Light& light) const;
-		void						send_uniform(const std::string& name, const std::vector<Light>& lights) const;
+		void						send_uniform(const std::string& name, const std::vector<Light*>& lights) const;
 		void						send_uniform(const std::string& name, const Material& material) const;
 
 		void						send_uniform(const std::string& name, float number) const;

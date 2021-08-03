@@ -32,7 +32,7 @@ namespace dim
 		bool			binded;
 		bool			textured;
 
-		void			draw(const Camera* camera, const std::vector<Light>& lights, DrawType draw_type, bool scene_shader) const;
+		void			draw(const Camera* camera, const std::vector<Light*>& lights, DrawType draw_type, bool scene_shader) const;
 
 	public:
 
@@ -48,7 +48,7 @@ namespace dim
 		void			set_shader(Shader& shader);
 		void			set_texture(const std::string texture_name);
 		void			set_texture(Texture& texture);
-		void			set_mesh(const Mesh& mesh);
+		void			set_mesh(const Mesh& mesh, dim::DataType data_sent = dim::DataType::All);
 
 		void			set_size(const Vector3& new_size);
 		void			set_rotation(float new_rotation, const Vector3& new_axis);

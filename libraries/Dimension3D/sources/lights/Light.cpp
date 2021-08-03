@@ -2,40 +2,7 @@
 
 namespace dim
 {
-	Light::Light(Type type, const Color& color, float intensity, const Vector3& vector)
-	{
-		set_type(type);
-		set_color(color);
-		set_intensity(intensity);
-		set_vector(vector);
-	}
-
-	Light::Type Light::get_type() const
-	{
-		return type;
-	}
-
-	void Light::set_type(Type type)
-	{
-		if (type == Type::Directional)
-			vector = normalized(-vector);
-
-		this->type = type;
-	}
-
-	Vector3 Light::get_vector() const
-	{
-		return vector;
-	}
-
-	void Light::set_vector(const Vector3& vector)
-	{
-		if (type == Type::Directional)
-			this->vector = normalized(vector);
-
-		else
-			this->vector = vector;
-	}
+	Light::Light() {}
 
 	Color Light::get_color() const
 	{

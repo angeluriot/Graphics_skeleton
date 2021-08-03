@@ -1,13 +1,14 @@
-#version 140
+#version 330
 precision mediump float;
 
-attribute vec3 positions;
-attribute vec2 uvs;
+attribute vec3 a_position;
+attribute vec2 a_texcoord;
 
-varying vec2 v_uvs;
+out vec2 v_texcoord;
 
 void main()
 {
-	gl_Position = vec4(positions, 1.);
-	v_uvs = uvs;
+	v_texcoord = a_texcoord;
+
+	gl_Position = vec4(a_position, 1.);
 }

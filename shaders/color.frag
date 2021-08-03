@@ -1,4 +1,4 @@
-#version 140
+#version 330
 precision mediump float;
 
 #define MAX_LIGHTS 10
@@ -20,17 +20,16 @@ struct Light
 	float intensity;
 };
 
-varying vec3 v_position;
-varying vec3 v_normal;
-varying vec2 v_texcoord;
+in vec3 v_position;
+in vec3 v_normal;
+in vec2 v_texcoord;
+
+out vec4 frag_color;
 
 uniform vec3 u_camera;
-
 uniform Material u_material;
-
 uniform Light[MAX_LIGHTS] u_lights;
 uniform int u_nb_lights;
-
 uniform sampler2D u_texture;
 uniform int u_textured;
 
@@ -52,7 +51,7 @@ void main()
 		if (u_lights[i].type == 2)
 		{
 			light_direction = normalize(v_position - u_lights[i].vector);
-			intensity = u_lights[i].intensity / distance(v_position, u_lights[i].vector);
+			intensity = u_lights[i].intensity / pow(distance(v_position, u_lights[i].vector), 2);
 		}
 
 		// Ambiant
@@ -70,5 +69,5 @@ void main()
 		}
 	}
 
-	gl_FragColor = vec4(ambient_color + diffuse_color + specular_color, ((1 - u_textured) * u_material.color.a + u_textured * texture2D(u_texture, v_texcoord).a));
+	frag_color = vec4(ambient_color + diffuse_color + specular_color, ((1 - u_textured) * u_material.color.a + u_textured * texture2D(u_texture, v_texcoord).a));
 }

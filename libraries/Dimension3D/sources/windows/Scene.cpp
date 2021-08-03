@@ -19,6 +19,7 @@ namespace dim
 		is_window = false;
 		unique_shader = false;
 		binded = false;
+		post_processing = false;
 	}
 
 	Scene::~Scene()
@@ -128,6 +129,13 @@ namespace dim
 		unique_shader = true;
 	}
 
+	void Scene::set_post_processing_shader(const Shader& shader)
+	{
+		post_processing_shader = shader;
+		screen.send_data(shader, Mesh::screen, DataType::Positions | DataType::TexCoords);
+		post_processing = true;
+	}
+
 	bool Scene::is_in(const Vector2& position) const
 	{
 		return position.x >= min.x && position.x <= max.x && position.y >= min.y && position.y <= max.y;
@@ -185,8 +193,34 @@ namespace dim
 			frame_buffer.unbind();
 	}
 
+	void Scene::add_light(const Light& light)
+	{
+		lights.push_back(light.clone());
+	}
+
 	void Scene::display()
 	{
+		if (post_processing)
+		{
+			if (!binded)
+				frame_buffer.bind();
+
+			post_processing_shader.bind();
+			frame_buffer.get_texture().bind();
+			screen.bind();
+
+			post_processing_shader.send_uniform("u_texture", frame_buffer.get_texture());
+
+			screen.draw();
+
+			screen.unbind();
+			frame_buffer.get_texture().unbind();
+			post_processing_shader.unbind();
+
+			if (!binded)
+				frame_buffer.unbind();
+		}
+
 		if (binded)
 			frame_buffer.unbind();
 

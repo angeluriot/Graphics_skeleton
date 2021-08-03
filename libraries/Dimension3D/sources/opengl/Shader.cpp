@@ -10,7 +10,7 @@ namespace dim
 		default_shader.shader = std::make_shared<sf::Shader>();
 
 		default_shader.shader->loadFromMemory(
-			"#version 140\n"
+			"#version 330\n"
 			"precision mediump float;\n"
 			"\n"
 			"attribute vec3 positions;\n"
@@ -29,7 +29,7 @@ namespace dim
 			"	v_uvs = uvs;\n"
 			"}",
 
-			"#version 140\n"
+			"#version 330\n"
 			"precision mediump float;\n"
 			"\n"
 			"varying vec3 v_normals;\n"
@@ -87,19 +87,19 @@ namespace dim
 	void Shader::send_uniform(const std::string& name, const Light& light) const
 	{
 		send_uniform(name + ".type", (int)light.get_type());
-		send_uniform(name + ".vector", light.get_vector());
-		send_uniform(name + ".color", light.get_color());
-		send_uniform(name + ".intensity", light.get_intensity());
+		send_uniform(name + ".vector", light.vector);
+		send_uniform(name + ".color", light.color);
+		send_uniform(name + ".intensity", light.intensity);
 	}
 
-	void Shader::send_uniform(const std::string& name, const std::vector<Light>& lights) const
+	void Shader::send_uniform(const std::string& name, const std::vector<Light*>& lights) const
 	{
 		for (int i = 0; i < lights.size() && i < max_lights; i++)
 		{
-			send_uniform("u_lights[" + std::to_string(i) + "].type", static_cast<int>(lights[i].get_type()));
-			send_uniform("u_lights[" + std::to_string(i) + "].vector", lights[i].get_vector());
-			send_uniform("u_lights[" + std::to_string(i) + "].color", lights[i].get_color());
-			send_uniform("u_lights[" + std::to_string(i) + "].intensity", lights[i].get_intensity());
+			send_uniform("u_lights[" + std::to_string(i) + "].type", static_cast<int>(lights[i]->get_type()));
+			send_uniform("u_lights[" + std::to_string(i) + "].vector", lights[i]->vector);
+			send_uniform("u_lights[" + std::to_string(i) + "].color", lights[i]->color);
+			send_uniform("u_lights[" + std::to_string(i) + "].intensity", lights[i]->intensity);
 		}
 
 		send_uniform("u_nb_lights", std::min(static_cast<int>(lights.size()), static_cast<int>(max_lights)));
@@ -259,7 +259,6 @@ namespace dim
 
 		catch (const std::out_of_range& e)
 		{
-			e.what();
 			throw std::invalid_argument("This name does not exit");
 		}
 	}

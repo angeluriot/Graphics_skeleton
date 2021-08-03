@@ -36,11 +36,14 @@ namespace dim
 		Shader			shader;
 		mutable bool	binded;
 		Camera2D		fixed_camera2D;
+		std::vector<Light*>	lights;
+		Shader			post_processing_shader;
+		bool			post_processing;
+		VertexBuffer	screen;
 
 	public:
 
 		Camera2D			camera2D;
-		std::vector<Light>	lights;
 
 							Scene(const Scene& other) = default;
 							Scene(std::string name = "Scene");
@@ -61,12 +64,14 @@ namespace dim
 		bool				is_moving() const;
 		bool				is_resized() const;
 		void				set_shader(const Shader& shader);
+		void				set_post_processing_shader(const Shader& shader);
 		bool				is_in(const Vector2& position) const;
 		sf::Vector2i		get_center() const;
 		void				clear(const Color& color = Color::Transparent);
 		void				draw(const sf::Drawable& drawable, bool fixed = false);
 		void				draw(const Object& object, DrawType draw_type = DrawType::Triangles);
 		void				draw(const VertexBuffer& vertex_buffer, DrawType draw_type = DrawType::Triangles);
+		void				add_light(const Light& light);
 		void				display();
 
 		friend				Controller;

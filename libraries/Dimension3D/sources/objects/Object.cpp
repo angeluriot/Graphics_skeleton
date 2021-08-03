@@ -2,7 +2,7 @@
 
 namespace dim
 {
-	void Object::draw(const Camera* camera, const std::vector<Light>& lights, DrawType draw_type, bool scene_shader) const
+	void Object::draw(const Camera* camera, const std::vector<Light*>& lights, DrawType draw_type, bool scene_shader) const
 	{
 		if (vertex_buffer.get_nb_vertices())
 		{
@@ -128,10 +128,10 @@ namespace dim
 		textured = true;
 	}
 
-	void Object::set_mesh(const Mesh& mesh)
+	void Object::set_mesh(const Mesh& mesh, dim::DataType data_sent)
 	{
 		this->mesh = mesh;
-		vertex_buffer.send_data(mesh);
+		vertex_buffer.send_data(mesh, data_sent);
 	}
 
 	void Object::set_size(const Vector3& new_size)

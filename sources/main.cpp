@@ -20,11 +20,13 @@ int main()
 	scene_1.set_camera(dim::PerspectiveCamera());
 	scene_2.set_camera(dim::PerspectiveCamera());
 
-	dim::Light light_1(dim::Light::Type::Directional, sf::Color(255, 50, 50), 1., dim::Vector3(-1.f, -1.f, -1.f).get_normalized());
-	dim::Light light_2(dim::Light::Type::Directional, sf::Color(50, 50, 255), 1., dim::Vector3(1.f, 1.f, -1.f).get_normalized());
+	scene_1.add_light(dim::DirectionalLight(dim::Vector3(-1.f, -1.f, -1.f), sf::Color(255, 50, 50)));
+	scene_1.add_light(dim::DirectionalLight(dim::Vector3(1.f, 1.f, -1.f), sf::Color(50, 50, 255)));
 
-	scene_1.lights = { light_1, light_2 };
-	scene_2.lights = { light_1, light_2 };
+	scene_2.add_light(dim::DirectionalLight(dim::Vector3(-1.f, -1.f, -1.f), sf::Color(255, 50, 50)));
+	scene_2.add_light(dim::DirectionalLight(dim::Vector3(1.f, 1.f, -1.f), sf::Color(50, 50, 255)));
+
+	scene_2.set_post_processing_shader(dim::Shader::get("screen"));
 
 	dim::Object object_1(dim::Mesh::cube, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
 	object_1.set_texture("texture_3");
@@ -97,6 +99,7 @@ int main()
 		// ImGui
 
 		ImGui::Begin("Hello, world!");
+
 		if (ImGui::Button("Look at this pretty button"))
 		{
 			if (type == dim::DrawType::Points)

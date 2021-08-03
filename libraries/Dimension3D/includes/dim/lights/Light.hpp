@@ -8,34 +8,36 @@
 
 namespace dim
 {
+	class Shader;
+	class Scene;
+
 	class Light
 	{
-	public:
+	protected:
 
-		enum class Type { Ambiant = 0, Directional = 1, Point = 2 };
-
-	private:
-
-		Type		type;
 		Vector3		vector;
 		Color		color;
 		float		intensity;
 
+		virtual Light*	clone() const = 0;
+
 	public:
 
+		enum class Type { Ambient = 0, Directional = 1, Point = 2 };
+
+					Light();
 					Light(const Light& other) = default;
-					Light(Type type = Type::Ambiant, const Color& color = Color::White, float intensity = 1.f, const Vector3& vector = Vector3());
 
 		Light&		operator=(const Light& other) = default;
 
-		Type		get_type() const;
-		void		set_type(Type type);
-		Vector3		get_vector() const;
-		void		set_vector(const Vector3& vector);
+		virtual Type	get_type() const = 0;
 		Color		get_color() const;
 		void		set_color(const Color& color);
 		float		get_intensity() const;
 		void		set_intensity(float intensity);
+
+		friend		Shader;
+		friend		Scene;
 	};
 }
 
