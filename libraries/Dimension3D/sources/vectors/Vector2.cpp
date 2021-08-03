@@ -121,8 +121,8 @@ namespace dim
 
 	Vector2& Vector2::operator=(const sf::Vector2i& vector)
 	{
-		x = vector.x;
-		y = vector.y;
+		x = static_cast<float>(vector.x);
+		y = static_cast<float>(vector.y);
 
 		return *this;
 	}
@@ -283,7 +283,7 @@ namespace dim
 
 	sf::Vector2i Vector2::to_sf_int() const
 	{
-		return sf::Vector2i(x, y);
+		return sf::Vector2i(static_cast<int>(x), static_cast<int>(y));
 	}
 
 	// Addition

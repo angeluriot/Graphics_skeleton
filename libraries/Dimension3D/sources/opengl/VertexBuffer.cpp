@@ -96,21 +96,21 @@ namespace dim
 					if (send_positions)
 					{
 						GLint positions = glGetAttribLocation(shader.get_id(), "a_position");
-						glVertexAttribPointer(positions, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (GLvoid*)(0));
+						glVertexAttribPointer(positions, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<GLvoid*>(0));
 						glEnableVertexAttribArray(positions);
 					}
 
 					if (send_normals)
 					{
 						GLint normals = glGetAttribLocation(shader.get_id(), "a_normal");
-						glVertexAttribPointer(normals, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (GLvoid*)(send_positions * mesh.get_positions_size()));
+						glVertexAttribPointer(normals, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<GLvoid*>(send_positions * mesh.get_positions_size()));
 						glEnableVertexAttribArray(normals);
 					}
 
 					if (send_texcoords)
 					{
 						GLint texcoords = glGetAttribLocation(shader.get_id(), "a_texcoord");
-						glVertexAttribPointer(texcoords, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (GLvoid*)(send_positions * mesh.get_positions_size() +
+						glVertexAttribPointer(texcoords, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), reinterpret_cast<GLvoid*>(send_positions * mesh.get_positions_size() +
 							send_normals * mesh.get_normals_size()));
 						glEnableVertexAttribArray(texcoords);
 					}

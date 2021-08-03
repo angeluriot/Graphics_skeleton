@@ -60,27 +60,27 @@ namespace dim
 
 	unsigned int Mesh::get_data_size() const
 	{
-		return positions.size() * sizeof(Vector3) + normals.size() * sizeof(Vector3) + texcoords.size() * sizeof(Vector2);
+		return static_cast<unsigned int>(positions.size() * sizeof(Vector3) + normals.size() * sizeof(Vector3) + texcoords.size() * sizeof(Vector2));
 	}
 
 	unsigned int Mesh::get_positions_size() const
 	{
-		return positions.size() * sizeof(Vector3);
+		return static_cast<unsigned int>(positions.size() * sizeof(Vector3));
 	}
 
 	unsigned int Mesh::get_normals_size() const
 	{
-		return normals.size() * sizeof(Vector3);
+		return static_cast<unsigned int>(normals.size() * sizeof(Vector3));
 	}
 
 	unsigned int Mesh::get_texcoords_size() const
 	{
-		return texcoords.size() * sizeof(Vector2);
+		return static_cast<unsigned int>(texcoords.size() * sizeof(Vector2));
 	}
 
 	unsigned int Mesh::get_nb_vertices() const
 	{
-		return positions.size();
+		return static_cast<unsigned int>(positions.size());
 	}
 
 	void Mesh::clear()
@@ -152,7 +152,7 @@ namespace dim
 
 		for (uint16_t i = 0; i < nb_lattitudes; i++)
 		{
-			double pos[] =
+			float pos[] =
 			{
 				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
 				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2.f * pi / nb_lattitudes), -1.f / 2.f,
@@ -163,28 +163,28 @@ namespace dim
 				cos(i * 2.f * pi / nb_lattitudes), sin(i * 2.f * pi / nb_lattitudes), 1.f / 2.f
 			};
 
-			double uvPos[] =
+			float uvPos[] =
 			{
-				i / (double)nb_lattitudes, 0.f,
-				(i + 1) / (double)nb_lattitudes, 0.f,
-				(i + 1) / (double)nb_lattitudes, 1.f,
+				i / (float)nb_lattitudes, 0.f,
+				(i + 1) / (float)nb_lattitudes, 0.f,
+				(i + 1) / (float)nb_lattitudes, 1.f,
 
-				i / (double)nb_lattitudes, 0.f,
-				(i + 1) / (double)nb_lattitudes, 1.f,
-				i / (double)nb_lattitudes, 1.f
+				i / (float)nb_lattitudes, 0.f,
+				(i + 1) / (float)nb_lattitudes, 1.f,
+				i / (float)nb_lattitudes, 1.f
 			};
 
-			for (uint16_t j = 0; j < 18; j++)
+			for (int j = 0; j < 18; j++)
 				positions[18 * i + j] = pos[j];
 
-			for (uint16_t j = 0; j < 12; j++)
+			for (int j = 0; j < 12; j++)
 				texcoords[12 * i + j] = uvPos[j];
 
 			float angle = pi / 4.f;
 			glm::vec3 normalI = glm::rotate(glm::mat4(1.f), (float)(i * 2.f * pi / nb_lattitudes), glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(cos(angle), 0.f, sin(angle), 1.f);
 			glm::vec3 normalI2 = glm::rotate(glm::mat4(1.f), (float)((i + 1.f) * 2.f * pi / nb_lattitudes), glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(cos(angle), 0.f, sin(angle), 1.f);
 
-			for (uint16_t j = 0; j < 3; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				normals[18 * i + 0 + j] = normalI[j];
 				normals[18 * i + 3 + j] = normalI2[j];
@@ -521,7 +521,7 @@ namespace dim
 
 		for (uint16_t i = 0; i < nb_lattitudes; i++)
 		{
-			double pos[] =
+			float pos[] =
 			{
 				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
 				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2 * pi / nb_lattitudes), -1.f / 2.f,
@@ -532,26 +532,26 @@ namespace dim
 				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), 1.f / 2.f
 			};
 
-			double uvPos[] =
+			float uvPos[] =
 			{
-				i / (double)nb_lattitudes, 0.f,
-				(i + 1) / (double)nb_lattitudes, 0.f,
-				(i + 1) / (double)nb_lattitudes, 1.f,
+				i / (float)nb_lattitudes, 0.f,
+				(i + 1) / (float)nb_lattitudes, 0.f,
+				(i + 1) / (float)nb_lattitudes, 1.f,
 
-				i / (double)nb_lattitudes, 0.f,
-				(i + 1) / (double)nb_lattitudes, 1.f,
-				i / (double)nb_lattitudes, 1.f
+				i / (float)nb_lattitudes, 0.f,
+				(i + 1) / (float)nb_lattitudes, 1.f,
+				i / (float)nb_lattitudes, 1.f
 			};
 
-			for (uint16_t j = 0; j < 18; j++)
+			for (int j = 0; j < 18; j++)
 				positions[18 * i + j] = pos[j];
 
-			for (uint16_t j = 0; j < 12; j++)
+			for (int j = 0; j < 12; j++)
 				texcoords[12 * i + j] = uvPos[j];
 
-			for (uint16_t j = 0; j < 6; j++)
+			for (int j = 0; j < 6; j++)
 			{
-				for (uint16_t k = 0; k < 2; k++)
+				for (int k = 0; k < 2; k++)
 					normals[18 * i + 3 * j + k] = pos[3 * j + k];
 
 				normals[18 * i + 3 * j + 2] = 0.f;
@@ -584,38 +584,38 @@ namespace dim
 		glm::vec3* vertexCoord = (glm::vec3*)malloc(nb_longitudes * nb_latitudes * sizeof(glm::vec3));
 		glm::vec2* uvCoord = (glm::vec2*)malloc(nb_longitudes * nb_latitudes * sizeof(glm::vec2));
 
-		for (uint16_t i = 0; i < nb_longitudes; i++)
+		for (int i = 0; i < (int)nb_longitudes; i++)
 		{
-			double theta = 2.f * pi / (nb_longitudes - 1) * i;
+			float theta = 2.f * pi / (nb_longitudes - 1) * i;
 
-			for (uint16_t j = 0; j < nb_latitudes; j++)
+			for (int j = 0; j < (int)nb_latitudes; j++)
 			{
-				double phi = pi / (nb_latitudes - 1) * j;
-				double pos[] = { sin(phi) * sin(theta), cos(phi), cos(theta) * sin(phi) };
-				double uvs[] = { i / (double)(nb_longitudes), j / (double)(nb_latitudes) };
+				float phi = pi / (nb_latitudes - 1) * j;
+				float pos[] = { sin(phi) * sin(theta), cos(phi), cos(theta) * sin(phi) };
+				float uvs[] = { i / (float)(nb_longitudes), j / (float)(nb_latitudes) };
 
-				for (uint16_t k = 0; k < 3; k++)
+				for (int k = 0; k < 3; k++)
 					vertexCoord[i * nb_latitudes + j][k] = radius * pos[k];
 
-				for (uint16_t k = 0; k < 2; k++)
+				for (int k = 0; k < 2; k++)
 					uvCoord[i * nb_latitudes + j][k] = uvs[k];
 			}
 		}
 
 		// Determine draw orders
-		uint16_t* order = (uint16_t*)malloc(nb_longitudes * (nb_latitudes - 1) * sizeof(uint16_t) * 6);
+		int* order = (int*)malloc(nb_longitudes * (nb_latitudes - 1) * sizeof(int) * 6);
 
-		for (uint16_t i = 0; i < nb_longitudes; i++)
+		for (int i = 0; i < (int)nb_longitudes; i++)
 		{
-			for (uint16_t j = 0; j < nb_latitudes - 1; j++)
+			for (int j = 0; j < (int)nb_latitudes - 1; j++)
 			{
-				uint16_t o[] =
+				int o[] =
 				{
-					i * nb_latitudes + j, (i + 1) * (nb_latitudes) % (nb_latitudes * nb_longitudes) + (j + 1) % nb_latitudes, (i + 1) * (nb_latitudes) % (nb_latitudes * nb_longitudes) + j,
-					i * nb_latitudes + j, i * (nb_latitudes)+(j + 1) % nb_latitudes, (i + 1) * (nb_latitudes) % (nb_latitudes * nb_longitudes) + (j + 1) % nb_latitudes
+					i * (int)nb_latitudes + j, (i + 1) * ((int)nb_latitudes) % ((int)nb_latitudes * (int)nb_longitudes) + (j + 1) % (int)nb_latitudes, (i + 1) * ((int)nb_latitudes) % ((int)nb_latitudes * (int)nb_longitudes) + j,
+					i * (int)nb_latitudes + j, i * ((int)nb_latitudes)+(j + 1) % (int)nb_latitudes, (i + 1) * ((int)nb_latitudes) % ((int)nb_latitudes * (int)nb_longitudes) + (j + 1) % (int)nb_latitudes
 				};
 
-				for (uint16_t k = 0; k < 6; k++)
+				for (int k = 0; k < 6; k++)
 					order[(nb_latitudes - 1) * i * 6 + j * 6 + k] = o[k];
 			}
 		}
@@ -625,17 +625,17 @@ namespace dim
 		normals.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 3, 0.f);
 		texcoords.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 2, 0.f);
 
-		for (uint16_t i = 0; i < nb_latitudes * (nb_longitudes - 1) * 6; i++)
+		for (int i = 0; i < (int)nb_latitudes * ((int)nb_longitudes - 1) * 6; i++)
 		{
-			uint16_t indice = order[i];
+			int indice = order[i];
 
-			for (uint16_t j = 0; j < 3; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				positions[3 * i + j] = vertexCoord[indice][j];
 				normals[3 * i + j] = glm::normalize(vertexCoord[indice])[j];
 			}
 
-			for (uint16_t j = 0; j < 2; j++)
+			for (int j = 0; j < 2; j++)
 				texcoords[2 * i + j] = uvCoord[indice][j];
 		}
 

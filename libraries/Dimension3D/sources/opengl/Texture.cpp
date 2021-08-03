@@ -101,6 +101,7 @@ namespace dim
 
 		catch (const std::out_of_range& e)
 		{
+			e.what();
 			throw std::invalid_argument("This name does not exit");
 		}
 	}

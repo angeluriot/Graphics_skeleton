@@ -142,9 +142,9 @@ namespace dim
 
 	Vector3& Vector3::operator=(const sf::Vector3i& vector)
 	{
-		x = vector.x;
-		y = vector.y;
-		z = vector.z;
+		x = static_cast<float>(vector.x);
+		y = static_cast<float>(vector.y);
+		z = static_cast<float>(vector.z);
 
 		return *this;
 	}
@@ -335,7 +335,7 @@ namespace dim
 
 	sf::Vector3i Vector3::to_sf_int() const
 	{
-		return sf::Vector3i(x, y, z);
+		return sf::Vector3i(static_cast<int>(x), static_cast<int>(y), static_cast<int>(z));
 	}
 
 	// Addition

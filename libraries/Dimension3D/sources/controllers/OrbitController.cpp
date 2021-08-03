@@ -25,10 +25,10 @@ namespace dim
 	{
 		if (sf_event.type == sf::Event::MouseWheelMoved && scene.is_in(sf::Mouse::getPosition(Window::get_window())))
 		{
-			camera.position.set_norm(std::max(camera.position.get_norm() - sf_event.mouseWheel.delta * speed, 0.01f));
+			camera.position.set_norm(std::max(camera.position.get_norm() - static_cast<float>(sf_event.mouseWheel.delta) * speed, 0.01f));
 
 			if (camera.get_type() == Camera::Type::Orthographic)
-				static_cast<OrthographicCamera&>(camera).zoom(1.f + sf_event.mouseWheel.delta * speed * 0.5);
+				static_cast<OrthographicCamera&>(camera).zoom(1.f + static_cast<float>(sf_event.mouseWheel.delta) * speed * 0.5f);
 
 			camera.view = glm::lookAt(camera.position.to_glm(), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 		}

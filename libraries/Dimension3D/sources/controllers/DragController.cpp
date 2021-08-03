@@ -25,14 +25,14 @@ namespace dim
 	{
 		if (sf_event.type == sf::Event::MouseWheelMoved && scene.is_in(sf::Mouse::getPosition(Window::get_window())))
 		{
-			camera.position += normalized(camera.direction) * speed * sf_event.mouseWheel.delta;
+			camera.position += normalized(camera.direction) * speed * static_cast<float>(sf_event.mouseWheel.delta);
 
 			if (camera.get_type() == Camera::Type::Orthographic)
-				static_cast<OrthographicCamera&>(camera).zoom(1.f + sf_event.mouseWheel.delta * speed * 0.5);
+				static_cast<OrthographicCamera&>(camera).zoom(1.f + static_cast<float>(sf_event.mouseWheel.delta) * speed * 0.5f);
 
 			camera.view = glm::lookAt(camera.position.to_glm(), (camera.position + camera.direction).to_glm(), glm::vec3(0.f, 1.f, 0.f));
 
-			scene.camera2D.zoom(1.f - (speed * sf_event.mouseWheel.delta * 0.5));
+			scene.camera2D.zoom(1.f - (speed * static_cast<float>(sf_event.mouseWheel.delta) * 0.5f));
 			scene.render_texture.setView(scene.camera2D.get_view());
 		}
 	}

@@ -63,6 +63,6 @@ namespace dim
 
 	sf::Color Color::to_sf() const
 	{
-		return sf::Color(r * 255, g * 255, b * 255, a * 255);
+		return sf::Color(static_cast<sf::Uint8>(r * 255.f), static_cast<sf::Uint8>(g * 255.f), static_cast<sf::Uint8>(b * 255.f), static_cast<sf::Uint8>(a * 255.f));
 	}
 }

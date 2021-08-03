@@ -131,16 +131,16 @@ namespace dim
 		GLint location = glGetUniformLocation(get_id(), name.data());
 
 		if (group == 1)
-			glUniform1fv(location, numbers.size(), numbers.data());
+			glUniform1fv(location, static_cast<GLsizei>(numbers.size()), numbers.data());
 
 		else if (group == 2)
-			glUniform2fv(location, numbers.size() / 2, numbers.data());
+			glUniform2fv(location, static_cast<GLsizei>(numbers.size() / 2), numbers.data());
 
 		else if (group == 3)
-			glUniform3fv(location, numbers.size() / 3, numbers.data());
+			glUniform3fv(location, static_cast<GLsizei>(numbers.size() / 3), numbers.data());
 
 		else if (group == 4)
-			glUniform4fv(location, numbers.size() / 4, numbers.data());
+			glUniform4fv(location, static_cast<GLsizei>(numbers.size() / 4), numbers.data());
 
 		else
 			throw std::invalid_argument("Invalid group (<1 or >4)");
@@ -151,16 +151,16 @@ namespace dim
 		GLint location = glGetUniformLocation(get_id(), name.data());
 
 		if (group == 1)
-			glUniform1iv(location, numbers.size(), numbers.data());
+			glUniform1iv(location, static_cast<GLsizei>(numbers.size()), numbers.data());
 
 		else if (group == 2)
-			glUniform2iv(location, numbers.size() / 2, numbers.data());
+			glUniform2iv(location, static_cast<GLsizei>(numbers.size() / 2), numbers.data());
 
 		else if (group == 3)
-			glUniform3iv(location, numbers.size() / 3, numbers.data());
+			glUniform3iv(location, static_cast<GLsizei>(numbers.size() / 3), numbers.data());
 
 		else if (group == 4)
-			glUniform4iv(location, numbers.size() / 4, numbers.data());
+			glUniform4iv(location, static_cast<GLsizei>(numbers.size() / 4), numbers.data());
 
 		else
 			throw std::invalid_argument("Invalid group (<1 or >4)");
@@ -193,25 +193,25 @@ namespace dim
 	void Shader::send_uniform(const std::string& name, const std::vector<Vector2>& vectors) const
 	{
 		GLint location = glGetUniformLocation(get_id(), name.data());
-		glUniform2fv(location, vectors.size(), reinterpret_cast<const float*>(vectors.data()));
+		glUniform2fv(location, static_cast<GLsizei>(vectors.size()), reinterpret_cast<const float*>(vectors.data()));
 	}
 
 	void Shader::send_uniform(const std::string& name, const std::vector<Vector3>& vectors) const
 	{
 		GLint location = glGetUniformLocation(get_id(), name.data());
-		glUniform3fv(location, vectors.size(), reinterpret_cast<const float*>(vectors.data()));
+		glUniform3fv(location, static_cast<GLsizei>(vectors.size()), reinterpret_cast<const float*>(vectors.data()));
 	}
 
 	void Shader::send_uniform(const std::string& name, const std::vector<Vector4>& vectors) const
 	{
 		GLint location = glGetUniformLocation(get_id(), name.data());
-		glUniform4fv(location, vectors.size(), reinterpret_cast<const float*>(vectors.data()));
+		glUniform4fv(location, static_cast<GLsizei>(vectors.size()), reinterpret_cast<const float*>(vectors.data()));
 	}
 
 	void Shader::send_uniform(const std::string& name, const std::vector<Color>& colors) const
 	{
 		GLint location = glGetUniformLocation(get_id(), name.data());
-		glUniform4fv(location, colors.size(), reinterpret_cast<const float*>(colors.data()));
+		glUniform4fv(location, static_cast<GLsizei>(colors.size()), reinterpret_cast<const float*>(colors.data()));
 	}
 
 	void Shader::send_uniform(const std::string& name, const glm::mat2& matrix) const
@@ -259,6 +259,7 @@ namespace dim
 
 		catch (const std::out_of_range& e)
 		{
+			e.what();
 			throw std::invalid_argument("This name does not exit");
 		}
 	}
