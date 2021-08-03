@@ -49,7 +49,7 @@ namespace dim
 		void		set_direction(float yaw, float pitch);
 		float		get_yaw() const;
 		float		get_pitch() const;
-		virtual void	set_resolution(float width, float height) = 0;
+		virtual void	set_resolution(unsigned int width, unsigned int height) = 0;
 
 		friend		Controller;
 		friend		OrbitController;

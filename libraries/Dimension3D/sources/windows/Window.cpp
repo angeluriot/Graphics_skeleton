@@ -10,17 +10,26 @@ namespace dim
 
 	void Window::create_relative(const std::string& project_name, float screen_ratio, float window_ratio, bool resizable, const std::string& icon_path)
 	{
-		uint16_t width;
-		uint16_t height;
+		unsigned int width;
+		unsigned int height;
 
 		if (sf::VideoMode::getDesktopMode().width > window_ratio * sf::VideoMode::getDesktopMode().height)
-			height = sf::VideoMode::getDesktopMode().height * screen_ratio, width = height * window_ratio;
+		{
+			height = static_cast<unsigned int>(screen_ratio * static_cast<float>(sf::VideoMode::getDesktopMode().height));
+			width = static_cast<unsigned int>(window_ratio * static_cast<float>(height));
+		}
 
 		else if (sf::VideoMode::getDesktopMode().width < (16.f / 9.f) * sf::VideoMode::getDesktopMode().height)
-			width = sf::VideoMode::getDesktopMode().width * screen_ratio, height = width / window_ratio;
+		{
+			width = static_cast<unsigned int>(screen_ratio * static_cast<float>(sf::VideoMode::getDesktopMode().width));
+			height = static_cast<unsigned int>(window_ratio * static_cast<float>(width));
+		}
 
 		else
-			width = sf::VideoMode::getDesktopMode().width * screen_ratio, height = sf::VideoMode::getDesktopMode().height * screen_ratio;
+		{
+			width = static_cast<unsigned int>(screen_ratio * static_cast<float>(sf::VideoMode::getDesktopMode().width));
+			height = static_cast<unsigned int>(screen_ratio * static_cast<float>(sf::VideoMode::getDesktopMode().height));
+		}
 
 		screen_coef = width / 1920.f;
 
@@ -164,7 +173,7 @@ namespace dim
 
 	uint16_t Window::to_relative(uint16_t position)
 	{
-		return round(position * screen_coef);
+		return static_cast<uint16_t>(round(position * screen_coef));
 	}
 
 	void Window::check_events(const sf::Event& sf_event)

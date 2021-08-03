@@ -24,7 +24,7 @@ namespace dim
 		Type get_type() const override;
 		void zoom(float zoom);
 		void set_zoom(float new_zoom);
-		void set_resolution(float width, float height) override;
+		void set_resolution(unsigned int width, unsigned int height) override;
 	};
 }
 

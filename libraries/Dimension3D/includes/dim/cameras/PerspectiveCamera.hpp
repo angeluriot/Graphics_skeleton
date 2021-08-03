@@ -21,7 +21,7 @@ namespace dim
 		PerspectiveCamera(float fov = default_fov, float near = default_near, float far = default_far);
 
 		Type get_type() const override;
-		void set_resolution(float width, float height) override;
+		void set_resolution(unsigned int width, unsigned int height) override;
 	};
 }
 

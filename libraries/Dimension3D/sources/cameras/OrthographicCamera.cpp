@@ -34,11 +34,11 @@ namespace dim
 		projection = glm::ortho(-ratio * zoom_level, ratio * zoom_level, -zoom_level, zoom_level, near, far);
 	}
 
-	void OrthographicCamera::set_resolution(float width, float height)
+	void OrthographicCamera::set_resolution(unsigned int width, unsigned int height)
 	{
 		if (width > 0.f && height > 0.f)
 		{
-			ratio = width / height;
+			ratio = (float)width / (float)height;
 			projection = glm::ortho(-ratio * zoom_level, ratio * zoom_level, -zoom_level, zoom_level, near, far);
 		}
 	}

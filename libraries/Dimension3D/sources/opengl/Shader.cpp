@@ -257,7 +257,7 @@ namespace dim
 			return shaders.at(name);
 		}
 
-		catch (const std::out_of_range& e)
+		catch (const std::out_of_range&)
 		{
 			throw std::invalid_argument("This name does not exit");
 		}

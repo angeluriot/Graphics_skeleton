@@ -59,6 +59,8 @@ namespace dim
 
 	void VertexBuffer::send_data(const Mesh& mesh, DataType data_sent)
 	{
+		#pragma warning(push, 0)
+
 		glDeleteBuffers(1, &(*vbo));
 		glDeleteVertexArrays(1, &(*vao));
 
@@ -119,6 +121,8 @@ namespace dim
 			}
 			glBindVertexArray(0);
 		}
+
+		#pragma warning(pop)
 	}
 
 	Shader VertexBuffer::get_shader() const

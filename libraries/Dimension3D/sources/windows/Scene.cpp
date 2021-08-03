@@ -238,8 +238,8 @@ namespace dim
 
 		if (first_frame || size.x != viewportPanelSize.x || size.y != viewportPanelSize.y)
 		{
-			size.x = viewportPanelSize.x;
-			size.y = viewportPanelSize.y;
+			size.x = static_cast<int>(viewportPanelSize.x);
+			size.y = static_cast<int>(viewportPanelSize.y);
 
 			resized = true;
 		}
@@ -253,16 +253,16 @@ namespace dim
 
 		moving = min.x != vMin.x + vPos.x || min.y != vMin.y + vPos.y || max.x != vMax.x + vPos.x || max.y != vMax.y + vPos.y;
 
-		min.x = vMin.x + vPos.x;
-		min.y = vMin.y + vPos.y;
-		max.x = vMax.x + vPos.x;
-		max.y = vMax.y + vPos.y;
+		min.x = static_cast<int>(vMin.x + vPos.x);
+		min.y = static_cast<int>(vMin.y + vPos.y);
+		max.x = static_cast<int>(vMax.x + vPos.x);
+		max.y = static_cast<int>(vMax.y + vPos.y);
 
 		active = ImGui::IsWindowFocused();
 
 		ImGui::SetCursorPos(ImVec2(8, 27));
 
-		uint64_t textureID = frame_buffer.get_texture().get_id();
+		unsigned int textureID = frame_buffer.get_texture().get_id();
 		ImGui::Image(textureID, ImVec2{ (float)temp.x, (float)temp.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
 		ImGui::SetCursorPos(ImVec2(8, 27));

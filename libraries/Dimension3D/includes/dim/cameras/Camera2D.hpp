@@ -28,7 +28,7 @@ namespace dim
 		void	rotate(float angle);
 		void	move(const Vector2& movement);
 
-		void	set_resolution(float width, float height);
+		void	set_resolution(unsigned int width, unsigned int height);
 		sf::View& get_view();
 		float	get_zoom() const;
 		Vector2 get_resolution() const;

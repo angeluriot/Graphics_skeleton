@@ -41,7 +41,7 @@ namespace dim
 		view.move(movement.to_sf_float());
 	}
 
-	void Camera2D::set_resolution(float width, float height)
+	void Camera2D::set_resolution(unsigned int width, unsigned int height)
 	{
 		move((Vector2(width, height) - size) * 0.5f * zoom_level);
 

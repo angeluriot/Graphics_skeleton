@@ -149,9 +149,8 @@ namespace dim
 			return frame_buffers.at(name);
 		}
 
-		catch (const std::out_of_range& e)
+		catch (const std::out_of_range&)
 		{
-			e.what();
 			throw std::invalid_argument("This name does not exit");
 		}
 	}

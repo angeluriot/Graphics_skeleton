@@ -28,7 +28,7 @@ int main()
 
 	scene_2.set_post_processing_shader(dim::Shader::get("screen"));
 
-	dim::Object object_1(dim::Mesh::cube, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
+	dim::Object object_1(dim::Mesh::circle_64, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
 	object_1.set_texture("texture_3");
 	object_1.set_size(dim::Vector3(1.f, 1.f, 1.f));
 	object_1.move(dim::Vector3(0.f, 0.f, 0.f));
@@ -89,9 +89,9 @@ int main()
 		scene_2.draw(object_2, type);
 		scene_2.draw(object_3, type);
 
-		scene_1.draw(test_1);
-		scene_1.draw(test_2, true);
-		scene_1.draw(test_3);
+		//scene_1.draw(test_1);
+		//scene_1.draw(test_2, true);
+		//scene_1.draw(test_3);
 
 		scene_1.display();
 		scene_2.display();

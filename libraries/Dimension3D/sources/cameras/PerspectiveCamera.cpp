@@ -21,9 +21,9 @@ namespace dim
 		return Type::Perspective;
 	}
 
-	void PerspectiveCamera::set_resolution(float width, float height)
+	void PerspectiveCamera::set_resolution(unsigned int width, unsigned int height)
 	{
 		if (width > 0.f && height > 0.f)
-			projection = glm::perspective(glm::radians(fov), width / height, near, far);
+			projection = glm::perspective(glm::radians(fov), (float)width / (float)height, near, far);
 	}
 }
