@@ -26,8 +26,8 @@ namespace dim
 		OrbitController& operator=(const OrbitController& other) = default;
 
 		Type	get_type() const override;
-		void	check_events(const sf::Event& sf_event, Scene& scene) override;
-		void	update(Scene& scene) override;
+		void	check_events(const sf::Event& sf_event, Scene& scene, Camera& camera) override;
+		void	update(Scene& scene, Camera& camera) override;
 	};
 }
 

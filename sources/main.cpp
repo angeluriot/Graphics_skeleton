@@ -14,10 +14,11 @@ int main()
 	dim::Scene scene_1("My_scene_1");
 	dim::Scene scene_2("My_scene_2");
 
-	scene_1.set_controller(dim::DragController());
-	scene_2.set_controller(dim::DragController());
+	scene_1.set_controller(dim::OrbitController());
+	scene_2.set_controller(dim::OrbitController());
 
-	scene_1.camera.set_direction(dim::Vector3(0.f, -1.f, -1.f));
+	scene_1.set_camera(dim::PerspectiveCamera());
+	scene_2.set_camera(dim::PerspectiveCamera());
 
 	dim::Light light_1(dim::Light::Type::Directional, sf::Color(255, 50, 50), 1., dim::Vector3(-1.f, -1.f, -1.f).get_normalized());
 	dim::Light light_2(dim::Light::Type::Directional, sf::Color(50, 50, 255), 1., dim::Vector3(1.f, 1.f, -1.f).get_normalized());
@@ -31,7 +32,7 @@ int main()
 	object_1.move(dim::Vector3(0.f, 0.f, 0.f));
 
 	dim::Object object_2(dim::Mesh::sphere_64, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
-	object_2.set_texture("texture_1");
+	//object_2.set_texture("texture_1");
 	object_2.set_size(dim::Vector3(1.f, 1.f, 1.f));
 	object_2.move(dim::Vector3(1.f, 0.f, 0.f));
 

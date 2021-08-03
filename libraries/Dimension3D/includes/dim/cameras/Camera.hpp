@@ -15,10 +15,9 @@ namespace dim
 
 	class Camera
 	{
-	private:
+	protected:
 
 		Vector3				position;
-		float				fov;
 		glm::mat4			view;
 		glm::mat4			projection;
 		Vector3				direction;
@@ -27,33 +26,36 @@ namespace dim
 		float				near;
 		float				far;
 
+		virtual Camera*		clone() const = 0;
+
 	public:
 
-		static constexpr float				default_fov			= 45.f;
-		static constexpr float				default_near		= 0.1f;
-		static constexpr float				default_far			= 100.f;
+		enum class Type { Perspective, Orthographic };
 
+		static constexpr float	default_near	= 0.1f;
+		static constexpr float	default_far		= 100.f;
+
+					Camera();
 					Camera(const Camera& other) = default;
-					Camera(float fov = default_fov, float near = default_near, float far = default_far);
 
 		Camera&		operator=(const Camera& other) = default;
 
+		virtual Type	get_type() const = 0;
 		glm::mat4	get_matrix() const;
 		Vector3		get_position() const;
 		void		set_position(const Vector3& position);
-		float		get_fov() const;
-		void		set_fov(float fov);
 		Vector3		get_direction() const;
 		void		set_direction(Vector3 direction);
 		void		set_direction(float yaw, float pitch);
 		float		get_yaw() const;
 		float		get_pitch() const;
-		void		set_resolution(float width, float height);
+		virtual void	set_resolution(float width, float height) = 0;
 
 		friend		Controller;
 		friend		OrbitController;
 		friend		FlyController;
 		friend		DragController;
+		friend		Scene;
 	};
 }
 

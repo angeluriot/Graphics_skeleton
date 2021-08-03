@@ -4,8 +4,8 @@
 #include "dim/utils/libraries.hpp"
 #include "dim/vectors/Vector3.hpp"
 #include "dim/opengl/VertexBuffer.hpp"
-#include "dim/utils/Material.hpp"
-#include "dim/objects/Light.hpp"
+#include "dim/objects/Material.hpp"
+#include "dim/lights/Light.hpp"
 #include "dim/opengl/Shader.hpp"
 #include "dim/cameras/Camera.hpp"
 #include "dim/windows/Scene.hpp"
@@ -32,8 +32,7 @@ namespace dim
 		bool			binded;
 		bool			textured;
 
-		void			draw(const Camera& camera, DrawType draw_type) const;
-		void			draw(const Camera& camera, const std::vector<Light>& lights, DrawType draw_type, bool scene_shader) const;
+		void			draw(const Camera* camera, const std::vector<Light>& lights, DrawType draw_type, bool scene_shader) const;
 
 	public:
 

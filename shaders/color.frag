@@ -1,6 +1,8 @@
 #version 140
 precision mediump float;
 
+#define MAX_LIGHTS 10
+
 struct Material
 {
 	vec4 color;
@@ -26,11 +28,7 @@ uniform vec3 u_camera;
 
 uniform Material u_material;
 
-const int nb_lights_max = 10;
-uniform int[nb_lights_max] u_light_types;
-uniform vec3[nb_lights_max] u_light_vectors;
-uniform vec4[nb_lights_max] u_light_colors;
-uniform float[nb_lights_max] u_light_intensities;
+uniform Light[MAX_LIGHTS] u_lights;
 uniform int u_nb_lights;
 
 uniform sampler2D u_texture;
@@ -38,16 +36,6 @@ uniform int u_textured;
 
 void main()
 {
-	Light[nb_lights_max] lights;
-
-	for (int i = 0; i < u_nb_lights; i++)
-	{
-		lights[i].type = u_light_types[i];
-		lights[i].vector = u_light_vectors[i];
-		lights[i].color = u_light_colors[i];
-		lights[i].intensity = u_light_intensities[i];
-	}
-
 	vec3 ambient_color = vec3(0., 0., 0.);
 	vec3 diffuse_color = vec3(0., 0., 0.);
 	vec3 specular_color = vec3(0., 0., 0.);
@@ -58,27 +46,27 @@ void main()
 
 	for (int i = 0; i < u_nb_lights; i++)
 	{
-		light_direction = lights[i].vector;
-		intensity = lights[i].intensity;
+		light_direction = u_lights[i].vector;
+		intensity = u_lights[i].intensity;
 
-		if (lights[i].type == 2)
+		if (u_lights[i].type == 2)
 		{
-			light_direction = normalize(v_position - lights[i].vector);
-			intensity = lights[i].intensity / distance(v_position, lights[i].vector);
+			light_direction = normalize(v_position - u_lights[i].vector);
+			intensity = u_lights[i].intensity / distance(v_position, u_lights[i].vector);
 		}
 
 		// Ambiant
 		ambient_color += ((1 - u_textured) * u_material.color.rgb + u_textured * texture2D(u_texture, v_texcoord).rgb) * u_material.ambient * intensity;
 
-		if (lights[i].type != 0)
+		if (u_lights[i].type != 0)
 		{
 			// Diffuse
-			diffuse_color += ((1 - u_textured) * u_material.color.rgb + u_textured * texture2D(u_texture, v_texcoord).rgb) * u_material.diffuse * max(0., dot(v_normal, -light_direction)) * lights[i].color.rgb * intensity;
+			diffuse_color += ((1 - u_textured) * u_material.color.rgb + u_textured * texture2D(u_texture, v_texcoord).rgb) * u_material.diffuse * max(0., dot(v_normal, -light_direction)) * u_lights[i].color.rgb * intensity;
 
 			// Specular
 			vec3 reflection = reflect(light_direction, v_normal);
 			vec3 camera_direction = normalize(u_camera - v_position);
-			specular_color += u_material.specular * pow(max(0., dot(reflection, camera_direction)), u_material.shininess) * lights[i].color.rgb * intensity;
+			specular_color += u_material.specular * pow(max(0., dot(reflection, camera_direction)), u_material.shininess) * u_lights[i].color.rgb * intensity;
 		}
 	}
 

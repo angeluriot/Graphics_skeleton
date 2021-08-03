@@ -7,6 +7,7 @@ namespace dim
 		frame_buffer.create(100, 100);
 		render_texture.create(100, 100);
 		controller = nullptr;
+		camera = nullptr;
 		this->name = name;
 		size = sf::Vector2i(100, 100);
 		min  = sf::Vector2i(0, 0);
@@ -24,12 +25,15 @@ namespace dim
 	{
 		delete controller;
 		controller = nullptr;
+
+		delete camera;
+		camera = nullptr;
 	}
 
 	void Scene::check_events(const sf::Event& sf_event)
 	{
-		if (controller != nullptr)
-			controller->check_events(sf_event, *this);
+		if (controller != nullptr && camera != nullptr)
+			controller->check_events(sf_event, *this, *camera);
 	}
 
 	void Scene::update()
@@ -38,7 +42,9 @@ namespace dim
 		{
 			frame_buffer.set_size(size.x, size.y);
 			render_texture.create(size.x, size.y);
-			camera.set_resolution(size.x, size.y);
+
+			if (camera != nullptr)
+				camera->set_resolution(size.x, size.y);
 
 			camera2D.set_resolution(size.x, size.y);
 			render_texture.setView(camera2D.get_view());
@@ -46,13 +52,19 @@ namespace dim
 			fixed_camera2D.set_resolution(size.x, size.y);
 		}
 
-		if (controller != nullptr)
-			controller->update(*this);
+		if (controller != nullptr && camera != nullptr)
+			controller->update(*this, *camera);
 
 		if (unique_shader)
 		{
 			shader.bind();
-			shader.send_uniform("u_camera", camera.get_position());
+
+			if (camera != nullptr)
+				shader.send_uniform("u_camera", camera->get_position());
+
+			else
+				shader.send_uniform("u_camera", Vector3(0.f, 0.f, -1.f));
+
 			shader.send_uniform("u_light", lights);
 			shader.unbind();
 		}
@@ -68,6 +80,11 @@ namespace dim
 	{
 		frame_buffer.unbind();
 		binded = false;
+	}
+
+	void Scene::set_camera(const Camera& camera)
+	{
+		this->camera = camera.clone();
 	}
 
 	void Scene::set_controller(const Controller& controller)

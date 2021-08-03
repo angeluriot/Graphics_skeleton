@@ -3,7 +3,7 @@
 
 #include "dim/utils/libraries.hpp"
 #include "dim/vectors/Vector3.hpp"
-#include "dim/objects/Light.hpp"
+#include "dim/lights/Light.hpp"
 #include "dim/utils/Color.hpp"
 
 namespace dim

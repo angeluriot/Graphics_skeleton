@@ -2,7 +2,7 @@
 
 namespace dim
 {
-	void Object::draw(const Camera& camera, const std::vector<Light>& lights, DrawType draw_type, bool scene_shader) const
+	void Object::draw(const Camera* camera, const std::vector<Light>& lights, DrawType draw_type, bool scene_shader) const
 	{
 		if (vertex_buffer.get_nb_vertices())
 		{
@@ -19,12 +19,23 @@ namespace dim
 
 			shader.send_uniform("u_model", model);
 			shader.send_uniform("u_normals_model", glm::transpose(glm::inverse(glm::mat3(model))));
-			shader.send_uniform("u_mvp", camera.get_matrix() * model);
+
+			if (camera != nullptr)
+				shader.send_uniform("u_mvp", camera->get_matrix() * model);
+
+			else
+				shader.send_uniform("u_mvp", model);
 
 			// Camera
 
 			if (!scene_shader)
-				shader.send_uniform("u_camera", camera.get_position());
+			{
+				if (camera != nullptr)
+					shader.send_uniform("u_camera", camera->get_position());
+
+				else
+					shader.send_uniform("u_camera", Vector3(0.f, 0.f, -1.f));
+			}
 
 			// Material
 

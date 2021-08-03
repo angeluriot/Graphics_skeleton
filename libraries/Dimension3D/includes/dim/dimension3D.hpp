@@ -2,9 +2,9 @@
 #define DIMENSION3D_H
 
 #include "dim/utils/libraries.hpp"
-#include "dim/utils/Mesh.hpp"
-#include "dim/objects/Light.hpp"
-#include "dim/utils/Material.hpp"
+#include "dim/objects/Mesh.hpp"
+#include "dim/lights/Light.hpp"
+#include "dim/objects/Material.hpp"
 #include "dim/Menu.hpp"
 #include "dim/objects/Object.hpp"
 #include "dim/opengl/Shader.hpp"

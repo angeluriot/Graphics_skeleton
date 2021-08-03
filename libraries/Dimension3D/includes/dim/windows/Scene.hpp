@@ -11,6 +11,8 @@ namespace dim
 	class Camera;
 	class Object;
 	class Controller;
+	class OrbitController;
+	class FlyController;
 	class DragController;
 
 	class Scene
@@ -21,6 +23,7 @@ namespace dim
 		FrameBuffer		frame_buffer;
 		sf::RenderTexture render_texture;
 		Controller*		controller;
+		Camera*			camera;
 		sf::Vector2i	size;
 		sf::Vector2i	min;
 		sf::Vector2i	max;
@@ -36,7 +39,6 @@ namespace dim
 
 	public:
 
-		Camera				camera;
 		Camera2D			camera2D;
 		std::vector<Light>	lights;
 
@@ -50,6 +52,7 @@ namespace dim
 		void				update();
 		void				bind() const;
 		void				unbind() const;
+		void				set_camera(const Camera& camera);
 		void				set_controller(const Controller& controller);
 		unsigned int		get_width() const;
 		unsigned int		get_height() const;
@@ -66,6 +69,9 @@ namespace dim
 		void				draw(const VertexBuffer& vertex_buffer, DrawType draw_type = DrawType::Triangles);
 		void				display();
 
+		friend				Controller;
+		friend				OrbitController;
+		friend				FlyController;
 		friend				DragController;
 	};
 }

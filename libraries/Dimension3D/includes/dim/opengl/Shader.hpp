@@ -23,6 +23,7 @@ namespace dim
 		std::shared_ptr<sf::Shader> shader;
 
 		static std::map<std::string, Shader> shaders;
+		static constexpr unsigned int max_lights = 10;
 
 		static void init();
 

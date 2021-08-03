@@ -30,12 +30,12 @@ namespace dim
 		camera.view = glm::lookAt(camera.position.to_glm(), (camera.position + camera.direction).to_glm(), glm::vec3(0.f, 1.f, 0.f));
 	}
 
-	void FlyController::look(Scene& scene)
+	void FlyController::look(Scene& scene, Camera& camera)
 	{
-		float new_yaw = scene.camera.yaw + (sf::Mouse::getPosition(Window::get_window()).x - scene.get_center().x) * sensitivity;
-		float new_pitch = scene.camera.pitch - (sf::Mouse::getPosition(Window::get_window()).y - scene.get_center().y) * sensitivity;
+		float new_yaw = camera.yaw + (sf::Mouse::getPosition(Window::get_window()).x - scene.get_center().x) * sensitivity;
+		float new_pitch = camera.pitch - (sf::Mouse::getPosition(Window::get_window()).y - scene.get_center().y) * sensitivity;
 
-		scene.camera.set_direction(new_yaw, new_pitch);
+		camera.set_direction(new_yaw, new_pitch);
 	}
 
 	FlyController::FlyController(float sensitivity, float speed)
@@ -56,7 +56,7 @@ namespace dim
 		return Type::Fly;
 	}
 
-	void FlyController::check_events(const sf::Event& sf_event, Scene& scene)
+	void FlyController::check_events(const sf::Event& sf_event, Scene& scene, Camera& camera)
 	{
 		if (!moving && sf_event.type == sf::Event::MouseButtonReleased && scene.is_in(sf::Mouse::getPosition(Window::get_window())))
 		{
@@ -74,12 +74,12 @@ namespace dim
 		}
 	}
 
-	void FlyController::update(Scene& scene)
+	void FlyController::update(Scene& scene, Camera& camera)
 	{
 		if (moving)
 		{
-			move(scene.camera);
-			look(scene);
+			move(camera);
+			look(scene, camera);
 			sf::Mouse::setPosition(scene.get_center(), dim::Window::get_window());
 			ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 		}

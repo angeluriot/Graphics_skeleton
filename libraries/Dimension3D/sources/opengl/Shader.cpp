@@ -94,24 +94,15 @@ namespace dim
 
 	void Shader::send_uniform(const std::string& name, const std::vector<Light>& lights) const
 	{
-		std::vector<int> light_types;
-		std::vector<Vector3> light_vectors;
-		std::vector<Color> light_colors;
-		std::vector<float> light_intensities;
-
-		for (auto& light : lights)
+		for (int i = 0; i < lights.size() && i < max_lights; i++)
 		{
-			light_types.push_back(static_cast<int>(light.get_type()));
-			light_vectors.push_back(light.get_vector());
-			light_colors.push_back(light.get_color());
-			light_intensities.push_back(light.get_intensity());
+			send_uniform("u_lights[" + std::to_string(i) + "].type", static_cast<int>(lights[i].get_type()));
+			send_uniform("u_lights[" + std::to_string(i) + "].vector", lights[i].get_vector());
+			send_uniform("u_lights[" + std::to_string(i) + "].color", lights[i].get_color());
+			send_uniform("u_lights[" + std::to_string(i) + "].intensity", lights[i].get_intensity());
 		}
 
-		send_uniform("u_light_types", light_types);
-		send_uniform("u_light_vectors", light_vectors);
-		send_uniform("u_light_colors", light_colors);
-		send_uniform("u_light_intensities", light_intensities);
-		send_uniform("u_nb_lights", static_cast<int>(lights.size()));
+		send_uniform("u_nb_lights", std::min(static_cast<int>(lights.size()), static_cast<int>(max_lights)));
 	}
 
 	void Shader::send_uniform(const std::string& name, const Material& material) const

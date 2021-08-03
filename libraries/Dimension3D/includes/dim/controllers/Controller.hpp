@@ -27,8 +27,8 @@ namespace dim
 		Controller& operator=(const Controller& other) = default;
 
 		virtual Type get_type() const = 0;
-		virtual void check_events(const sf::Event& sf_event, Scene& scene) = 0;
-		virtual void update(Scene& scene) = 0;
+		virtual void check_events(const sf::Event& sf_event, Scene& scene, Camera& camera) = 0;
+		virtual void update(Scene& scene, Camera& camera) = 0;
 
 		friend Scene;
 	};

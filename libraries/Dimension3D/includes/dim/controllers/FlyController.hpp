@@ -28,7 +28,7 @@ namespace dim
 
 		Controller* clone() const override;
 		void	move(Camera& camera);
-		void	look(Scene& scene);
+		void	look(Scene& scene, Camera& camera);
 
 	public:
 
@@ -38,8 +38,8 @@ namespace dim
 		FlyController& operator=(const FlyController& other) = default;
 
 		Type	get_type() const override;
-		void	check_events(const sf::Event& sf_event, Scene& scene) override;
-		void	update(Scene& scene) override;
+		void	check_events(const sf::Event& sf_event, Scene& scene, Camera& camera) override;
+		void	update(Scene& scene, Camera& camera) override;
 		void	set_controls(sf::Keyboard::Key forward, sf::Keyboard::Key left, sf::Keyboard::Key right, sf::Keyboard::Key backward, sf::Keyboard::Key up, sf::Keyboard::Key down);
 	};
 }
