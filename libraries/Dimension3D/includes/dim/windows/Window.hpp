@@ -16,6 +16,7 @@ namespace dim
 		static float				screen_coef;	// Co�fficient en fonction de la taille de l'�cran par rapport au 1080p
 		static sf::Clock			clock;
 		static float				elapsed_time;
+		static Color				background;
 
 	public: // CHANGER APRES !!!!!!!!!!
 
@@ -30,7 +31,7 @@ namespace dim
 		static sf::RenderWindow&	get_window();
 		static uint16_t				get_width();
 		static uint16_t				get_height();
-		static void					clear(const Color& color = Color(0.05f, 0.05f, 0.05f, 1.f));
+		static void					clear(const Color& color = background);
 		static void					draw(const sf::Drawable& drawable);
 		static void					display();
 		static void					close();

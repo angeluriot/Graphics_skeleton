@@ -65,4 +65,49 @@ namespace dim
 	{
 		return sf::Color(static_cast<sf::Uint8>(r * 255.f), static_cast<sf::Uint8>(g * 255.f), static_cast<sf::Uint8>(b * 255.f), static_cast<sf::Uint8>(a * 255.f));
 	}
+
+	ImVec4 Color::to_im() const
+	{
+		return ImVec4(r, g, b, a);
+	}
+
+	Color operator+(const Color& color_1, const Color& color_2)
+	{
+		return Color(color_1.r + color_2.r, color_1.g + color_2.g, color_1.b + color_2.b, color_1.a + color_2.a);
+	}
+
+	Color operator-(const Color& color_1, const Color& color_2)
+	{
+		return Color(color_1.r - color_2.r, color_1.g - color_2.g, color_1.b - color_2.b, color_1.a - color_2.a);
+	}
+
+	Color operator*(const Color& color_1, const Color& color_2)
+	{
+		return Color(color_1.r * color_2.r, color_1.g * color_2.g, color_1.b * color_2.b, color_1.a * color_2.a);
+	}
+
+	Color operator*(float number, const Color& color)
+	{
+		return Color(number * color.r, number * color.g, number * color.b, number * color.a);
+	}
+
+	Color operator*(const Color& color, float number)
+	{
+		return Color(color.r * number, color.g * number, color.b * number, color.a * number);
+	}
+
+	Color operator/(const Color& color_1, const Color& color_2)
+	{
+		return Color(color_1.r / color_2.r, color_1.g / color_2.g, color_1.b / color_2.b, color_1.a / color_2.a);
+	}
+
+	Color operator/(float number, const Color& color)
+	{
+		return Color(number / color.r, number / color.g, number / color.b, number / color.a);
+	}
+
+	Color operator/(const Color& color, float number)
+	{
+		return Color(color.r / number, color.g / number, color.b / number, color.a / number);
+	}
 }

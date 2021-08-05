@@ -10,6 +10,7 @@ int main()
 	dim::Texture::add("texture_1", "resources/textures/jojo.jpg");
 	dim::Texture::add("texture_2", "resources/textures/rem.png");
 	dim::Texture::add("texture_3", "resources/textures/pessi.jpg");
+	dim::Texture::add("earth", "resources/textures/earth.jpg");
 
 	dim::Scene scene_1("My_scene_1");
 	dim::Scene scene_2("My_scene_2");
@@ -17,8 +18,11 @@ int main()
 	scene_1.set_controller(dim::OrbitController());
 	scene_2.set_controller(dim::OrbitController());
 
-	scene_1.set_camera(dim::PerspectiveCamera());
-	scene_2.set_camera(dim::PerspectiveCamera());
+	dim::PerspectiveCamera cam;
+	cam.set_position(dim::Vector3(0.f, 0.f, 1.5f));
+
+	scene_1.set_camera(cam);
+	scene_2.set_camera(cam);
 
 	scene_1.add_light(dim::DirectionalLight(dim::Vector3(-1.f, -1.f, -1.f), sf::Color(255, 50, 50)));
 	scene_1.add_light(dim::DirectionalLight(dim::Vector3(1.f, 1.f, -1.f), sf::Color(50, 50, 255)));
@@ -28,8 +32,8 @@ int main()
 
 	scene_2.set_post_processing_shader(dim::Shader::get("screen"));
 
-	dim::Object object_1(dim::Mesh::circle_64, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
-	object_1.set_texture("texture_3");
+	dim::Object object_1(dim::Mesh::screen, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
+	object_1.set_texture("earth");
 	object_1.set_size(dim::Vector3(1.f, 1.f, 1.f));
 	object_1.move(dim::Vector3(0.f, 0.f, 0.f));
 
@@ -113,6 +117,18 @@ int main()
 		}
 
 		ImGui::ColorPicker3("color_2", color, ImGuiColorEditFlags_PickerHueWheel);
+
+		static float slider_value;
+		static float slider_values[3];
+		static float slider_angle;
+		static bool check;
+		static int current = 3;
+
+		ImGui::SliderFloat("Slider", &slider_value, 0, 500);
+		ImGui::SliderFloat3("Slider_2", slider_values, 100, 300);
+		ImGui::SliderAngle("Slider_3", &slider_angle);
+		ImGui::Checkbox("Check", &check);
+		ImGui::Combo("combo", &current, "tomates\0bananes\0courgettes\0pommes\0machins");
 
 		if (clock.getElapsedTime().asSeconds() > 0.3f)
 		{

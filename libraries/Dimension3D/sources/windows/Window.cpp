@@ -7,6 +7,7 @@ namespace dim
 	bool				Window::running			= false;
 	sf::Clock			Window::clock;
 	float				Window::elapsed_time	= 1.f / 60.f;
+	Color				Window::background		= Color(13.f / 255.f, 17.f / 255.f, 23.f / 255.f);
 
 	void Window::create_relative(const std::string& project_name, float screen_ratio, float window_ratio, bool resizable, const std::string& icon_path)
 	{
@@ -117,9 +118,13 @@ namespace dim
 		window->clear(color.to_sf());
 
 		glViewport(0, 0, Window::get_width(), Window::get_height());
-		glEnable(GL_DEPTH_TEST);
 		glClearColor(color.r, color.g, color.b, color.a);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+		glFrontFace(GL_CW);
 
 		ImGui::SFML::Update(dim::Window::get_window(), sf::seconds(Window::elapsed_time));
 

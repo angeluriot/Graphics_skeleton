@@ -230,7 +230,10 @@ namespace dim
 
 		// ImGui
 
-		ImGui::Begin(name.data());
+		ImGui::SetNextWindowSizeConstraints(ImVec2(50, 50), ImVec2(10000, 10000));
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse;
+
+		ImGui::Begin(name.data(), NULL, windowFlags);
 
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 

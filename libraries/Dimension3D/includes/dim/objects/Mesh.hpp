@@ -46,10 +46,10 @@ namespace dim
 		void				clear();
 
 		static Mesh			Circle(unsigned int nb_edges);
-		static Mesh			Cone(unsigned int nb_lattitudes);
+		static Mesh			Cone(unsigned int nb_latitudes);
 		static Mesh			Cube();
 		static Mesh			EmptyCube();
-		static Mesh			Cylinder(unsigned int nb_lattitudes);
+		static Mesh			Cylinder(unsigned int nb_latitudes);
 		static Mesh			Sphere(unsigned int nb_latitudes, unsigned int nb_longitudes);
 		static Mesh			Square();
 		static Mesh			Screen();

@@ -43,9 +43,9 @@ namespace dim
 
 	void Camera2D::set_resolution(unsigned int width, unsigned int height)
 	{
-		move((Vector2(width, height) - size) * 0.5f * zoom_level);
+		move((Vector2(static_cast<float>(width), static_cast<float>(height)) - size) * 0.5f * zoom_level);
 
-		size = Vector2(width, height);
+		size = Vector2(static_cast<float>(width), static_cast<float>(height));
 		view.setSize(zoom_level * size.to_sf_float());
 	}
 

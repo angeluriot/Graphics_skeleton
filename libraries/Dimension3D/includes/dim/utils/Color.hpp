@@ -40,7 +40,17 @@ namespace dim
 		Color& operator=(const sf::Color& color);
 
 		sf::Color to_sf() const;
+		ImVec4 to_im() const;
 	};
+
+	Color operator+(const Color& color_1, const Color& color_2);
+	Color operator-(const Color& color_1, const Color& color_2);
+	Color operator*(const Color& color_1, const Color& color_2);
+	Color operator*(float number, const Color& color);
+	Color operator*(const Color& color, float number);
+	Color operator/(const Color& color_1, const Color& color_2);
+	Color operator/(float number, const Color& color);
+	Color operator/(const Color& color, float number);
 }
 
 #endif

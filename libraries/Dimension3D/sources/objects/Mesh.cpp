@@ -92,663 +92,497 @@ namespace dim
 
 	Mesh Mesh::Circle(unsigned int nb_edges)
 	{
-		std::vector<float> positions;
-		std::vector<float> normals;
-		std::vector<float> texcoords;
-
-		positions.resize(9 * nb_edges, 0.f);
-		normals.resize(9 * nb_edges, 0.f);
-		texcoords.resize(6 * nb_edges, 0.f);
-
-		for (uint16_t i = 0; i < nb_edges; i++)
-		{
-			float pos[] =
-			{
-				(float)cos(i * 2.f * pi / nb_edges), (float)sin(i * 2.f * pi / nb_edges), 0.f,
-				0.f, 0.f, 0.f,
-				(float)cos((i + 1) * 2.f * pi / nb_edges), (float)sin((i + 1) * 2.f * pi / nb_edges), 0.f
-			};
-
-			for (uint16_t j = 0; j < 9; j++)
-				positions[9 * i + j] = 0.5f * pos[j];
-
-			for (uint16_t j = 0; j < 3; j++)
-				for (uint16_t k = 0; k < 2; k++)
-					texcoords[6 * i + 2 * j + k] = positions[9 * i + 3 * j + k] + 0.5f;
-
-			for (uint16_t j = 0; j < 3; j++)
-			{
-				float normal[] = { 0.f, 0.f, 1.f };
-
-				for (uint16_t k = 0; k < 3; k++)
-					normals[9 * i + 3 * j + k] = normal[k];
-			}
-		}
-
 		Mesh mesh;
+		float nb = static_cast<float>(nb_edges);
 
-		for (int i = 0; i < positions.size(); i += 3)
+		for (unsigned int i = 0; i < nb_edges; i++)
 		{
-			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
-			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+			mesh.positions.push_back(Vector3(0.5f * cos(i * 2.f * pi / nb), 0.5f * sin(i * 2.f * pi / nb), 0.f));
+			mesh.positions.push_back(Vector3(0.f, 0.f, 0.f));
+			mesh.positions.push_back(Vector3(0.5f * cos((i + 1) * 2.f * pi / nb), 0.5f * sin((i + 1) * 2.f * pi / nb), 0.f));
 		}
 
-		for (int i = 0; i < texcoords.size(); i += 2)
-			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+		for (auto& position : mesh.positions)
+		{
+			mesh.normals.push_back(Vector3(0.f, 0.f, 1.f));
+			mesh.texcoords.push_back(Vector2(position.x + 0.5f, 0.5f - position.y));
+		}
 
 		return mesh;
 	}
 
-	Mesh Mesh::Cone(unsigned int nb_lattitudes)
+	Mesh Mesh::Cone(unsigned int nb_latitudes)
 	{
-		std::vector<float> positions;
-		std::vector<float> normals;
-		std::vector<float> texcoords;
-
-		float radius = 0.5f;
-		positions.resize(3 * 6 * nb_lattitudes, 0.f);
-		normals.resize(3 * 6 * nb_lattitudes, 0.f);
-		texcoords.resize(2 * 6 * nb_lattitudes, 0.f);
-
-		for (uint16_t i = 0; i < nb_lattitudes; i++)
-		{
-			float pos[] =
-			{
-				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
-				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2.f * pi / nb_lattitudes), -1.f / 2.f,
-				cos((i + 1) * 2.f * pi / nb_lattitudes), sin((i + 1) * 2.f * pi / nb_lattitudes), 1.f / 2.f,
-
-				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
-				cos((i + 1) * 2.f * pi / nb_lattitudes), sin((i + 1) * 2 * pi / nb_lattitudes), 1.f / 2.f,
-				cos(i * 2.f * pi / nb_lattitudes), sin(i * 2.f * pi / nb_lattitudes), 1.f / 2.f
-			};
-
-			float uvPos[] =
-			{
-				i / (float)nb_lattitudes, 0.f,
-				(i + 1) / (float)nb_lattitudes, 0.f,
-				(i + 1) / (float)nb_lattitudes, 1.f,
-
-				i / (float)nb_lattitudes, 0.f,
-				(i + 1) / (float)nb_lattitudes, 1.f,
-				i / (float)nb_lattitudes, 1.f
-			};
-
-			for (int j = 0; j < 18; j++)
-				positions[18 * i + j] = pos[j];
-
-			for (int j = 0; j < 12; j++)
-				texcoords[12 * i + j] = uvPos[j];
-
-			float angle = pi / 4.f;
-			glm::vec3 normalI = glm::rotate(glm::mat4(1.f), (float)(i * 2.f * pi / nb_lattitudes), glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(cos(angle), 0.f, sin(angle), 1.f);
-			glm::vec3 normalI2 = glm::rotate(glm::mat4(1.f), (float)((i + 1.f) * 2.f * pi / nb_lattitudes), glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(cos(angle), 0.f, sin(angle), 1.f);
-
-			for (int j = 0; j < 3; j++)
-			{
-				normals[18 * i + 0 + j] = normalI[j];
-				normals[18 * i + 3 + j] = normalI2[j];
-				normals[18 * i + 6 + j] = normalI2[j];
-				normals[18 * i + 9 + j] = normalI[j];
-				normals[18 * i + 12 + j] = normalI2[j];
-				normals[18 * i + 15 + j] = normalI[j];
-			}
-		}
-
 		Mesh mesh;
+		float nb = static_cast<float>(nb_latitudes);
 
-		for (int i = 0; i < positions.size(); i += 3)
+		for (unsigned int i = 0; i < nb_latitudes; i++)
 		{
-			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
-			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+			mesh.positions.push_back(Vector3(0.5f * cos((i + 1) * 2.f * pi / nb), -0.5f, 0.5f * sin((i + 1) * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.5f * cos(i * 2.f * pi / nb), -0.5f, 0.5f * sin(i * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.f, 0.5f, 0.f));
+
+			mesh.normals.push_back(normalized(Vector3(mesh.positions[i * 3].x, 0.25f, mesh.positions[i * 3].z)));
+			mesh.normals.push_back(normalized(Vector3(mesh.positions[i * 3 + 1].x, 0.25f, mesh.positions[i * 3 + 1].z)));
+			mesh.normals.push_back((mesh.normals[i * 3] + mesh.normals[i * 3 + 1]) / 2.f);
+
+			mesh.texcoords.push_back(Vector2((i + 1) / nb, 1.f));
+			mesh.texcoords.push_back(Vector2(i / nb, 1.f));
+			mesh.texcoords.push_back(Vector2((i + 0.5f) / nb, 0.f));
 		}
 
-		for (int i = 0; i < texcoords.size(); i += 2)
-			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+		for (unsigned int i = 0; i < nb_latitudes; i++)
+		{
+			mesh.positions.push_back(Vector3(0.5f * cos(i * 2.f * pi / nb), -0.5f, 0.5f * sin(i * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.5f * cos((i + 1) * 2.f * pi / nb), -0.5f, 0.5f * sin((i + 1) * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.f, -0.5f, 0.f));
+
+			mesh.normals.push_back(Vector3(0.f, -1.f, 0.f));
+			mesh.normals.push_back(Vector3(0.f, -1.f, 0.f));
+			mesh.normals.push_back(Vector3(0.f, -1.f, 0.f));
+
+			mesh.texcoords.push_back(Vector2(mesh.positions[(nb_latitudes + i) * 3].x + 0.5f, 0.5f - mesh.positions[(nb_latitudes + i) * 3].z));
+			mesh.texcoords.push_back(Vector2(mesh.positions[(nb_latitudes + i) * 3 + 1].x + 0.5f, 0.5f - mesh.positions[(nb_latitudes + i) * 3 + 1].z));
+			mesh.texcoords.push_back(Vector2(mesh.positions[(nb_latitudes + i) * 3 + 2].x + 0.5f, 0.5f - mesh.positions[(nb_latitudes + i) * 3 + 2].z));
+		}
 
 		return mesh;
 	}
 
 	Mesh Mesh::Cube()
 	{
-		std::vector<float> positions;
-		std::vector<float> normals;
-		std::vector<float> texcoords;
-
-		positions =
-		{
-			//Back
-			-0.5f,  0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f,
-			0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-
-			//Front
-			0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-			0.5f, -0.5f,  0.5f,
-			0.5f,  0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-
-			//Left
-			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f,  0.5f,
-
-			//Right
-			0.5f,  0.5f, -0.5f,
-			0.5f,  0.5f,  0.5f,
-			0.5f, -0.5f,  0.5f,
-			0.5f, -0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f,
-			0.5f, -0.5f,  0.5f,
-
-			//Top
-			0.5f,  0.5f, -0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f,  0.5f,  0.5f,
-			0.5f,  0.5f, -0.5f,
-			-0.5f,  0.5f,  0.5f,
-			0.5f,  0.5f,  0.5f,
-
-			//Bottom
-			0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f, -0.5f,
-			0.5f, -0.5f, -0.5f,
-			0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f
-		};
-
-		normals =
-		{
-			//Back
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f,
-
-			//Front
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f,
-
-			//Left
-			-1.f, 0.f, 0.f,
-			-1.f, 0.f, 0.f,
-			-1.f, 0.f, 0.f,
-			-1.f, 0.f, 0.f,
-			-1.f, 0.f, 0.f,
-			-1.f, 0.f, 0.f,
-
-			//Right
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-
-			//Top
-			0.f, 1.f, 0.f,
-			0.f, 1.f, 0.f,
-			0.f, 1.f, 0.f,
-			0.f, 1.f, 0.f,
-			0.f, 1.f, 0.f,
-			0.f, 1.f, 0.f,
-
-			//Bottom
-			0.f, -1.f, 0.f,
-			0.f, -1.f, 0.f,
-			0.f, -1.f, 0.f,
-			0.f, -1.f, 0.f,
-			0.f, -1.f, 0.f,
-			0.f, -1.f, 0.f
-		};
-
-		texcoords =
-		{
-			//Back
-			1.f, 0.f,
-			0.f, 0.f,
-			1.f, 1.f,
-			0.f, 0.f,
-			0.f, 1.f,
-			1.f, 1.f,
-
-			//Front
-			1.f, 0.f,
-			0.f, 0.f,
-			0.f, 1.f,
-			1.f, 1.f,
-			1.f, 0.f,
-			0.f, 1.f,
-
-			//Left
-			1.f, 0.f,
-			0.f, 0.f,
-			1.f, 1.f,
-			0.f, 0.f,
-			0.f, 1.f,
-			1.f, 1.f,
-
-			//Right
-			1.f, 0.f,
-			0.f, 0.f,
-			0.f, 1.f,
-			1.f, 1.f,
-			1.f, 0.f,
-			0.f, 1.f,
-
-			//Top
-			1.f, 0.f,
-			0.f, 0.f,
-			0.f, 1.f,
-			1.f, 0.f,
-			0.f, 1.f,
-			1.f, 1.f,
-
-			//Bottom
-			0.f, 0.f,
-			1.f, 1.f,
-			1.f, 0.f,
-			0.f, 0.f,
-			0.f, 1.f,
-			1.f, 1.f
-		};
-
 		Mesh mesh;
 
-		for (int i = 0; i < positions.size(); i += 3)
+		mesh.positions =
 		{
-			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
-			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
-		}
+			//Back
+			Vector3(-0.5f,  0.5f, -0.5f),
+			Vector3( 0.5f,  0.5f, -0.5f),
+			Vector3(-0.5f, -0.5f, -0.5f),
+			Vector3( 0.5f,  0.5f, -0.5f),
+			Vector3( 0.5f, -0.5f, -0.5f),
+			Vector3(-0.5f, -0.5f, -0.5f),
 
-		for (int i = 0; i < texcoords.size(); i += 2)
-			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+			//Front
+			Vector3( 0.5f,  0.5f,  0.5f),
+			Vector3(-0.5f,  0.5f,  0.5f),
+			Vector3(-0.5f, -0.5f,  0.5f),
+			Vector3( 0.5f, -0.5f,  0.5f),
+			Vector3( 0.5f,  0.5f,  0.5f),
+			Vector3(-0.5f, -0.5f,  0.5f),
+
+			//Left
+			Vector3(-0.5f,  0.5f,  0.5f),
+			Vector3(-0.5f,  0.5f, -0.5f),
+			Vector3(-0.5f, -0.5f,  0.5f),
+			Vector3(-0.5f,  0.5f, -0.5f),
+			Vector3(-0.5f, -0.5f, -0.5f),
+			Vector3(-0.5f, -0.5f,  0.5f),
+
+			//Right
+			Vector3(0.5f,  0.5f, -0.5f),
+			Vector3(0.5f,  0.5f,  0.5f),
+			Vector3(0.5f, -0.5f,  0.5f),
+			Vector3(0.5f, -0.5f, -0.5f),
+			Vector3(0.5f,  0.5f, -0.5f),
+			Vector3(0.5f, -0.5f,  0.5f),
+
+			//Top
+			Vector3( 0.5f,  0.5f, -0.5f),
+			Vector3(-0.5f,  0.5f, -0.5f),
+			Vector3(-0.5f,  0.5f,  0.5f),
+			Vector3( 0.5f,  0.5f, -0.5f),
+			Vector3(-0.5f,  0.5f,  0.5f),
+			Vector3( 0.5f,  0.5f,  0.5f),
+
+			//Bottom
+			Vector3( 0.5f, -0.5f, -0.5f),
+			Vector3(-0.5f, -0.5f,  0.5f),
+			Vector3(-0.5f, -0.5f, -0.5f),
+			Vector3( 0.5f, -0.5f, -0.5f),
+			Vector3( 0.5f, -0.5f,  0.5f),
+			Vector3(-0.5f, -0.5f,  0.5f)
+		};
+
+		mesh.normals =
+		{
+			//Back
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f),
+
+			//Front
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f),
+
+			//Left
+			Vector3(-1.f, 0.f, 0.f),
+			Vector3(-1.f, 0.f, 0.f),
+			Vector3(-1.f, 0.f, 0.f),
+			Vector3(-1.f, 0.f, 0.f),
+			Vector3(-1.f, 0.f, 0.f),
+			Vector3(-1.f, 0.f, 0.f),
+
+			//Right
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+
+			//Top
+			Vector3(0.f, 1.f, 0.f),
+			Vector3(0.f, 1.f, 0.f),
+			Vector3(0.f, 1.f, 0.f),
+			Vector3(0.f, 1.f, 0.f),
+			Vector3(0.f, 1.f, 0.f),
+			Vector3(0.f, 1.f, 0.f),
+
+			//Bottom
+			Vector3(0.f, -1.f, 0.f),
+			Vector3(0.f, -1.f, 0.f),
+			Vector3(0.f, -1.f, 0.f),
+			Vector3(0.f, -1.f, 0.f),
+			Vector3(0.f, -1.f, 0.f),
+			Vector3(0.f, -1.f, 0.f)
+		};
+
+		mesh.texcoords =
+		{
+			//Back
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(1.f, 1.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 1.f),
+			Vector2(1.f, 1.f),
+
+			//Front
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 1.f),
+			Vector2(1.f, 1.f),
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 1.f),
+
+			//Left
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(1.f, 1.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 1.f),
+			Vector2(1.f, 1.f),
+
+			//Right
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 1.f),
+			Vector2(1.f, 1.f),
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 1.f),
+
+			//Top
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 1.f),
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 1.f),
+			Vector2(1.f, 1.f),
+
+			//Bottom
+			Vector2(0.f, 0.f),
+			Vector2(1.f, 1.f),
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 1.f),
+			Vector2(1.f, 1.f)
+		};
 
 		return mesh;
 	}
 
 	Mesh Mesh::EmptyCube()
 	{
-		std::vector<float> positions;
-		std::vector<float> normals;
-		std::vector<float> texcoords;
-
-		positions =
-		{
-			//Back
-			0.5f, -0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			-0.5f,  0.5f, -0.5f,
-
-			//Front
-			0.5f, -0.5f,  0.5f,
-			0.5f,  0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-
-			//Top
-			-0.5f,  0.5f, -0.5f,
-			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f,
-			0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			0.5f,  0.5f,  0.5f,
-			0.5f,  0.5f, -0.5f,
-
-			//Bottom
-			-0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f, -0.5f,
-			0.5f, -0.5f, -0.5f,
-			0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-			0.5f, -0.5f,  0.5f,
-			0.5f, -0.5f, -0.5f
-		};
-
-		normals =
-		{
-			//Back
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-
-			//Front
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-
-			//Top
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-
-			//Bottom
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f,
-			1.f, 0.f, 0.f
-		};
-
-		texcoords =
-		{
-			//Back
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-
-			//Front
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-
-			//Top
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-
-			//Bottom
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f,
-			0.f, 0.f
-		};
-
 		Mesh mesh;
 
-		for (int i = 0; i < positions.size(); i += 3)
+		mesh.positions =
 		{
-			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
-			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
-		}
+			//Back
+			Vector3( 0.5f, -0.5f, -0.5f),
+			Vector3( 0.5f,  0.5f, -0.5f),
+			Vector3(-0.5f, -0.5f, -0.5f),
+			Vector3(-0.5f,  0.5f, -0.5f),
 
-		for (int i = 0; i < texcoords.size(); i += 2)
-			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+			//Front
+			Vector3( 0.5f, -0.5f,  0.5f),
+			Vector3( 0.5f,  0.5f,  0.5f),
+			Vector3(-0.5f, -0.5f,  0.5f),
+			Vector3(-0.5f,  0.5f,  0.5f),
+
+			//Top
+			Vector3(-0.5f,  0.5f, -0.5f),
+			Vector3(-0.5f,  0.5f,  0.5f),
+			Vector3(-0.5f,  0.5f, -0.5f),
+			Vector3( 0.5f,  0.5f, -0.5f),
+			Vector3( 0.5f,  0.5f,  0.5f),
+			Vector3(-0.5f,  0.5f,  0.5f),
+			Vector3( 0.5f,  0.5f,  0.5f),
+			Vector3( 0.5f,  0.5f, -0.5f),
+
+			//Bottom
+			Vector3(-0.5f, -0.5f, -0.5f),
+			Vector3(-0.5f, -0.5f,  0.5f),
+			Vector3(-0.5f, -0.5f, -0.5f),
+			Vector3( 0.5f, -0.5f, -0.5f),
+			Vector3( 0.5f, -0.5f,  0.5f),
+			Vector3(-0.5f, -0.5f,  0.5f),
+			Vector3( 0.5f, -0.5f,  0.5f),
+			Vector3( 0.5f, -0.5f, -0.5f)
+		};
+
+		mesh.normals =
+		{
+			//Back
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+
+			//Front
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+
+			//Top
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+
+			//Bottom
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f),
+			Vector3(1.f, 0.f, 0.f)
+		};
+
+		mesh.texcoords =
+		{
+			//Back
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+
+			//Front
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+
+			//Top
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+
+			//Bottom
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 0.f)
+		};
 
 		return mesh;
 	}
 
-	Mesh Mesh::Cylinder(unsigned int nb_lattitudes)
+	Mesh Mesh::Cylinder(unsigned int nb_latitudes)
 	{
-		std::vector<float> positions;
-		std::vector<float> normals;
-		std::vector<float> texcoords;
-
-		float radius = 0.5f;
-
-		positions.resize(3 * 6 * nb_lattitudes, 0.f);
-		normals.resize(3 * 6 * nb_lattitudes, 0.f);
-		texcoords.resize(2 * 6 * nb_lattitudes, 0.f);
-
-		for (uint16_t i = 0; i < nb_lattitudes; i++)
-		{
-			float pos[] =
-			{
-				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
-				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2 * pi / nb_lattitudes), -1.f / 2.f,
-				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2 * pi / nb_lattitudes), 1.f / 2.f,
-
-				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), -1.f / 2.f,
-				radius * cos((i + 1) * 2.f * pi / nb_lattitudes), radius * sin((i + 1) * 2.f * pi / nb_lattitudes), 1.f / 2.f,
-				radius * cos(i * 2.f * pi / nb_lattitudes), radius * sin(i * 2.f * pi / nb_lattitudes), 1.f / 2.f
-			};
-
-			float uvPos[] =
-			{
-				i / (float)nb_lattitudes, 0.f,
-				(i + 1) / (float)nb_lattitudes, 0.f,
-				(i + 1) / (float)nb_lattitudes, 1.f,
-
-				i / (float)nb_lattitudes, 0.f,
-				(i + 1) / (float)nb_lattitudes, 1.f,
-				i / (float)nb_lattitudes, 1.f
-			};
-
-			for (int j = 0; j < 18; j++)
-				positions[18 * i + j] = pos[j];
-
-			for (int j = 0; j < 12; j++)
-				texcoords[12 * i + j] = uvPos[j];
-
-			for (int j = 0; j < 6; j++)
-			{
-				for (int k = 0; k < 2; k++)
-					normals[18 * i + 3 * j + k] = pos[3 * j + k];
-
-				normals[18 * i + 3 * j + 2] = 0.f;
-			}
-		}
-
 		Mesh mesh;
+		float nb = static_cast<float>(nb_latitudes);
 
-		for (int i = 0; i < positions.size(); i += 3)
+		for (unsigned int i = 0; i < nb_latitudes; i++)
 		{
-			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
-			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
+			mesh.positions.push_back(Vector3(0.5f * cos((i + 1) * 2.f * pi / nb), -0.5f, 0.5f * sin((i + 1) * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.5f * cos(i * 2.f * pi / nb), -0.5f, 0.5f * sin(i * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.5f * cos(i * 2.f * pi / nb), 0.5f, 0.5f * sin(i * 2.f * pi / nb)));
+
+			mesh.positions.push_back(Vector3(0.5f * cos(i * 2.f * pi / nb), 0.5f, 0.5f * sin(i * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.5f * cos((i + 1) * 2.f * pi / nb), 0.5f, 0.5f * sin((i + 1) * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.5f * cos((i + 1) * 2.f * pi / nb), -0.5f, 0.5f * sin((i + 1) * 2.f * pi / nb)));
+
+			mesh.texcoords.push_back(Vector2((i + 1) / nb, 1.f));
+			mesh.texcoords.push_back(Vector2(i / nb, 1.f));
+			mesh.texcoords.push_back(Vector2(i / nb, 0.f));
+
+			mesh.texcoords.push_back(Vector2(i / nb, 0.f));
+			mesh.texcoords.push_back(Vector2((i + 1) / nb, 0.f));
+			mesh.texcoords.push_back(Vector2((i + 1) / nb, 1.f));
 		}
 
-		for (int i = 0; i < texcoords.size(); i += 2)
-			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+		for (auto& position : mesh.positions)
+			mesh.normals.push_back(normalized(Vector3(position.x, 0.f, position.z)));
+
+		for (unsigned int i = 0; i < nb_latitudes; i++)
+		{
+			mesh.positions.push_back(Vector3(0.5f * cos(i * 2.f * pi / nb), -0.5f, 0.5f * sin(i * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.5f * cos((i + 1) * 2.f * pi / nb), -0.5f, 0.5f * sin((i + 1) * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.f, -0.5f, 0.f));
+
+			mesh.normals.push_back(Vector3(0.f, -1.f, 0.f));
+			mesh.normals.push_back(Vector3(0.f, -1.f, 0.f));
+			mesh.normals.push_back(Vector3(0.f, -1.f, 0.f));
+
+			mesh.texcoords.push_back(Vector2(mesh.positions[nb_latitudes * 6 + i * 3].x + 0.5f, 0.5f - mesh.positions[nb_latitudes * 6 + i * 3].z));
+			mesh.texcoords.push_back(Vector2(mesh.positions[nb_latitudes * 6 + i * 3 + 1].x + 0.5f, 0.5f - mesh.positions[nb_latitudes * 6 + i * 3 + 1].z));
+			mesh.texcoords.push_back(Vector2(mesh.positions[nb_latitudes * 6 + i * 3 + 2].x + 0.5f, 0.5f - mesh.positions[nb_latitudes * 6 + i * 3 + 2].z));
+		}
+
+		for (unsigned int i = 0; i < nb_latitudes; i++)
+		{
+			mesh.positions.push_back(Vector3(0.5f * cos((i + 1) * 2.f * pi / nb), 0.5f, 0.5f * sin((i + 1) * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.5f * cos(i * 2.f * pi / nb), 0.5f, 0.5f * sin(i * 2.f * pi / nb)));
+			mesh.positions.push_back(Vector3(0.f, 0.5f, 0.f));
+
+			mesh.normals.push_back(Vector3(0.f, 1.f, 0.f));
+			mesh.normals.push_back(Vector3(0.f, 1.f, 0.f));
+			mesh.normals.push_back(Vector3(0.f, 1.f, 0.f));
+
+			mesh.texcoords.push_back(Vector2(mesh.positions[nb_latitudes * 9 + i * 3].x + 0.5f, 0.5f - mesh.positions[nb_latitudes * 9 + i * 3].z));
+			mesh.texcoords.push_back(Vector2(mesh.positions[nb_latitudes * 9 + i * 3 + 1].x + 0.5f, 0.5f - mesh.positions[nb_latitudes * 9 + i * 3 + 1].z));
+			mesh.texcoords.push_back(Vector2(mesh.positions[nb_latitudes * 9 + i * 3 + 2].x + 0.5f, 0.5f - mesh.positions[nb_latitudes * 9 + i * 3 + 2].z));
+		}
 
 		return mesh;
 	}
 
 	Mesh Mesh::Sphere(unsigned int nb_latitudes, unsigned int nb_longitudes)
 	{
-		std::vector<float> positions;
-		std::vector<float> normals;
-		std::vector<float> texcoords;
-
-		float radius = 0.5f;
-
-		// Determine position
-		glm::vec3* vertexCoord = (glm::vec3*)malloc(nb_longitudes * nb_latitudes * sizeof(glm::vec3));
-		glm::vec2* uvCoord = (glm::vec2*)malloc(nb_longitudes * nb_latitudes * sizeof(glm::vec2));
-
-		for (int i = 0; i < (int)nb_longitudes; i++)
-		{
-			float theta = 2.f * pi / (nb_longitudes - 1) * i;
-
-			for (int j = 0; j < (int)nb_latitudes; j++)
-			{
-				float phi = pi / (nb_latitudes - 1) * j;
-				float pos[] = { sin(phi) * sin(theta), cos(phi), cos(theta) * sin(phi) };
-				float uvs[] = { i / (float)(nb_longitudes), j / (float)(nb_latitudes) };
-
-				for (int k = 0; k < 3; k++)
-					vertexCoord[i * nb_latitudes + j][k] = radius * pos[k];
-
-				for (int k = 0; k < 2; k++)
-					uvCoord[i * nb_latitudes + j][k] = uvs[k];
-			}
-		}
-
-		// Determine draw orders
-		int* order = (int*)malloc(nb_longitudes * (nb_latitudes - 1) * sizeof(int) * 6);
-
-		for (int i = 0; i < (int)nb_longitudes; i++)
-		{
-			for (int j = 0; j < (int)nb_latitudes - 1; j++)
-			{
-				int o[] =
-				{
-					i * (int)nb_latitudes + j, (i + 1) * ((int)nb_latitudes) % ((int)nb_latitudes * (int)nb_longitudes) + (j + 1) % (int)nb_latitudes, (i + 1) * ((int)nb_latitudes) % ((int)nb_latitudes * (int)nb_longitudes) + j,
-					i * (int)nb_latitudes + j, i * ((int)nb_latitudes)+(j + 1) % (int)nb_latitudes, (i + 1) * ((int)nb_latitudes) % ((int)nb_latitudes * (int)nb_longitudes) + (j + 1) % (int)nb_latitudes
-				};
-
-				for (int k = 0; k < 6; k++)
-					order[(nb_latitudes - 1) * i * 6 + j * 6 + k] = o[k];
-			}
-		}
-
-		// Merge everything
-		positions.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 3, 0.f);
-		normals.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 3, 0.f);
-		texcoords.resize(nb_longitudes * (nb_latitudes - 1) * 6 * 2, 0.f);
-
-		for (int i = 0; i < (int)nb_latitudes * ((int)nb_longitudes - 1) * 6; i++)
-		{
-			int indice = order[i];
-
-			for (int j = 0; j < 3; j++)
-			{
-				positions[3 * i + j] = vertexCoord[indice][j];
-				normals[3 * i + j] = glm::normalize(vertexCoord[indice])[j];
-			}
-
-			for (int j = 0; j < 2; j++)
-				texcoords[2 * i + j] = uvCoord[indice][j];
-		}
-
 		Mesh mesh;
+		float nb_y = static_cast<float>(nb_latitudes);
+		float nb_x = static_cast<float>(nb_longitudes);
 
-		for (int i = 0; i < positions.size(); i += 3)
-		{
-			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
-			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
-		}
+		for (unsigned int x = 0; x < nb_longitudes; x++)
+			for (unsigned int y = 0; y < nb_latitudes; y++)
+			{
+				mesh.positions.push_back(Vector3::Spherical(0.5f, (x + 1) * 2.f * pi / nb_x, y * pi / nb_y));
+				mesh.positions.push_back(Vector3::Spherical(0.5f, x * 2.f * pi / nb_x, y * pi / nb_y));
+				mesh.positions.push_back(Vector3::Spherical(0.5f, x * 2.f * pi / nb_x, (y + 1) * pi / nb_y));
 
-		for (int i = 0; i < texcoords.size(); i += 2)
-			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+				mesh.positions.push_back(Vector3::Spherical(0.5f, (x + 1) * 2.f * pi / nb_x, y * pi / nb_y));
+				mesh.positions.push_back(Vector3::Spherical(0.5f, x * 2.f * pi / nb_x, (y + 1) * pi / nb_y));
+				mesh.positions.push_back(Vector3::Spherical(0.5f, (x + 1) * 2.f * pi / nb_x, (y + 1) * pi / nb_y));
+
+				mesh.texcoords.push_back(Vector2((x + 1) / nb_x, y / nb_y));
+				mesh.texcoords.push_back(Vector2(x / nb_x, y / nb_y));
+				mesh.texcoords.push_back(Vector2(x / nb_x, (y + 1) / nb_y));
+
+				mesh.texcoords.push_back(Vector2((x + 1) / nb_x, y / nb_y));
+				mesh.texcoords.push_back(Vector2(x / nb_x, (y + 1) / nb_y));
+				mesh.texcoords.push_back(Vector2((x + 1) / nb_x, (y + 1) / nb_y));
+			}
+
+		for (auto& position : mesh.positions)
+			mesh.normals.push_back(normalized(position));
 
 		return mesh;
 	}
 
 	Mesh Mesh::Square()
 	{
-		std::vector<float> positions;
-		std::vector<float> normals;
-		std::vector<float> texcoords;
-
-		positions =
-		{
-			0.5f,  0.5f,  0.f,
-			-0.5f,  0.5f,  0.f,
-			-0.5f, -0.5f,  0.f,
-			0.5f, -0.5f,  0.f,
-			0.5f,  0.5f,  0.f,
-			-0.5f, -0.5f,  0.f
-		};
-
-		normals =
-		{
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f,
-			0.f, 0.f, 1.f
-		};
-
-		texcoords =
-		{
-			1.f, 0.f,
-			0.f, 0.f,
-			0.f, 1.f,
-			1.f, 1.f,
-			1.f, 0.f,
-			0.f, 1.f
-		};
-
 		Mesh mesh;
 
-		for (int i = 0; i < positions.size(); i += 3)
+		mesh.positions =
 		{
-			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
-			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
-		}
+			Vector3( 0.5f,  0.5f,  0.f),
+			Vector3(-0.5f,  0.5f,  0.f),
+			Vector3(-0.5f, -0.5f,  0.f),
+			Vector3( 0.5f, -0.5f,  0.f),
+			Vector3( 0.5f,  0.5f,  0.f),
+			Vector3(-0.5f, -0.5f,  0.f)
+		};
 
-		for (int i = 0; i < texcoords.size(); i += 2)
-			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+		mesh.normals =
+		{
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f),
+			Vector3(0.f, 0.f, 1.f)
+		};
+
+		mesh.texcoords =
+		{
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 0.f),
+			Vector2(0.f, 1.f),
+			Vector2(1.f, 1.f),
+			Vector2(1.f, 0.f),
+			Vector2(0.f, 1.f)
+		};
 
 		return mesh;
 	}
 
 	Mesh Mesh::Screen()
 	{
-		std::vector<float> positions;
-		std::vector<float> normals;
-		std::vector<float> texcoords;
-
-		positions =
-		{
-			1.f,  1.f,  0.f,
-			-1.f,  1.f,  0.f,
-			-1.f, -1.f,  0.f,
-			1.f, -1.f,  0.f,
-			1.f,  1.f,  0.f,
-			-1.f, -1.f,  0.f
-		};
-
-		normals =
-		{
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f,
-			0.f, 0.f, -1.f
-		};
-
-		texcoords =
-		{
-			1.f, 1.f,
-			0.f, 1.f,
-			0.f, 0.f,
-			1.f, 0.f,
-			1.f, 1.f,
-			0.f, 0.f
-		};
-
 		Mesh mesh;
 
-		for (int i = 0; i < positions.size(); i += 3)
+		mesh.positions =
 		{
-			mesh.positions.push_back(Vector3(positions[i], positions[i + 1], positions[i + 2]));
-			mesh.normals.push_back(Vector3(normals[i], normals[i + 1], normals[i + 2]));
-		}
+			Vector3( 1.f,  1.f,  0.f),
+			Vector3(-1.f,  1.f,  0.f),
+			Vector3(-1.f, -1.f,  0.f),
+			Vector3( 1.f, -1.f,  0.f),
+			Vector3( 1.f,  1.f,  0.f),
+			Vector3(-1.f, -1.f,  0.f)
+		};
 
-		for (int i = 0; i < texcoords.size(); i += 2)
-			mesh.texcoords.push_back(Vector2(texcoords[i], texcoords[i + 1]));
+		mesh.normals =
+		{
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f),
+			Vector3(0.f, 0.f, -1.f)
+		};
+
+		mesh.texcoords =
+		{
+			Vector2(1.f, 1.f),
+			Vector2(0.f, 1.f),
+			Vector2(0.f, 0.f),
+			Vector2(1.f, 0.f),
+			Vector2(1.f, 1.f),
+			Vector2(0.f, 0.f)
+		};
 
 		return mesh;
 	}
