@@ -351,12 +351,22 @@ namespace dim
 		Window::set_cull_face(true);
 
 		if (!binded)
+		{
 			frame_buffer.bind();
+
+			if (unique_shader)
+				shader.bind();
+		}
 
 		vertex_buffer.draw(draw_type);
 
 		if (!binded)
+		{
 			frame_buffer.unbind();
+
+			if (unique_shader)
+				shader.unbind();
+		}
 	}
 
 	void Scene::display()

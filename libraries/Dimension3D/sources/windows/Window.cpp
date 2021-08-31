@@ -370,13 +370,25 @@ namespace dim
 	{
 		Window::set_cull_face(true);
 
-		if (!binded && post_processing)
-			frame_buffer.bind();
+		if (!binded)
+		{
+			if (post_processing)
+				frame_buffer.bind();
+
+			if (unique_shader)
+				shader.bind();
+		}
 
 		vertex_buffer.draw(draw_type);
 
-		if (!binded && post_processing)
-			frame_buffer.unbind();
+		if (!binded)
+		{
+			if (post_processing)
+				frame_buffer.unbind();
+
+			if (unique_shader)
+				shader.unbind();
+		}
 	}
 
 	void Window::display()
