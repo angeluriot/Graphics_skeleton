@@ -2,9 +2,9 @@
 
 int main()
 {
-	dim::Window::create_relative("app", 3.f / 4.f, 16.f / 9.f, true, "resources/icons/icon.png");
+	dim::Window::open("app", 3.f / 4.f, "resources/icons/icon.png");
 
-	dim::Shader::add("default", "shaders/color.vert", "shaders/color.frag");
+	//dim::Shader::add("default", "shaders/color.vert", "shaders/color.frag");
 	dim::Shader::add("screen", "shaders/screen.vert", "shaders/screen.frag");
 
 	dim::Texture::add("texture_1", "resources/textures/jojo.jpg");
@@ -12,40 +12,51 @@ int main()
 	dim::Texture::add("texture_3", "resources/textures/pessi.jpg");
 	dim::Texture::add("earth", "resources/textures/earth.jpg");
 
-	dim::Scene scene_1("My_scene_1");
-	dim::Scene scene_2("My_scene_2");
+	//dim::Scene::add("My_scene_1");
+	//dim::Scene::add("My_scene_2");
 
-	scene_1.set_controller(dim::OrbitController());
-	scene_2.set_controller(dim::OrbitController());
+	//dim::Scene& scene_1 = dim::Scene::get("My_scene_1");
+	//dim::Scene& scene_2 = dim::Scene::get("My_scene_2");
+
+	//scene_1.set_controller(dim::DragController());
+	//scene_2.set_controller(dim::OrbitController());
+	dim::Window::set_controller(dim::DragController());
 
 	dim::PerspectiveCamera cam;
 	cam.set_position(dim::Vector3(0.f, 0.f, 1.5f));
 
-	scene_1.set_camera(cam);
-	scene_2.set_camera(cam);
+	//scene_1.set_camera(cam);
+	//scene_2.set_camera(cam);
+	dim::Window::set_camera(cam);
 
-	scene_1.add_light(dim::DirectionalLight(dim::Vector3(-1.f, -1.f, -1.f), sf::Color(255, 50, 50)));
-	scene_1.add_light(dim::DirectionalLight(dim::Vector3(1.f, 1.f, -1.f), sf::Color(50, 50, 255)));
+	//scene_1.add_light(dim::DirectionalLight(dim::Vector3(-1.f, -1.f, -1.f), sf::Color(255, 255, 255)));
+	//scene_1.add_light(dim::DirectionalLight(dim::Vector3(1.f, 1.f, -1.f), sf::Color(50, 20, 255)));
+	dim::Window::add_light(dim::DirectionalLight(dim::Vector3(-1.f, -1.f, -1.f), sf::Color(255, 255, 255)));
 
-	scene_2.add_light(dim::DirectionalLight(dim::Vector3(-1.f, -1.f, -1.f), sf::Color(255, 50, 50)));
-	scene_2.add_light(dim::DirectionalLight(dim::Vector3(1.f, 1.f, -1.f), sf::Color(50, 50, 255)));
+	//scene_2.add_light(dim::DirectionalLight(dim::Vector3(-1.f, -1.f, -1.f), sf::Color(255, 20, 20)));
+	//scene_2.add_light(dim::DirectionalLight(dim::Vector3(1.f, 1.f, -1.f), sf::Color(20, 20, 255)));
 
-	scene_2.set_post_processing_shader(dim::Shader::get("screen"));
+	//scene_2.set_post_processing_shader(dim::Shader::get("screen"));
+	//scene_1.set_shader(dim::Shader::get("default"));
 
-	dim::Object object_1(dim::Mesh::screen, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
+	dim::Object object_1(dim::Mesh::Sphere(256, 256), dim::Material(sf::Color(255, 50, 50), 0.1f, 0.5f, 0.6f, 30.f));
 	object_1.set_texture("earth");
 	object_1.set_size(dim::Vector3(1.f, 1.f, 1.f));
-	object_1.move(dim::Vector3(0.f, 0.f, 0.f));
+	object_1.move(dim::Vector3(0.1f, 0.f, 0.f));
 
-	dim::Object object_2(dim::Mesh::sphere_64, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
+	dim::Object object_2(dim::Mesh::empty_square, dim::Material(dim::Color(0.1f, 1.f, 0.1f)));
 	//object_2.set_texture("texture_1");
 	object_2.set_size(dim::Vector3(1.f, 1.f, 1.f));
 	object_2.move(dim::Vector3(1.f, 0.f, 0.f));
 
-	dim::Object object_3(dim::Mesh::sphere_64, dim::Material(sf::Color(255, 10, 10), 0.1f, 0.5f, 0.6f, 30.f));
-	object_3.set_texture("texture_2");
+	dim::Object object_3(dim::Mesh::Cylinder(256), dim::Material(sf::Color(50, 50, 255), 0.1f, 0.5f, 0.6f, 30.f));
+	object_3.set_texture("texture_1");
 	object_3.set_size(dim::Vector3(1.f, 1.f, 1.f));
 	object_3.move(dim::Vector3(-1.f, 0.f, 0.f));
+
+	object_1.set_thickness(3.f);
+	object_2.set_thickness(6.f);
+	object_3.set_thickness(9.f);
 
 	sf::Clock clock;
 	clock.restart();
@@ -60,19 +71,16 @@ int main()
 		while (dim::Window::get_window().pollEvent(sf_event))
 		{
 			dim::Window::check_events(sf_event);
-			scene_1.check_events(sf_event);
-			scene_2.check_events(sf_event);
+			//dim::Scene::check_all_events(sf_event);
 		}
 
 		dim::Window::clear();
+		//dim::Scene::clear_all();
+		//dim::Scene::update_all();
+
+		dim::Window::update();
 
 		// Dimension3D
-
-		scene_1.clear();
-		scene_2.clear();
-
-		scene_1.update();
-		scene_2.update();
 
 		sf::RectangleShape test_1;
 		test_1.setPosition(0, 0);
@@ -89,16 +97,15 @@ int main()
 		test_3.setSize(sf::Vector2f(200, 200));
 		test_3.setFillColor(sf::Color::Green);
 
-		scene_1.draw(object_1, type);
-		scene_2.draw(object_2, type);
-		scene_2.draw(object_3, type);
+		dim::Window::draw(object_1, type);
+		dim::Window::draw(object_2, type);
+		dim::Window::draw(object_3, type);
 
-		//scene_1.draw(test_1);
-		//scene_1.draw(test_2, true);
-		//scene_1.draw(test_3);
+		dim::Window::draw(test_1);
+		dim::Window::draw(test_2, true);
+		//scene_2.draw(test_3);
 
-		scene_1.display();
-		scene_2.display();
+		//dim::Scene::display_all();
 
 		// ImGui
 
@@ -132,12 +139,12 @@ int main()
 
 		if (clock.getElapsedTime().asSeconds() > 0.3f)
 		{
-			fps = int(1.f / dim::Window::clock.getElapsedTime().asSeconds());
+			fps = int(1.f / dim::Window::get_elapsed_time());
 			clock.restart();
 		}
 
 		ImGui::Text(std::to_string(fps).data());
-		ImGui::Text(("(" + std::to_string(scene_1.get_width()) + " " + std::to_string(scene_1.get_height()) + ")").data());
+		//ImGui::Text(("(" + std::to_string(scene_1.get_width()) + " " + std::to_string(scene_1.get_height()) + ")").data());
 		ImGui::End();
 
 		// ----------

@@ -1,5 +1,5 @@
-#ifndef VERTEXBUFFER_H
-#define VERTEXBUFFER_H
+#ifndef DIM_VERTEXBUFFER_HPP
+#define DIM_VERTEXBUFFER_HPP
 
 #include "dim/utils/libraries.hpp"
 #include "dim/opengl/Shader.hpp"
@@ -13,8 +13,9 @@ namespace dim
 	class Texture;
 	class Mesh;
 
-	enum class DrawType { Triangles = GL_TRIANGLES, Lines = GL_LINES, Points = GL_POINTS };
 	enum class DataType : uint8_t { Positions = 1, Normals = 2, TexCoords = 4, All = 7 };
+
+	enum class DrawType { Default = 15, Points = GL_POINTS, Lines = GL_LINES, Triangles = GL_TRIANGLES };
 
 	class VertexBuffer
 	{
@@ -31,6 +32,8 @@ namespace dim
 										VertexBuffer(const VertexBuffer& other) = default;
 										VertexBuffer(const std::string& shader_name);
 										VertexBuffer(const Shader& shader);
+										VertexBuffer(const std::string& shader_name, const Mesh& mesh, DataType data_sent = DataType::All);
+										VertexBuffer(const Shader& shader, const Mesh& mesh, DataType data_sent = DataType::All);
 										~VertexBuffer();
 
 		VertexBuffer&					operator=(const VertexBuffer& other) = default;
@@ -48,10 +51,10 @@ namespace dim
 		void							draw(DrawType draw_type = DrawType::Triangles) const;
 	};
 
-	DataType	operator&(DataType type_1, DataType type_2);
-	DataType	operator|(DataType type_1, DataType type_2);
-	DataType	operator^(DataType type_1, DataType type_2);
-	DataType	operator~(DataType type);
+	DataType operator&(DataType type_1, DataType type_2);
+	DataType operator|(DataType type_1, DataType type_2);
+	DataType operator^(DataType type_1, DataType type_2);
+	DataType operator~(DataType type);
 }
 
 #endif

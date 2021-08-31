@@ -1,50 +1,91 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#ifndef DIM_WINDOW_HPP
+#define DIM_WINDOW_HPP
 
 #include "dim/utils/libraries.hpp"
 
 namespace dim
 {
 	class Camera;
-	class Light;
+	class Camera2D;
+	class Object;
+	class Controller;
+	class OrbitController;
+	class FlyController;
+	class DragController;
 
-	class Window // RAJOUTER DE QUOI faire sa propre fen�tre !!!!!!!
+	class Window
 	{
-	public: // CHANGER APRES !!!!!!!!!!
+	private:
 
-		static sf::RenderWindow*	window;			// Pointeur vers la fen�tre
-		static float				screen_coef;	// Co�fficient en fonction de la taille de l'�cran par rapport au 1080p
+		static sf::RenderWindow*	window;
+		static float				screen_coef;
 		static sf::Clock			clock;
 		static float				elapsed_time;
-		static Color				background;
-
-	public: // CHANGER APRES !!!!!!!!!!
-
-		static bool					running;		// Hauteur de la fen�tre
+		static float				thickness;
+		static bool					cull_face;
+		static Controller*			controller;
+		static Camera*				camera;
+		static bool					unique_shader;
+		static Shader				shader;
+		static bool					binded;
+		static Camera2D				fixed_camera2D;
+		static std::vector<Light*>	lights;
+		static FrameBuffer			frame_buffer;
+		static Shader				post_processing_shader;
+		static bool					post_processing;
+		static VertexBuffer			screen;
 
 	public:
 
-		static void					create_relative(const std::string& project_name, float screen_ratio = 3.f / 4.f, float window_ratio = 16.f / 9.f,
-													bool resizable = false, const std::string& icon_path = "");
-		static void					create_absolute(const std::string& project_name, uint16_t width = 1920, uint16_t height = 1080, bool resizable = false,
-													const std::string& icon_path = "");
+		static const Color			background;
+		static const Vector2int		initial_size;
+		static bool					running;
+		static Camera2D				camera2D;
+
+		static void					open(const std::string& name, float screen_ratio, const std::string& icon_path = "");
+		static void					open(const std::string& name, unsigned int width, unsigned int height, const std::string& icon_path = "");
+		static void					open(const std::string& name, const Vector2int& size, const std::string& icon_path = "");
 		static sf::RenderWindow&	get_window();
-		static uint16_t				get_width();
-		static uint16_t				get_height();
+		static Vector2int			get_position();
+		static unsigned int			get_width();
+		static unsigned int			get_height();
+		static Vector2int			get_size();
+		static void					bind();
+		static void					unbind();
+		static void					set_camera(const Camera& camera);
+		static Camera&				get_camera();
+		static void					set_controller(const Controller& controller);
+		static Controller&			get_controller();
+		static void					set_shader(const Shader& shader);
+		static Shader				get_shader();
+		static FrameBuffer			get_frame_buffer();
+		static void					set_post_processing_shader(const Shader& shader);
+		static Shader				get_post_processing_shader();
+		static Vector2				get_2d_world_mouse_position();
+		static void					add_light(const Light& light);
+		static void					clear_lights();
 		static void					clear(const Color& color = background);
-		static void					draw(const sf::Drawable& drawable);
+		static void					check_events(const sf::Event& sf_event);
+		static void					update();
+		static void					draw(const sf::Drawable& drawable, bool fixed = false);
+		static void					draw(const Object& object, DrawType draw_type = DrawType::Default);
+		static void					draw(const VertexBuffer& vertex_buffer, DrawType draw_type = DrawType::Triangles);
 		static void					display();
 		static void					close();
-		static uint16_t				to_relative(uint16_t position);
-		static void					check_events(const sf::Event& sf_event);
-
-		friend						Camera;
+		static int					hd_to_window(int position);
+		static Vector2int			hd_to_window(int x, int y);
+		static Vector2int			hd_to_window(const Vector2int& position);
+		static void					set_thickness(float thickness);
+		static void					set_cull_face(bool enable);
+		static float				get_elapsed_time();
+		static bool					is_in(const Vector2& position);
+		static bool					is_on_border(const Vector2& position);
 	};
 
 	sf::RenderWindow&	get_window();
-	uint16_t			to_relative(uint16_t position);
-	bool				is_in_window(const Vector2& position);
-	bool				is_on_border_window(const Vector2& position);
+	int					hd_to_window(int position);
+	Vector2int			hd_to_window(int x, int y);
+	Vector2int			hd_to_window(const Vector2int& position);
 }
 
 #endif

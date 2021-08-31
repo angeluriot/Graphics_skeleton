@@ -1,6 +1,5 @@
 #include "dim/dimension3D.hpp"
 
-// Construit un vecteur
 namespace dim
 {
 	const Vector3 Vector3::null = Vector3();
@@ -13,15 +12,6 @@ namespace dim
 		z = 0.f;
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector3::Vector3(const Vector3& vector)
-	{
-		*this = vector;
-	}
-
-	// Construit un vecteur � partir de ses coordonn�es cart�siennes
-
 	Vector3::Vector3(float x, float y, float z)
 	{
 		this->x = x;
@@ -29,53 +19,92 @@ namespace dim
 		this->z = z;
 	}
 
-	Vector3::Vector3(const Vector4& vector)
+	Vector3::Vector3(const Vector2& other, float z)
 	{
-		x = vector.x;
-		y = vector.y;
-		z = vector.z;
-	}
-
-	Vector3::Vector3(const Vector2& vector, float z)
-	{
-		x = vector.x;
-		y = vector.y;
+		x = other.x;
+		y = other.y;
 		this->z = z;
 	}
 
-	Vector3::Vector3(float x, const Vector2& vector)
+	Vector3::Vector3(float x, const Vector2& other)
 	{
 		this->x = x;
-		y = vector.x;
-		z = vector.y;
+		y = other.x;
+		z = other.y;
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector3::Vector3(const std::array<float, 3>& vector)
+	Vector3::Vector3(const Vector4& other)
 	{
-		*this = vector;
+		*this = other;
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector3::Vector3(const glm::vec3& vector)
+	Vector3::Vector3(const Vector2int& other, float z)
 	{
-		*this = vector;
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
+		this->z = z;
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector3::Vector3(const sf::Vector3f& vector)
+	Vector3::Vector3(float x, const Vector2int& other)
 	{
-		*this = vector;
+		this->x = x;
+		y = static_cast<float>(other.x);
+		z = static_cast<float>(other.y);
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector3::Vector3(const sf::Vector3i& vector)
+	Vector3::Vector3(const Vector3int& other)
 	{
-		*this = vector;
+		*this = other;
+	}
+
+	Vector3::Vector3(const Vector4int& other)
+	{
+		*this = other;
+	}
+
+	Vector3::Vector3(const std::array<float, 3>& other)
+	{
+		*this = other;
+	}
+
+	Vector3::Vector3(const std::array<float, 4>& other)
+	{
+		*this = other;
+	}
+
+	Vector3::Vector3(const std::array<int, 3>& other)
+	{
+		*this = other;
+	}
+
+	Vector3::Vector3(const std::array<int, 4>& other)
+	{
+		*this = other;
+	}
+
+	Vector3::Vector3(const glm::vec3& other)
+	{
+		*this = other;
+	}
+
+	Vector3::Vector3(const glm::vec4& other)
+	{
+		*this = other;
+	}
+
+	Vector3::Vector3(const sf::Vector3f& other)
+	{
+		*this = other;
+	}
+
+	Vector3::Vector3(const sf::Vector3i& other)
+	{
+		*this = other;
+	}
+
+	Vector3::Vector3(const ImVec4& other)
+	{
+		*this = other;
 	}
 
 	Vector3::Vector3(const sf::Color& color)
@@ -93,58 +122,110 @@ namespace dim
 		return Vector3(norm * sin(theta) * sin(phi), norm * cos(phi), norm * cos(theta) * sin(phi));
 	}
 
-	// Assignations
-
-	Vector3& Vector3::operator=(const Vector3& vector)
+	Vector3& Vector3::operator=(const Vector4& other)
 	{
-		x = vector.x;
-		y = vector.y;
-		z = vector.z;
+		x = other.x;
+		y = other.y;
+		z = other.z;
 
 		return *this;
 	}
 
-	Vector3& Vector3::operator=(float number)
+	Vector3& Vector3::operator=(const Vector3int& other)
 	{
-		x = number;
-		y = number;
-		z = number;
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
+		z = static_cast<float>(other.z);
 
 		return *this;
 	}
 
-	Vector3& Vector3::operator=(const std::array<float, 3>& vector)
+	Vector3& Vector3::operator=(const Vector4int& other)
 	{
-		x = vector[0];
-		y = vector[1];
-		z = vector[2];
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
+		z = static_cast<float>(other.z);
 
 		return *this;
 	}
 
-	Vector3& Vector3::operator=(const glm::vec3& vector)
+	Vector3& Vector3::operator=(const std::array<float, 3>& other)
 	{
-		x = vector.x;
-		y = vector.y;
-		z = vector.z;
+		x = other[0];
+		y = other[1];
+		z = other[2];
 
 		return *this;
 	}
 
-	Vector3& Vector3::operator=(const sf::Vector3f& vector)
+	Vector3& Vector3::operator=(const std::array<float, 4>& other)
 	{
-		x = vector.x;
-		y = vector.y;
-		z = vector.z;
+		x = other[0];
+		y = other[1];
+		z = other[2];
 
 		return *this;
 	}
 
-	Vector3& Vector3::operator=(const sf::Vector3i& vector)
+	Vector3& Vector3::operator=(const std::array<int, 3>& other)
 	{
-		x = static_cast<float>(vector.x);
-		y = static_cast<float>(vector.y);
-		z = static_cast<float>(vector.z);
+		x = static_cast<float>(other[0]);
+		y = static_cast<float>(other[1]);
+		z = static_cast<float>(other[2]);
+
+		return *this;
+	}
+
+	Vector3& Vector3::operator=(const std::array<int, 4>& other)
+	{
+		x = static_cast<float>(other[0]);
+		y = static_cast<float>(other[1]);
+		z = static_cast<float>(other[2]);
+
+		return *this;
+	}
+
+	Vector3& Vector3::operator=(const glm::vec3& other)
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
+
+		return *this;
+	}
+
+	Vector3& Vector3::operator=(const glm::vec4& other)
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
+
+		return *this;
+	}
+
+	Vector3& Vector3::operator=(const sf::Vector3f& other)
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
+
+		return *this;
+	}
+
+	Vector3& Vector3::operator=(const sf::Vector3i& other)
+	{
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
+		z = static_cast<float>(other.z);
+
+		return *this;
+	}
+
+	Vector3& Vector3::operator=(const ImVec4& other)
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
 
 		return *this;
 	}
@@ -158,21 +239,21 @@ namespace dim
 		return *this;
 	}
 
-	Vector3& Vector3::operator+=(const Vector3& vector)
+	Vector3& Vector3::operator+=(const Vector3& other)
 	{
-		*this = *this + vector;
+		*this = *this + other;
 		return *this;
 	}
 
-	Vector3& Vector3::operator-=(const Vector3& vector)
+	Vector3& Vector3::operator-=(const Vector3& other)
 	{
-		*this = *this - vector;
+		*this = *this - other;
 		return *this;
 	}
 
-	Vector3& Vector3::operator*=(const Vector3& vector)
+	Vector3& Vector3::operator*=(const Vector3& other)
 	{
-		*this = *this * vector;
+		*this = *this * other;
 		return *this;
 	}
 
@@ -182,9 +263,27 @@ namespace dim
 		return *this;
 	}
 
-	Vector3& Vector3::operator/=(const Vector3& vector)
+	Vector3& Vector3::operator*=(int number)
 	{
-		*this = *this / vector;
+		*this = *this * number;
+		return *this;
+	}
+
+	Vector3& Vector3::operator*=(const glm::mat3& matrix)
+	{
+		*this = *this * matrix;
+		return *this;
+	}
+
+	Vector3& Vector3::operator*=(const glm::mat4& matrix)
+	{
+		*this = *this * matrix;
+		return *this;
+	}
+
+	Vector3& Vector3::operator/=(const Vector3& other)
+	{
+		*this = *this / other;
 		return *this;
 	}
 
@@ -194,9 +293,15 @@ namespace dim
 		return *this;
 	}
 
-	Vector3& Vector3::operator^=(const Vector3& vector)
+	Vector3& Vector3::operator/=(int number)
 	{
-		*this = *this ^ vector;
+		*this = *this / number;
+		return *this;
+	}
+
+	Vector3& Vector3::operator^=(const Vector3& other)
+	{
+		*this = *this ^ other;
 		return *this;
 	}
 
@@ -210,33 +315,20 @@ namespace dim
 		return null - *this;
 	}
 
-	float Vector3::dot(const Vector3& vector) const
-	{
-		return x * vector.x + y * vector.y + z * vector.z;
-	}
-
-	// Donne la norme du vecteur
-
 	float Vector3::get_norm() const
 	{
 		return sqrt(x * x + y * y + z * z);
 	}
-
-	// Donne la norme du vecteur au carr�
 
 	float Vector3::get_norm_2() const
 	{
 		return x * x + y * y + z * z;
 	}
 
-	// Donne l'angle theta du vecteur
-
 	float Vector3::get_theta() const
 	{
 		return Vector2(z, x).get_angle();
 	}
-
-	// Donne l'angle phi du vecteur
 
 	float Vector3::get_phi() const
 	{
@@ -246,81 +338,44 @@ namespace dim
 		return acos(y / get_norm());
 	}
 
-	Vector3 Vector3::get_normalized() const
-	{
-		if (get_norm() != 0.f)
-			return *this / get_norm();
-
-		return unit;
-	}
-
 	const float* Vector3::get_ptr() const
 	{
 		return &x;
 	}
 
-	float Vector3::get_distance(const Vector3& point) const
-	{
-		return (point - *this).get_norm();
-	}
-
-	float Vector3::get_distance_2(const Vector3& point) const
-	{
-		return (point - *this).get_norm_2();
-	}
-
-	float Vector3::get_theta(const Vector3& point) const
-	{
-		return (point - *this).get_theta();
-	}
-
-	float Vector3::get_phi(const Vector3& point) const
-	{
-		return (point - *this).get_phi();
-	}
-
-	// Modifie la norme du vecteur
-
 	void Vector3::set_norm(float norm)
 	{
-		*this = get_normalized() * norm;
+		*this = dim::normalize(*this) * norm;
 	}
-
-	// Modifie l'angle theta du vecteur
 
 	void Vector3::set_theta(float theta)
 	{
 		*this = Spherical(get_norm(), theta, get_phi());
 	}
 
-	// Modifie l'angle phi du vecteur
-
 	void Vector3::set_phi(float phi)
 	{
 		*this = Spherical(get_norm(), get_theta(), phi);
 	}
 
-	// Normalise le vecteur
-
 	void Vector3::normalize()
 	{
-		if (get_norm() != 0.f)
-			*this /= get_norm();
-
-		else
-			*this = unit;
+		*this = dim::normalize(*this);
 	}
-
-	// Met toutes les composantes � z�ro
 
 	void Vector3::clear()
 	{
 		*this = null;
 	}
 
-	std::array<float, 3> Vector3::to_array() const
+	std::array<float, 3> Vector3::to_array_float() const
 	{
 		return { x, y, z };
+	}
+
+	std::array<int, 3> Vector3::to_array_int() const
+	{
+		return { static_cast<int>(round(x)), static_cast<int>(round(y)), static_cast<int>(round(z)) };
 	}
 
 	glm::vec3 Vector3::to_glm() const
@@ -335,24 +390,18 @@ namespace dim
 
 	sf::Vector3i Vector3::to_sf_int() const
 	{
-		return sf::Vector3i(static_cast<int>(x), static_cast<int>(y), static_cast<int>(z));
+		return sf::Vector3i(static_cast<int>(round(x)), static_cast<int>(round(y)), static_cast<int>(round(z)));
 	}
-
-	// Addition
 
 	Vector3 operator+(const Vector3& vector_1, const Vector3& vector_2)
 	{
 		return Vector3(vector_1.x + vector_2.x, vector_1.y + vector_2.y, vector_1.z + vector_2.z);
 	}
 
-	// Soustraction
-
 	Vector3 operator-(const Vector3& vector_1, const Vector3& vector_2)
 	{
 		return Vector3(vector_1.x - vector_2.x, vector_1.y - vector_2.y, vector_1.z - vector_2.z);
 	}
-
-	// Produits
 
 	Vector3 operator*(float number, const Vector3& vector)
 	{
@@ -361,7 +410,17 @@ namespace dim
 
 	Vector3 operator*(const Vector3& vector, float number)
 	{
-		return Vector3(vector.x * number, vector.y * number, vector.z * number);
+		return number * vector;
+	}
+
+	Vector3 operator*(int number, const Vector3& vector)
+	{
+		return Vector3(static_cast<float>(number) * vector.x, static_cast<float>(number) * vector.y, static_cast<float>(number) * vector.z);
+	}
+
+	Vector3 operator*(const Vector3& vector, int number)
+	{
+		return number * vector;
 	}
 
 	Vector3 operator*(const Vector3& vector_1, const Vector3& vector_2)
@@ -369,13 +428,25 @@ namespace dim
 		return Vector3(vector_1.x * vector_2.x, vector_1.y * vector_2.y, vector_1.z * vector_2.z);
 	}
 
-	Vector3 operator*(const glm::mat4& matrix, const Vector3& vector)
+	Vector3 operator*(const glm::mat3& matrix, const Vector3& vector)
 	{
-		glm::vec4 result = matrix * glm::vec4(vector.x, vector.y, vector.z, 1.f);
-		return glm::vec3(result.x, result.y, result.z);
+		return Vector3(matrix * vector.to_glm());
 	}
 
-	// Division
+	Vector3 operator*(const Vector3& vector, const glm::mat3& matrix)
+	{
+		return matrix * vector;
+	}
+
+	Vector3 operator*(const glm::mat4& matrix, const Vector3& vector)
+	{
+		return Vector3(matrix * Vector4(vector, 1.f));
+	}
+
+	Vector3 operator*(const Vector3& vector, const glm::mat4& matrix)
+	{
+		return matrix * vector;
+	}
 
 	Vector3 operator/(float number, const Vector3& vector)
 	{
@@ -390,12 +461,24 @@ namespace dim
 		return Vector3(vector.x / number, vector.y / number, vector.z / number);
 	}
 
+	Vector3 operator/(int number, const Vector3& vector)
+	{
+		return Vector3((vector.x != 0.f ? static_cast<float>(number) / vector.x : 0.f), (vector.y != 0.f ? static_cast<float>(number) / vector.y : 0.f),
+			(vector.z != 0.f ? static_cast<float>(number) / vector.z : 0.f));
+	}
+
+	Vector3 operator/(const Vector3& vector, int number)
+	{
+		if (number == 0)
+			return Vector3::null;
+
+		return Vector3(vector.x / static_cast<float>(number), vector.y / static_cast<float>(number), vector.z / static_cast<float>(number));
+	}
+
 	Vector3 operator/(const Vector3& vector_1, const Vector3& vector_2)
 	{
 		return Vector3((vector_2.x != 0.f ? vector_1.x / vector_2.x : 0.f), (vector_2.y != 0.f ? vector_1.y / vector_2.y : 0.f), (vector_2.z != 0.f ? vector_1.z / vector_2.z : 0.f));
 	}
-
-	// Produit vectoriel
 
 	Vector3 operator^(const Vector3& vector_1, const Vector3& vector_2)
 	{
@@ -404,10 +487,8 @@ namespace dim
 
 	float dot(const Vector3& vector_1, const Vector3& vector_2)
 	{
-		return vector_1.dot(vector_2);
+		return vector_1.x * vector_2.x + vector_1.y * vector_2.y + vector_1.z * vector_2.z;
 	}
-
-	// Egalit�s
 
 	bool operator==(const Vector3& vector_1, const Vector3& vector_2)
 	{
@@ -419,8 +500,6 @@ namespace dim
 		return (!(vector_1 == vector_2));
 	}
 
-	// Affichage
-
 	std::ostream& operator<<(std::ostream& os, const Vector3& vector)
 	{
 		os << "(" << vector.x << ", " << vector.y << ", " << vector.z << ")";
@@ -429,46 +508,31 @@ namespace dim
 
 	float distance(const Vector3& point_1, const Vector3& point_2)
 	{
-		return point_1.get_distance(point_2);
+		return (point_2 - point_1).get_norm();
 	}
 
 	float distance_2(const Vector3& point_1, const Vector3& point_2)
 	{
-		return point_1.get_distance_2(point_2);
+		return (point_2 - point_1).get_norm_2();
 	}
 
 	float theta(const Vector3& point_1, const Vector3& point_2)
 	{
-		return point_1.get_theta(point_2);
+		return (point_2 - point_1).get_theta();
 	}
 
 	float phi(const Vector3& point_1, const Vector3& point_2)
 	{
-		return point_1.get_phi(point_2);
+		return (point_2 - point_1).get_phi();
 	}
 
-	Vector3 normalized(const Vector3& vector)
+	Vector3 normalize(const Vector3& vector)
 	{
-		return vector.get_normalized();
-	}
+		float norm = vector.get_norm();
 
-	std::array<float, 3> to_array(const Vector3& vector)
-	{
-		return vector.to_array();
-	}
+		if (norm != 0.f)
+			return vector / norm;
 
-	glm::vec3 to_glm(const Vector3& vector)
-	{
-		return vector.to_glm();
-	}
-
-	sf::Vector3f to_sf_float(const Vector3& vector)
-	{
-		return vector.to_sf_float();
-	}
-
-	sf::Vector3i to_sf_int(const Vector3& vector)
-	{
-		return vector.to_sf_int();
+		return Vector3::unit;
 	}
 }

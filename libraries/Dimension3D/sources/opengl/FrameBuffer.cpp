@@ -8,18 +8,28 @@ namespace dim
 	{
 		fbo = std::make_shared<GLuint>();
 		rbo = std::make_shared<GLuint>();
-		this->width = std::make_shared<unsigned int>(0);
-		this->height = std::make_shared<unsigned int>(0);
+		width = std::make_shared<unsigned int>(Window::initial_size.x);
+		height = std::make_shared<unsigned int>(Window::initial_size.y);
 	}
 
 	FrameBuffer::FrameBuffer(unsigned int width, unsigned int height)
 	{
 		fbo = std::make_shared<GLuint>(0);
 		rbo = std::make_shared<GLuint>(0);
-		this->width = std::make_shared<unsigned int>(width);
-		this->height = std::make_shared<unsigned int>(height);
+		this->width = std::make_shared<unsigned int>(std::max(width, static_cast<unsigned int>(1)));
+		this->height = std::make_shared<unsigned int>(std::max(height, static_cast<unsigned int>(1)));
 
 		create(width, height);
+	}
+
+	FrameBuffer::FrameBuffer(const Vector2int& size)
+	{
+		fbo = std::make_shared<GLuint>(0);
+		rbo = std::make_shared<GLuint>(0);
+		width = std::make_shared<unsigned int>(std::max(size.x, 1));
+		height = std::make_shared<unsigned int>(std::max(size.y, 1));
+
+		create(size);
 	}
 
 	FrameBuffer::~FrameBuffer()
@@ -33,8 +43,8 @@ namespace dim
 
 	void FrameBuffer::create(unsigned int width, unsigned int height)
 	{
-		*(this->width) = width;
-		*(this->height) = height;
+		*(this->width) = std::max(width, static_cast<unsigned int>(1));
+		*(this->height) = std::max(height, static_cast<unsigned int>(1));
 
 		glDeleteFramebuffers(1, &(*fbo));
 		glDeleteTextures(1, &(*texture.id));
@@ -69,6 +79,11 @@ namespace dim
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
+	void FrameBuffer::create(const Vector2int& size)
+	{
+		create(size.x, size.y);
+	}
+
 	void FrameBuffer::bind() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, *fbo);
@@ -91,19 +106,29 @@ namespace dim
 		return texture;
 	}
 
-	void FrameBuffer::set_size(unsigned int new_width, unsigned int new_height)
+	void FrameBuffer::set_size(unsigned int width, unsigned int height)
 	{
-		create(new_width, new_height);
+		create(width, height);
 	}
 
-	void FrameBuffer::set_width(unsigned int new_width)
+	void FrameBuffer::set_size(const Vector2int& size)
 	{
-		set_size(new_width, *height);
+		create(size.x, size.y);
 	}
 
-	void FrameBuffer::set_height(unsigned int new_height)
+	void FrameBuffer::set_width(unsigned int width)
 	{
-		set_size(*width, new_height);
+		set_size(width, *height);
+	}
+
+	void FrameBuffer::set_height(unsigned int height)
+	{
+		set_size(*width, height);
+	}
+
+	Vector2int FrameBuffer::get_size() const
+	{
+		return Vector2int(*width, *height);
 	}
 
 	unsigned int FrameBuffer::get_width() const

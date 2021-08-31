@@ -2,25 +2,25 @@
 
 namespace dim
 {
-	Color Color::Transparent = Color(0, 0, 0, 0);
-	Color Color::Black = Color(0, 0, 0, 1);
-	Color Color::White = Color(1, 1, 1, 1);
-	Color Color::Red = Color(1, 0, 0, 1);
-	Color Color::Green = Color(0, 1, 0, 1);
-	Color Color::Blue = Color(0, 0, 1, 1);
-	Color Color::Yellow = Color(1, 1, 0, 1);
-	Color Color::Pink = Color(1, 0, 1, 1);
-	Color Color::Cyan = Color(0, 1, 1, 1);
-	Color Color::Orange = Color(1, 0.5, 0, 1);
-	Color Color::Purple = Color(0.5, 0, 1, 1);
-	Color Color::Grey = Color(0.5, 0.5, 0.5, 1);
+	const Color Color::transparent	= Color(0.f, 0.f, 0.f, 0.f);
+	const Color Color::black		= Color(0.f, 0.f, 0.f, 1.f);
+	const Color Color::white		= Color(1.f, 1.f, 1.f, 1.f);
+	const Color Color::red			= Color(1.f, 0.f, 0.f, 1.f);
+	const Color Color::green		= Color(0.f, 1.f, 0.f, 1.f);
+	const Color Color::blue			= Color(0.f, 0.f, 1.f, 1.f);
+	const Color Color::yellow		= Color(1.f, 1.f, 0.f, 1.f);
+	const Color Color::pink			= Color(1.f, 0.f, 1.f, 1.f);
+	const Color Color::cyan			= Color(0.f, 1.f, 1.f, 1.f);
+	const Color Color::orange		= Color(1.f, 0.5f, 0.f, 1.f);
+	const Color Color::purple		= Color(0.5f, 0.f, 1.f, 1.f);
+	const Color Color::grey			= Color(0.5f, 0.5f, 0.5f, 1.f);
 
 	Color::Color()
 	{
-		r = 0;
-		g = 0;
-		b = 0;
-		a = 0;
+		r = 0.f;
+		g = 0.f;
+		b = 0.f;
+		a = 0.f;
 	}
 
 	Color::Color(const Vector4& vector)
@@ -35,18 +35,18 @@ namespace dim
 
 	Color::Color(float red, float green, float blue, float alpha)
 	{
-		r = red;
-		g = green;
-		b = blue;
-		a = alpha;
+		r = clamp(red, 0.f, 1.f);
+		g = clamp(green, 0.f, 1.f);
+		b = clamp(blue, 0.f, 1.f);
+		a = clamp(alpha, 0.f, 1.f);
 	}
 
 	Color& Color::operator=(const Vector4& vector)
 	{
-		r = vector.x;
-		g = vector.y;
-		b = vector.z;
-		a = vector.w;
+		r = clamp(vector.x, 0.f, 1.f);
+		g = clamp(vector.y, 0.f, 1.f);
+		b = clamp(vector.z, 0.f, 1.f);
+		a = clamp(vector.w, 0.f, 1.f);
 
 		return *this;
 	}
@@ -58,6 +58,54 @@ namespace dim
 		b = color.b / 255.f;
 		a = color.a / 255.f;
 
+		return *this;
+	}
+
+	Color& Color::operator+=(const Color& other)
+	{
+		*this = *this + other;
+		return *this;
+	}
+
+	Color& Color::operator-=(const Color& other)
+	{
+		*this = *this - other;
+		return *this;
+	}
+
+	Color& Color::operator*=(const Color& other)
+	{
+		*this = *this * other;
+		return *this;
+	}
+
+	Color& Color::operator*=(float number)
+	{
+		*this = *this * number;
+		return *this;
+	}
+
+	Color& Color::operator*=(int number)
+	{
+		*this = *this * number;
+		return *this;
+	}
+
+	Color& Color::operator/=(const Color& other)
+	{
+		*this = *this / other;
+		return *this;
+	}
+
+	Color& Color::operator/=(float number)
+	{
+		*this = *this / number;
+		return *this;
+	}
+
+	Color& Color::operator/=(int number)
+	{
+		*this = *this / number;
 		return *this;
 	}
 
@@ -96,6 +144,16 @@ namespace dim
 		return Color(color.r * number, color.g * number, color.b * number, color.a * number);
 	}
 
+	Color operator*(int number, const Color& color)
+	{
+		return Color(number * color.r, number * color.g, number * color.b, number * color.a);
+	}
+
+	Color operator*(const Color& color, int number)
+	{
+		return Color(color.r * number, color.g * number, color.b * number, color.a * number);
+	}
+
 	Color operator/(const Color& color_1, const Color& color_2)
 	{
 		return Color(color_1.r / color_2.r, color_1.g / color_2.g, color_1.b / color_2.b, color_1.a / color_2.a);
@@ -107,6 +165,16 @@ namespace dim
 	}
 
 	Color operator/(const Color& color, float number)
+	{
+		return Color(color.r / number, color.g / number, color.b / number, color.a / number);
+	}
+
+	Color operator/(int number, const Color& color)
+	{
+		return Color(number / color.r, number / color.g, number / color.b, number / color.a);
+	}
+
+	Color operator/(const Color& color, int number)
 	{
 		return Color(color.r / number, color.g / number, color.b / number, color.a / number);
 	}

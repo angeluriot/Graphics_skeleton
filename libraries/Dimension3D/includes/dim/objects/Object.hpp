@@ -1,5 +1,5 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef DIM_OBJECT_HPP
+#define DIM_OBJECT_HPP
 
 #include "dim/utils/libraries.hpp"
 #include "dim/vectors/Vector3.hpp"
@@ -22,50 +22,60 @@ namespace dim
 
 		Shader			shader;
 		VertexBuffer	vertex_buffer;
-		Mesh			mesh;
 		Texture			texture;
 		glm::mat4		scaling_matrix;
 		glm::mat4		rotation_matrix;
 		glm::mat4		translation_matrix;
 		glm::mat4		origin_matrix;
 		glm::mat4		model;
-		bool			binded;
+		float			thickness;
 		bool			textured;
+		mutable bool	binded;
 
-		void			draw(const Camera* camera, const std::vector<Light*>& lights, DrawType draw_type, bool scene_shader) const;
+		void			draw(Camera* camera, const std::vector<Light*>& lights, DrawType draw_type, bool scene_shader) const;
 
 	public:
 
+		Mesh			mesh;
 		Material		material;
 
 						Object();
-						Object(const Object& other) = default;
-						Object(const Mesh& mesh, const Material& material = Material::default_material);
+						Object(const Object& other);
+						Object(const Mesh& mesh, const Material& material = Material(Color::white, 0.1f, 0.5f, 0.4f, 50.f));
 
-		Object&			operator=(const Object& other) = default;
+		Object&			operator=(const Object& other);
 
-		void			set_shader(const std::string shader_name);
-		void			set_shader(Shader& shader);
-		void			set_texture(const std::string texture_name);
-		void			set_texture(Texture& texture);
+		void			create(const Mesh& mesh, const Material& material = Material(Color::white, 0.1f, 0.5f, 0.4f, 50.f));
+		void			set_shader(const std::string& shader_name);
+		void			set_shader(const Shader& shader);
+		void			set_texture(const std::string& texture_name);
+		void			set_texture(const Texture& texture);
 		void			set_mesh(const Mesh& mesh, dim::DataType data_sent = dim::DataType::All);
+		void			update_mesh(dim::DataType data_sent = dim::DataType::All);
 
-		void			set_size(const Vector3& new_size);
-		void			set_rotation(float new_rotation, const Vector3& new_axis);
-		void			set_position(const Vector3& new_position);
-		void			set_origin(const Vector3& new_origin);
+		void			set_size(float x, float y, float z);
+		void			set_size(const Vector3& size);
+		void			set_rotation(float angle, const Vector3& axis);
+		void			set_position(float x, float y, float z);
+		void			set_position(const Vector3& position);
+		void			set_origin(float x, float y, float z);
+		void			set_origin(const Vector3& origin);
+		void			set_thickness(float thickness);
 
+		void			scale(float x, float y, float z);
 		void			scale(const Vector3& scale);
-		void			rotate(float rotation, const Vector3& axis);
+		void			rotate(float angle, const Vector3& axis);
+		void			move(float x, float y, float z);
 		void			move(const Vector3& movement);
 
 		Vector3			get_size() const;
 		glm::mat4		get_rotation() const;
 		Vector3			get_position() const;
 		Vector3			get_origin() const;
+		float			get_thickness() const;
 
-		void			bind();
-		void			unbind();
+		void			bind() const;
+		void			unbind() const;
 
 		friend			Scene;
 		friend			Window;

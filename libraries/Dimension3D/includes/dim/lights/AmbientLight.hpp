@@ -1,5 +1,5 @@
-#ifndef AMBIENTLIGHT_HPP
-#define AMBIENTLIGHT_HPP
+#ifndef DIM_AMBIENTLIGHT_HPP
+#define DIM_AMBIENTLIGHT_HPP
 
 #include "dim/lights/Light.hpp"
 
@@ -9,16 +9,16 @@ namespace dim
 	{
 	private:
 
-		Light*	clone() const override;
+		Light*			clone() const override;
 
 	public:
 
-		AmbientLight(const AmbientLight& other) = default;
-		AmbientLight(const Color& color = Color::White, float intensity = 1.f);
+						AmbientLight(const AmbientLight& other) = default;
+						AmbientLight(const Color& color = Color::white, float intensity = 1.f);
 
-		AmbientLight& operator=(const AmbientLight& other) = default;
+		AmbientLight&	operator=(const AmbientLight& other) = default;
 
-		Type get_type() const override;
+		Type			get_type() const override;
 	};
 }
 

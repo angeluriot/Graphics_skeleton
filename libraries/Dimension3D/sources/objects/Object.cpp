@@ -2,15 +2,19 @@
 
 namespace dim
 {
-	void Object::draw(const Camera* camera, const std::vector<Light*>& lights, DrawType draw_type, bool scene_shader) const
+	void Object::draw(Camera* camera, const std::vector<Light*>& lights, DrawType draw_type, bool scene_shader) const
 	{
 		if (vertex_buffer.get_nb_vertices())
 		{
+			Window::set_thickness(thickness);
+
 			// Bind
 
 			if (!binded)
 			{
-				shader.bind();
+				if (!scene_shader)
+					shader.bind();
+
 				texture.bind();
 				vertex_buffer.bind();
 			}
@@ -44,7 +48,7 @@ namespace dim
 			// Lights
 
 			if (!scene_shader)
-				shader.send_uniform("u_light", lights);
+				shader.send_uniform("u_lights", lights);
 
 			// Texture
 
@@ -67,28 +71,55 @@ namespace dim
 			{
 				vertex_buffer.unbind();
 				texture.unbind();
-				shader.unbind();
+
+				if (!scene_shader)
+					shader.unbind();
 			}
 		}
 	}
 
 	Object::Object()
 	{
-		shader = Shader::get("default");
-		vertex_buffer.set_shader(shader);
-		vertex_buffer.send_data(this->mesh);
 		scaling_matrix = glm::mat4(1.f);
 		rotation_matrix = glm::mat4(1.f);
 		translation_matrix = glm::mat4(1.f);
 		origin_matrix = glm::mat4(1.f);
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
-		binded = false;
 		textured = false;
+		binded = false;
+	}
+
+	Object::Object(const Object& other)
+	{
+		*this = other;
 	}
 
 	Object::Object(const Mesh& mesh, const Material& material)
 	{
-		shader = Shader::get("default");
+		create(mesh, material);
+	}
+
+	Object& Object::operator=(const Object& other)
+	{
+		shader = other.shader;
+		mesh = other.mesh;
+		vertex_buffer.set_shader(shader);
+		vertex_buffer.send_data(mesh);
+		texture = other.texture;
+		scaling_matrix = other.scaling_matrix;
+		rotation_matrix = other.rotation_matrix;
+		translation_matrix = other.translation_matrix;
+		origin_matrix = other.origin_matrix;
+		model = other.model;
+		thickness = other.thickness;
+		textured = other.textured;
+
+		return *this;
+	}
+
+	void Object::create(const Mesh& mesh, const Material& material)
+	{
+		shader = Shader::default_shader;
 		this->mesh = mesh;
 		this->material = material;
 		vertex_buffer.set_shader(shader);
@@ -98,31 +129,31 @@ namespace dim
 		translation_matrix = glm::mat4(1.f);
 		origin_matrix = glm::mat4(1.f);
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
-		binded = false;
 		textured = false;
+		binded = false;
 	}
 
-	void Object::set_shader(const std::string shader_name)
+	void Object::set_shader(const std::string& shader_name)
 	{
 		shader = Shader::get(shader_name);
 		vertex_buffer.set_shader(shader_name);
 		vertex_buffer.send_data(mesh);
 	}
 
-	void Object::set_shader(Shader& shader)
+	void Object::set_shader(const Shader& shader)
 	{
 		this->shader = shader;
 		vertex_buffer.set_shader(this->shader);
 		vertex_buffer.send_data(mesh);
 	}
 
-	void Object::set_texture(const std::string texture_name)
+	void Object::set_texture(const std::string& texture_name)
 	{
 		texture = Texture::get(texture_name);
 		textured = true;
 	}
 
-	void Object::set_texture(Texture& texture)
+	void Object::set_texture(const Texture& texture)
 	{
 		this->texture = texture;
 		textured = true;
@@ -134,28 +165,58 @@ namespace dim
 		vertex_buffer.send_data(mesh, data_sent);
 	}
 
-	void Object::set_size(const Vector3& new_size)
+	void Object::update_mesh(dim::DataType data_sent)
 	{
-		scaling_matrix = glm::scale(glm::mat4(1.f), new_size.to_glm());
+		vertex_buffer.send_data(mesh, data_sent);
+	}
+
+	void Object::set_size(float x, float y, float z)
+	{
+		set_size(Vector3(x, y, z));
+	}
+
+	void Object::set_size(const Vector3& size)
+	{
+		scaling_matrix = glm::scale(glm::mat4(1.f), size.to_glm());
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
 	}
 
-	void Object::set_rotation(float new_rotation, const Vector3& new_axis)
+	void Object::set_rotation(float angle, const Vector3& axis)
 	{
-		rotation_matrix = glm::rotate(glm::mat4(1.f), new_rotation, new_axis.to_glm());
+		rotation_matrix = glm::rotate(glm::mat4(1.f), angle, axis.to_glm());
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
 	}
 
-	void Object::set_position(const Vector3& new_position)
+	void Object::set_position(float x, float y, float z)
 	{
-		translation_matrix = glm::translate(glm::mat4(1.f), new_position.to_glm());
+		set_position(Vector3(x, y, z));
+	}
+
+	void Object::set_position(const Vector3& position)
+	{
+		translation_matrix = glm::translate(glm::mat4(1.f), position.to_glm());
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
 	}
 
-	void Object::set_origin(const Vector3& new_origin)
+	void Object::set_origin(float x, float y, float z)
 	{
-		origin_matrix = glm::translate(glm::mat4(1.f), new_origin.to_glm());
+		set_origin(Vector3(x, y, z));
+	}
+
+	void Object::set_origin(const Vector3& origin)
+	{
+		origin_matrix = glm::translate(glm::mat4(1.f), origin.to_glm());
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
+	}
+
+	void Object::set_thickness(float thickness)
+	{
+		this->thickness = std::max(thickness, 0.f);
+	}
+
+	void Object::scale(float x, float y, float z)
+	{
+		scale(Vector3(x, y, z));
 	}
 
 	void Object::scale(const Vector3& scale)
@@ -164,10 +225,15 @@ namespace dim
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
 	}
 
-	void Object::rotate(float rotation, const Vector3& axis)
+	void Object::rotate(float angle, const Vector3& axis)
 	{
-		rotation_matrix = glm::rotate(rotation_matrix, rotation, axis.to_glm());
+		rotation_matrix = glm::rotate(rotation_matrix, angle, axis.to_glm());
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
+	}
+
+	void Object::move(float x, float y, float z)
+	{
+		move(Vector3(x, y, z));
 	}
 
 	void Object::move(const Vector3& movement)
@@ -196,7 +262,12 @@ namespace dim
 		return Vector4(origin_matrix * glm::vec4(0.f, 0.f, 0.f, 1.f));
 	}
 
-	void Object::bind()
+	float Object::get_thickness() const
+	{
+		return thickness;
+	}
+
+	void Object::bind() const
 	{
 		shader.bind();
 		texture.bind();
@@ -204,7 +275,7 @@ namespace dim
 		binded = true;
 	}
 
-	void Object::unbind()
+	void Object::unbind() const
 	{
 		vertex_buffer.unbind();
 		texture.unbind();

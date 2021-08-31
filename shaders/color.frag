@@ -10,6 +10,7 @@ struct Material
 	float diffuse;
 	float specular;
 	float shininess;
+	int illuminated;
 };
 
 struct Light
@@ -35,39 +36,47 @@ uniform int u_textured;
 
 void main()
 {
-	vec3 ambient_color = vec3(0., 0., 0.);
-	vec3 diffuse_color = vec3(0., 0., 0.);
-	vec3 specular_color = vec3(0., 0., 0.);
-	vec3 reflection = vec3(0., 0., 0.);
-	vec3 camera_direction = vec3(0., 0., 0.);
-	vec3 light_direction = vec3(0., 0., 0.);
-	float intensity = 0 ;
+	vec4 initial_color = (1 - u_textured) * u_material.color + u_textured * texture2D(u_texture, v_texcoord);
 
-	for (int i = 0; i < u_nb_lights; i++)
+	if (u_material.illuminated == 1)
 	{
-		light_direction = u_lights[i].vector;
-		intensity = u_lights[i].intensity;
+		vec3 ambient_color = vec3(0., 0., 0.);
+		vec3 diffuse_color = vec3(0., 0., 0.);
+		vec3 specular_color = vec3(0., 0., 0.);
+		vec3 reflection = vec3(0., 0., 0.);
+		vec3 camera_direction = vec3(0., 0., 0.);
+		vec3 light_direction = vec3(0., 0., 0.);
+		float intensity = 0 ;
 
-		if (u_lights[i].type == 2)
+		for (int i = 0; i < u_nb_lights; i++)
 		{
-			light_direction = normalize(v_position - u_lights[i].vector);
-			intensity = u_lights[i].intensity / pow(distance(v_position, u_lights[i].vector), 2);
+			light_direction = u_lights[i].vector;
+			intensity = u_lights[i].intensity;
+
+			if (u_lights[i].type == 2)
+			{
+				light_direction = normalize(v_position - u_lights[i].vector);
+				intensity = u_lights[i].intensity / pow(distance(v_position, u_lights[i].vector), 2);
+			}
+
+			// Ambiant
+			ambient_color += initial_color.rgb * u_material.ambient * intensity;
+
+			if (u_lights[i].type != 0)
+			{
+				// Diffuse
+				diffuse_color += initial_color.rgb * u_material.diffuse * max(0., dot(v_normal, -light_direction)) * u_lights[i].color.rgb * intensity;
+
+				// Specular
+				reflection = reflect(light_direction, v_normal);
+				camera_direction = normalize(u_camera - v_position);
+				specular_color += u_material.specular * pow(max(0., dot(reflection, camera_direction)), u_material.shininess) * u_lights[i].color.rgb * intensity;
+			}
 		}
 
-		// Ambiant
-		ambient_color += ((1 - u_textured) * u_material.color.rgb + u_textured * texture2D(u_texture, v_texcoord).rgb) * u_material.ambient * intensity;
-
-		if (u_lights[i].type != 0)
-		{
-			// Diffuse
-			diffuse_color += ((1 - u_textured) * u_material.color.rgb + u_textured * texture2D(u_texture, v_texcoord).rgb) * u_material.diffuse * max(0., dot(v_normal, -light_direction)) * u_lights[i].color.rgb * intensity;
-
-			// Specular
-			vec3 reflection = reflect(light_direction, v_normal);
-			vec3 camera_direction = normalize(u_camera - v_position);
-			specular_color += u_material.specular * pow(max(0., dot(reflection, camera_direction)), u_material.shininess) * u_lights[i].color.rgb * intensity;
-		}
+		frag_color = vec4(ambient_color + diffuse_color + specular_color, initial_color.a);
 	}
 
-	frag_color = vec4(ambient_color + diffuse_color + specular_color, ((1 - u_textured) * u_material.color.a + u_textured * texture2D(u_texture, v_texcoord).a));
+	else
+		frag_color = initial_color;
 }

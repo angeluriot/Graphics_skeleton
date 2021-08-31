@@ -5,30 +5,41 @@ namespace dim
 	Camera2D::Camera2D()
 	{
 		zoom_level = 1.f;
-		size = Vector2(100, 100);
+		size = Window::initial_size;
 		view = sf::View((size / 2.f).to_sf_float(), size.to_sf_float());
 	}
 
-	void Camera2D::set_zoom(float new_zoom)
+	void Camera2D::set_zoom(float zoom)
 	{
-		zoom_level = new_zoom;
-		view.setSize(zoom_level * size.to_sf_float());
+		if (zoom > 0.f)
+		{
+			zoom_level = zoom;
+			view.setSize((zoom_level * size).to_sf_float());
+		}
 	}
 
-	void Camera2D::set_rotation(float new_angle)
+	void Camera2D::set_rotation(float angle)
 	{
-		view.setRotation(new_angle);
+		view.setRotation(angle);
 	}
 
-	void Camera2D::set_position(const Vector2& new_position)
+	void Camera2D::set_position(const Vector2& position)
 	{
-		view.setCenter(new_position.to_sf_float() * zoom_level);
+		view.setCenter((zoom_level * position).to_sf_float());
+	}
+
+	void Camera2D::set_position(float x, float y)
+	{
+		set_position(Vector2(x, y));
 	}
 
 	void Camera2D::zoom(float zoom)
 	{
-		zoom_level *= zoom;
-		view.setSize(zoom_level * size.to_sf_float());
+		if (zoom > 0.f)
+		{
+			zoom_level *= zoom;
+			view.setSize((zoom_level * size).to_sf_float());
+		}
 	}
 
 	void Camera2D::rotate(float angle)
@@ -36,17 +47,30 @@ namespace dim
 		view.rotate(angle);
 	}
 
-	void Camera2D::move(const Vector2& movement)
+	void Camera2D::move(const Vector2& move)
 	{
-		view.move(movement.to_sf_float());
+		view.move(move.to_sf_float());
+	}
+
+	void Camera2D::move(float x, float y)
+	{
+		move(Vector2(x, y));
 	}
 
 	void Camera2D::set_resolution(unsigned int width, unsigned int height)
 	{
-		move((Vector2(static_cast<float>(width), static_cast<float>(height)) - size) * 0.5f * zoom_level);
+		if (width > 0 && height > 0)
+		{
+			move((Vector2(static_cast<float>(width), static_cast<float>(height)) - size) * 0.5f * zoom_level);
+			size = Vector2(static_cast<float>(width), static_cast<float>(height));
+			view.setSize((zoom_level * size).to_sf_float());
+		}
+	}
 
-		size = Vector2(static_cast<float>(width), static_cast<float>(height));
-		view.setSize(zoom_level * size.to_sf_float());
+	void Camera2D::set_resolution(const Vector2int& resolution)
+	{
+		if (resolution.x > 0 && resolution.y > 0)
+			set_resolution(resolution.x, resolution.y);
 	}
 
 	sf::View& Camera2D::get_view()

@@ -1,5 +1,5 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef DIM_TEXTURE_HPP
+#define DIM_TEXTURE_HPP
 
 #include "dim/utils/libraries.hpp"
 
@@ -24,25 +24,25 @@ namespace dim
 
 	public:
 
-								Texture();
-								Texture(const Texture& other) = default;
-								Texture(const std::string& path, Filtering filtering = Filtering::Linear, Warpping warpping = Warpping::Repeat);
-								~Texture();
+												Texture();
+												Texture(const Texture& other) = default;
+												Texture(const std::string& path, Filtering filtering = Filtering::Linear, Warpping warpping = Warpping::Repeat);
+												~Texture();
 
-		Texture&				operator=(const Texture& other) = default;
+		Texture&								operator=(const Texture& other) = default;
 
-		void					load(const std::string& path, Filtering filtering = Filtering::Linear, Warpping warpping = Warpping::Repeat);
-		GLuint					get_id() const;
-		unsigned int			get_unit() const;
-		void					bind() const;
-		void					unbind() const;
+		void									load(const std::string& path, Filtering filtering = Filtering::Linear, Warpping warpping = Warpping::Repeat);
+		GLuint									get_id() const;
+		unsigned int							get_unit() const;
+		void									bind() const;
+		void									unbind() const;
 
-		static void				add(const std::string& name, const Texture& texture);
-		static void				add(const std::string& name, const std::string& path, Filtering filtering = Filtering::Linear, Warpping warpping = Warpping::Repeat);
-		static void				remove(const std::string& name);
-		static Texture			get(const std::string& name);
+		static void								add(const std::string& name, const Texture& texture);
+		static void								add(const std::string& name, const std::string& path, Filtering filtering = Filtering::Linear, Warpping warpping = Warpping::Repeat);
+		static void								remove(const std::string& name);
+		static Texture							get(const std::string& name);
 
-		friend					FrameBuffer;
+		friend									FrameBuffer;
 	};
 }
 

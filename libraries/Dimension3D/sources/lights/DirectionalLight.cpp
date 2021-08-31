@@ -14,9 +14,14 @@ namespace dim
 		set_intensity(intensity);
 	}
 
+	void DirectionalLight::set_direction(float x, float y, float z)
+	{
+		set_direction(Vector3(x, y, z));
+	}
+
 	void DirectionalLight::set_direction(const Vector3& direction)
 	{
-		vector = normalized(direction);
+		vector = normalize(direction);
 	}
 
 	Vector3 DirectionalLight::get_direction() const

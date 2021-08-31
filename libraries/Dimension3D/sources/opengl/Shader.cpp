@@ -13,38 +13,109 @@ namespace dim
 			"#version 330\n"
 			"precision mediump float;\n"
 			"\n"
-			"attribute vec3 positions;\n"
-			"attribute vec3 normals;\n"
-			"attribute vec2 uvs;\n"
+			"attribute vec3 a_position;\n"
+			"attribute vec3 a_normal;\n"
+			"attribute vec2 a_texcoord;\n"
 			"\n"
-			"varying vec3 v_normals;\n"
-			"varying vec2 v_uvs;\n"
+			"out vec3 v_position;\n"
+			"out vec3 v_normal;\n"
+			"out vec2 v_texcoord;\n"
 			"\n"
 			"uniform mat4 u_model;\n"
+			"uniform mat3 u_normals_model;\n"
+			"uniform mat4 u_mvp;\n"
 			"\n"
 			"void main()\n"
 			"{\n"
-			"	gl_Position = u_model * vec4(positions, 1.);\n"
-			"	v_normals = normals;\n"
-			"	v_uvs = uvs;\n"
-			"}",
+			"	v_position = vec3(u_model * vec4(a_position, 1.));\n"
+			"	v_normal = normalize(u_normals_model * a_normal);\n"
+			"	v_texcoord = a_texcoord;\n"
+			"\n"
+			"	gl_Position = u_mvp * vec4(a_position, 1.);\n"
+			"}\n",
 
 			"#version 330\n"
 			"precision mediump float;\n"
 			"\n"
-			"varying vec3 v_normals;\n"
-			"varying vec2 v_uvs;\n"
+			"#define MAX_LIGHTS 10\n"
 			"\n"
-			"uniform sampler2D texture_1;\n"
-			"uniform sampler2D texture_2;\n"
+			"struct Material\n"
+			"{\n"
+			"	vec4 color;\n"
+			"	float ambient;\n"
+			"	float diffuse;\n"
+			"	float specular;\n"
+			"	float shininess;\n"
+			"	int illuminated;\n"
+			"};\n"
 			"\n"
-			"uniform vec4 u_color;\n"
+			"struct Light\n"
+			"{\n"
+			"	int type;\n"
+			"	vec3 vector;\n"
+			"	vec4 color;\n"
+			"	float intensity;\n"
+			"};\n"
+			"\n"
+			"in vec3 v_position;\n"
+			"in vec3 v_normal;\n"
+			"in vec2 v_texcoord;\n"
+			"\n"
+			"out vec4 frag_color;\n"
+			"\n"
+			"uniform vec3 u_camera;\n"
+			"uniform Material u_material;\n"
+			"uniform Light[MAX_LIGHTS] u_lights;\n"
+			"uniform int u_nb_lights;\n"
+			"uniform sampler2D u_texture;\n"
+			"uniform int u_textured;\n"
 			"\n"
 			"void main()\n"
 			"{\n"
-			"	gl_FragColor = u_color;\n"
-			"	//gl_FragColor = vec4(texture2D(texture_2, v_uvs).rgb, 1.);\n"
-			"}");
+			"	vec4 initial_color = (1 - u_textured) * u_material.color + u_textured * texture2D(u_texture, v_texcoord);\n"
+			"\n"
+			"	if (u_material.illuminated == 1)\n"
+			"	{\n"
+			"		vec3 ambient_color = vec3(0., 0., 0.);\n"
+			"		vec3 diffuse_color = vec3(0., 0., 0.);\n"
+			"		vec3 specular_color = vec3(0., 0., 0.);\n"
+			"		vec3 reflection = vec3(0., 0., 0.);\n"
+			"		vec3 camera_direction = vec3(0., 0., 0.);\n"
+			"		vec3 light_direction = vec3(0., 0., 0.);\n"
+			"		float intensity = 0 ;\n"
+			"\n"
+			"		for (int i = 0; i < u_nb_lights; i++)\n"
+			"		{\n"
+			"			light_direction = u_lights[i].vector;\n"
+			"			intensity = u_lights[i].intensity;\n"
+			"\n"
+			"			if (u_lights[i].type == 2)\n"
+			"			{\n"
+			"				light_direction = normalize(v_position - u_lights[i].vector);\n"
+			"				intensity = u_lights[i].intensity / pow(distance(v_position, u_lights[i].vector), 2);\n"
+			"			}\n"
+			"\n"
+			"			// Ambiant\n"
+			"			ambient_color += initial_color.rgb * u_material.ambient * intensity;\n"
+			"\n"
+			"			if (u_lights[i].type != 0)\n"
+			"			{\n"
+			"				// Diffuse\n"
+			"				diffuse_color += initial_color.rgb * u_material.diffuse * max(0., dot(v_normal, -light_direction)) * u_lights[i].color.rgb * intensity;\n"
+			"\n"
+			"				// Specular\n"
+			"				reflection = reflect(light_direction, v_normal);\n"
+			"				camera_direction = normalize(u_camera - v_position);\n"
+			"				specular_color += u_material.specular * pow(max(0., dot(reflection, camera_direction)), u_material.shininess) * u_lights[i].color.rgb * intensity;\n"
+			"			}\n"
+			"		}\n"
+			"\n"
+			"		frag_color = vec4(ambient_color + diffuse_color + specular_color, initial_color.a);\n"
+			"	}\n"
+			"\n"
+			"	else\n"
+			"		frag_color = initial_color;\n"
+			"}\n");
 	}
 
 	Shader::Shader() {}
@@ -94,12 +165,12 @@ namespace dim
 
 	void Shader::send_uniform(const std::string& name, const std::vector<Light*>& lights) const
 	{
-		for (int i = 0; i < lights.size() && i < max_lights; i++)
+		for (unsigned int i = 0; i < lights.size() && i < max_lights; i++)
 		{
-			send_uniform("u_lights[" + std::to_string(i) + "].type", static_cast<int>(lights[i]->get_type()));
-			send_uniform("u_lights[" + std::to_string(i) + "].vector", lights[i]->vector);
-			send_uniform("u_lights[" + std::to_string(i) + "].color", lights[i]->color);
-			send_uniform("u_lights[" + std::to_string(i) + "].intensity", lights[i]->intensity);
+			send_uniform(name + "[" + std::to_string(i) + "].type", static_cast<int>(lights[i]->get_type()));
+			send_uniform(name + "[" + std::to_string(i) + "].vector", lights[i]->vector);
+			send_uniform(name + "[" + std::to_string(i) + "].color", lights[i]->color);
+			send_uniform(name + "[" + std::to_string(i) + "].intensity", lights[i]->intensity);
 		}
 
 		send_uniform("u_nb_lights", std::min(static_cast<int>(lights.size()), static_cast<int>(max_lights)));
@@ -112,6 +183,7 @@ namespace dim
 		send_uniform(name + ".diffuse", material.get_diffuse());
 		send_uniform(name + ".specular", material.get_specular());
 		send_uniform(name + ".shininess", material.get_shininess());
+		send_uniform(name + ".illuminated", material.is_illuminated());
 	}
 
 	void Shader::send_uniform(const std::string& name, float number) const

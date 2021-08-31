@@ -2,24 +2,24 @@
 
 namespace dim
 {
-	Material Material::default_material = Material(Color(1.f, 1.f, 1.f, 1.f), 0.4f, 0.6f, 0.4f, 50.f);
-
-	Material::Material()
+	Material::Material(const Color& color)
 	{
-		color = Color(0.f, 0.f, 0.f, 0.f);
+		set_color(color);
 		ambient = 0.f;
 		diffuse = 0.f;
 		specular = 0.f;
-		shininess = 1.f;
+		shininess = 0.f;
+		illuminated = false;
 	}
 
 	Material::Material(const Color& color, float ambient, float diffuse, float specular, float shininess)
 	{
-		this->color = color;
-		this->ambient = ambient;
-		this->diffuse = diffuse;
-		this->specular = specular;
-		this->shininess = shininess;
+		set_color(color);
+		set_ambient(ambient);
+		set_diffuse(diffuse);
+		set_specular(specular);
+		set_shininess(shininess);
+		illuminated = true;
 	}
 
 	Color Material::get_color() const
@@ -39,7 +39,7 @@ namespace dim
 
 	void Material::set_ambient(float ambient)
 	{
-		this->ambient = ambient;
+		this->ambient = std::max(ambient, 0.f);
 	}
 
 	float Material::get_diffuse() const
@@ -49,7 +49,7 @@ namespace dim
 
 	void Material::set_diffuse(float diffuse)
 	{
-		this->diffuse = diffuse;
+		this->diffuse = std::max(diffuse, 0.f);
 	}
 
 	float Material::get_specular() const
@@ -59,7 +59,7 @@ namespace dim
 
 	void Material::set_specular(float specular)
 	{
-		this->specular = specular;
+		this->specular = std::max(specular, 0.f);
 	}
 
 	float Material::get_shininess() const
@@ -69,6 +69,16 @@ namespace dim
 
 	void Material::set_shininess(float shininess)
 	{
-		this->shininess = shininess;
+		this->shininess = std::max(shininess, 1.f);
+	}
+
+	bool Material::is_illuminated() const
+	{
+		return illuminated;
+	}
+
+	void Material::set_illuminated(bool illuminated)
+	{
+		this->illuminated = illuminated;
 	}
 }

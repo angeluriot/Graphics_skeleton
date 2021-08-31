@@ -1,5 +1,5 @@
-#ifndef FLYCONTROLLER_HPP
-#define FLYCONTROLLER_HPP
+#ifndef DIM_FLYCONTROLLER_HPP
+#define DIM_FLYCONTROLLER_HPP
 
 #include "dim/controllers/Controller.hpp"
 
@@ -9,13 +9,13 @@ namespace dim
 	{
 	private:
 
-		bool				moving;
-		sf::Keyboard::Key	forward;
-		sf::Keyboard::Key	left;
-		sf::Keyboard::Key	right;
-		sf::Keyboard::Key	backward;
-		sf::Keyboard::Key	up;
-		sf::Keyboard::Key	down;
+		bool								moving;
+		sf::Keyboard::Key					forward;
+		sf::Keyboard::Key					left;
+		sf::Keyboard::Key					right;
+		sf::Keyboard::Key					backward;
+		sf::Keyboard::Key					up;
+		sf::Keyboard::Key					down;
 
 		static constexpr float				default_sensitivity	= 0.2f;
 		static constexpr float				default_speed		= 2.f;
@@ -26,21 +26,24 @@ namespace dim
 		static constexpr sf::Keyboard::Key	default_up			= sf::Keyboard::Key::Space;
 		static constexpr sf::Keyboard::Key	default_down		= sf::Keyboard::Key::LControl;
 
-		Controller* clone() const override;
-		void	move(Camera& camera);
-		void	look(Scene& scene, Camera& camera);
+		Controller*							clone() const override;
+		void								move(Camera& camera) const;
+		void								look(Scene& scene, Camera& camera) const;
+		void								look(Camera& camera) const;
 
 	public:
 
-				FlyController(float sensitivity = default_sensitivity, float speed = default_speed);
-				FlyController(const FlyController& other) = default;
+											FlyController(float sensitivity = default_sensitivity, float speed = default_speed);
+											FlyController(const FlyController& other) = default;
 
-		FlyController& operator=(const FlyController& other) = default;
+		FlyController&						operator=(const FlyController& other) = default;
 
-		Type	get_type() const override;
-		void	check_events(const sf::Event& sf_event, Scene& scene, Camera& camera) override;
-		void	update(Scene& scene, Camera& camera) override;
-		void	set_controls(sf::Keyboard::Key forward, sf::Keyboard::Key left, sf::Keyboard::Key right, sf::Keyboard::Key backward, sf::Keyboard::Key up, sf::Keyboard::Key down);
+		Type								get_type() const override;
+		void								check_events(const sf::Event& sf_event, Scene& scene, Camera& camera) override;
+		void								check_events(const sf::Event& sf_event, Camera& camera) override;
+		void								update(Scene& scene, Camera& camera) override;
+		void								update(Camera& camera) override;
+		void								set_controls(sf::Keyboard::Key forward, sf::Keyboard::Key left, sf::Keyboard::Key right, sf::Keyboard::Key backward, sf::Keyboard::Key up, sf::Keyboard::Key down);
 	};
 }
 

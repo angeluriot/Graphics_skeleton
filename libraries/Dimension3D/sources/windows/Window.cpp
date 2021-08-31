@@ -2,35 +2,35 @@
 
 namespace dim
 {
-	sf::RenderWindow*	Window::window			= NULL;
-	float				Window::screen_coef		= 1.f;
-	bool				Window::running			= false;
+	sf::RenderWindow*	Window::window					= nullptr;
+	float				Window::screen_coef				= 1.f;
 	sf::Clock			Window::clock;
-	float				Window::elapsed_time	= 1.f / 60.f;
-	Color				Window::background		= Color(13.f / 255.f, 17.f / 255.f, 23.f / 255.f);
+	float				Window::elapsed_time			= 1.f / 60.f;
+	float				Window::thickness				= 1.f;
+	const Color			Window::background				= Color(13.f / 255.f, 17.f / 255.f, 23.f / 255.f);
+	const Vector2int	Window::initial_size			= Vector2int(100, 100);
+	bool				Window::running					= false;
+	bool				Window::cull_face				= true;
+	Controller*			Window::controller				= nullptr;
+	Camera*				Window::camera					= nullptr;
+	bool				Window::unique_shader			= false;
+	Shader				Window::shader;
+	bool				Window::binded					= false;
+	Camera2D			Window::fixed_camera2D;
+	std::vector<Light*>	Window::lights					= {};
+	FrameBuffer			Window::frame_buffer;
+	Shader				Window::post_processing_shader;
+	bool				Window::post_processing			= false;
+	VertexBuffer		Window::screen;
+	Camera2D			Window::camera2D;
 
-	void Window::create_relative(const std::string& project_name, float screen_ratio, float window_ratio, bool resizable, const std::string& icon_path)
+	void Window::open(const std::string& name, float screen_ratio, const std::string& icon_path)
 	{
-		unsigned int width;
-		unsigned int height;
+		unsigned int width = static_cast<unsigned int>(clamp(screen_ratio, 0.f, 1.f) * static_cast<float>(sf::VideoMode::getDesktopMode().width));
+		unsigned int height = static_cast<unsigned int>(clamp(screen_ratio, 0.f, 1.f) * static_cast<float>(sf::VideoMode::getDesktopMode().height));
 
-		if (sf::VideoMode::getDesktopMode().width > window_ratio * sf::VideoMode::getDesktopMode().height)
-		{
-			height = static_cast<unsigned int>(screen_ratio * static_cast<float>(sf::VideoMode::getDesktopMode().height));
-			width = static_cast<unsigned int>(window_ratio * static_cast<float>(height));
-		}
-
-		else if (sf::VideoMode::getDesktopMode().width < (16.f / 9.f) * sf::VideoMode::getDesktopMode().height)
-		{
-			width = static_cast<unsigned int>(screen_ratio * static_cast<float>(sf::VideoMode::getDesktopMode().width));
-			height = static_cast<unsigned int>(window_ratio * static_cast<float>(width));
-		}
-
-		else
-		{
-			width = static_cast<unsigned int>(screen_ratio * static_cast<float>(sf::VideoMode::getDesktopMode().width));
-			height = static_cast<unsigned int>(screen_ratio * static_cast<float>(sf::VideoMode::getDesktopMode().height));
-		}
+		width = std::max(width, static_cast<unsigned int>(initial_size.x));
+		height = std::max(height, static_cast<unsigned int>(initial_size.y));
 
 		screen_coef = width / 1920.f;
 
@@ -41,31 +41,26 @@ namespace dim
 		settings.majorVersion = 3;
 		settings.minorVersion = 3;
 
-		sf::Uint32 style;
-
-		if (resizable)
-			style = sf::Style::Default;
-
-		else
-			style = sf::Style::Close | sf::Style::Titlebar;
-
-		window = new sf::RenderWindow(sf::VideoMode(width, height), project_name, style, settings);
-		//window->setFramerateLimit(60);
-		//window->setVerticalSyncEnabled(true);
+		window = new sf::RenderWindow(sf::VideoMode(width, height), name, sf::Style::Default, settings);
 
 		if (icon_path != "")
 		{
 			sf::Image icon;
-			icon.loadFromFile(icon_path);
-			window->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
+			if (icon.loadFromFile(icon_path))
+				window->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 		}
 
 		init();
+		frame_buffer.create(width, height);
 		running = true;
 	}
 
-	void Window::create_absolute(const std::string& project_name, uint16_t width, uint16_t height, bool resizable, const std::string& icon_path)
+	void Window::open(const std::string& name, unsigned int width, unsigned int height, const std::string& icon_path)
 	{
+		width = std::max(width, static_cast<unsigned int>(initial_size.x));
+		height = std::max(height, static_cast<unsigned int>(initial_size.y));
+
 		screen_coef = width / 1920.f;
 
 		sf::ContextSettings settings;
@@ -75,27 +70,24 @@ namespace dim
 		settings.majorVersion = 3;
 		settings.minorVersion = 3;
 
-		sf::Uint32 style;
-
-		if (resizable)
-			style = sf::Style::Default;
-
-		else
-			style = sf::Style::Close | sf::Style::Titlebar;
-
-		window = new sf::RenderWindow(sf::VideoMode(get_width(), get_height()), project_name, style, settings);
-		window->setFramerateLimit(60);
-		window->setVerticalSyncEnabled(true);
+		window = new sf::RenderWindow(sf::VideoMode(width, height), name, sf::Style::Default, settings);
 
 		if (icon_path != "")
 		{
 			sf::Image icon;
-			icon.loadFromFile(icon_path);
-			window->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
+			if (icon.loadFromFile(icon_path))
+				window->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 		}
 
 		init();
+		frame_buffer.create(width, height);
 		running = true;
+	}
+
+	void Window::open(const std::string& name, const Vector2int& size, const std::string& icon_path)
+	{
+		open(name, size.x, size.y, icon_path);
 	}
 
 	sf::RenderWindow& Window::get_window()
@@ -103,18 +95,131 @@ namespace dim
 		return *window;
 	}
 
-	uint16_t Window::get_width()
+	Vector2int Window::get_position()
+	{
+		return window->getPosition();
+	}
+
+	unsigned int Window::get_width()
 	{
 		return window->getSize().x;
 	}
 
-	uint16_t Window::get_height()
+	unsigned int Window::get_height()
 	{
 		return window->getSize().y;
 	}
 
+	Vector2int Window::get_size()
+	{
+		return window->getSize();
+	}
+
+	void Window::bind()
+	{
+		if (post_processing)
+			frame_buffer.bind();
+
+		if (unique_shader)
+			shader.bind();
+
+		binded = true;
+	}
+
+	void Window::unbind()
+	{
+		if (post_processing)
+			frame_buffer.unbind();
+
+		if (unique_shader)
+			shader.unbind();
+
+		binded = false;
+	}
+
+	void Window::set_camera(const Camera& camera)
+	{
+		Window::camera = camera.clone();
+	}
+
+	Camera& Window::get_camera()
+	{
+		if (camera == nullptr)
+			throw std::runtime_error("There is no camera");
+
+		return *camera;
+	}
+
+	void Window::set_controller(const Controller& controller)
+	{
+		Window::controller = controller.clone();
+	}
+
+	Controller& Window::get_controller()
+	{
+		if (controller == nullptr)
+			throw std::runtime_error("There is no controller");
+
+		return *controller;
+	}
+
+	void Window::set_shader(const Shader& shader)
+	{
+		Window::shader = shader;
+		unique_shader = true;
+	}
+
+	Shader Window::get_shader()
+	{
+		return shader;
+	}
+
+	FrameBuffer Window::get_frame_buffer()
+	{
+		return frame_buffer;
+	}
+
+	void Window::set_post_processing_shader(const Shader& shader)
+	{
+		post_processing_shader = shader;
+		screen.send_data(shader, Mesh::screen, DataType::Positions | DataType::TexCoords);
+		post_processing = true;
+	}
+
+	Shader Window::get_post_processing_shader()
+	{
+		return post_processing_shader;
+	}
+
+	Vector2 Window::get_2d_world_mouse_position()
+	{
+		Vector2 pos;
+		pos.x = (sf::Mouse::getPosition(Window::get_window()).x - (get_size() / 2).x) * camera2D.get_zoom() + camera2D.get_view().getCenter().x;
+		pos.y = (sf::Mouse::getPosition(Window::get_window()).y - (get_size() / 2).y) * camera2D.get_zoom() + camera2D.get_view().getCenter().y;
+		return pos;
+	}
+
+	void Window::add_light(const Light& light)
+	{
+		lights.push_back(light.clone());
+	}
+
+	void Window::clear_lights()
+	{
+		for (auto& light : lights)
+		{
+			delete light;
+			light = nullptr;
+		}
+
+		lights.clear();
+	}
+
 	void Window::clear(const Color& color)
 	{
+		if (binded)
+			frame_buffer.unbind();
+
 		window->clear(color.to_sf());
 
 		glViewport(0, 0, Window::get_width(), Window::get_height());
@@ -122,16 +227,20 @@ namespace dim
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 		glFrontFace(GL_CW);
+
+		glPointSize(thickness);
+		glLineWidth(thickness);
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_LINE_SMOOTH);
 
 		ImGui::SFML::Update(dim::Window::get_window(), sf::seconds(Window::elapsed_time));
 
 		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
 			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
 
-		if (is_on_border_window(sf::Mouse::getPosition(Window::get_window())))
+		if (is_on_border(sf::Mouse::getPosition(Window::get_window())))
 			ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 		else
 			ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
@@ -143,28 +252,171 @@ namespace dim
 		ImGui::SetNextWindowSize(viewport->Size);
 		ImGui::SetNextWindowViewport(viewport->ID);
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
 		ImGui::Begin("InvisibleWindow", NULL, windowFlags);
 		ImGui::PopStyleVar(3);
 
 		ImGuiID dockSpaceId = ImGui::GetID("InvisibleWindowDockSpace");
 
-		ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+		ImGui::DockSpace(dockSpaceId, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_PassthruCentralNode);
 		ImGui::End();
+
+		if (binded)
+			frame_buffer.bind();
+
+		if (post_processing)
+		{
+			if (!binded)
+				frame_buffer.bind();
+
+			frame_buffer.clear(color);
+
+			if (!binded)
+				frame_buffer.unbind();
+		}
 	}
 
-	void Window::draw(const sf::Drawable& drawable)
+	void Window::check_events(const sf::Event& sf_event)
 	{
+		static int frame_id = 0;
+		ImGui::SFML::ProcessEvent(sf_event);
+
+		if (sf_event.type == sf::Event::Resized || frame_id < 5)
+		{
+			if (window->getSize().x < static_cast<unsigned int>(initial_size.x))
+				window->setSize(sf::Vector2u(initial_size.x, window->getSize().y));
+
+			if (window->getSize().y < static_cast<unsigned int>(initial_size.y))
+				window->setSize(sf::Vector2u(window->getSize().x, initial_size.y));
+
+			screen_coef = window->getSize().x / 1920.f;
+
+			if (post_processing)
+				frame_buffer.set_size(get_size());
+
+			if (camera != nullptr)
+				camera->set_resolution(get_size());
+
+			camera2D.set_resolution(get_size());
+			window->setView(camera2D.get_view());
+			fixed_camera2D.set_resolution(get_size());
+		}
+
+		if (controller != nullptr && camera != nullptr)
+			controller->check_events(sf_event, *camera);
+
+		if (sf_event.type == sf::Event::Closed)
+			running = false;
+
+		frame_id++;
+	}
+
+	void Window::update()
+	{
+		if (controller != nullptr && camera != nullptr)
+			controller->update(*camera);
+
+		if (unique_shader)
+		{
+			if (!binded)
+				shader.bind();
+
+			if (camera != nullptr)
+				shader.send_uniform("u_camera", camera->get_position());
+
+			else
+				shader.send_uniform("u_camera", Vector3(0.f, 0.f, -1.f));
+
+			shader.send_uniform("u_light", lights);
+
+			if (!binded)
+				shader.unbind();
+		}
+	}
+
+	void Window::draw(const sf::Drawable& drawable, bool fixed)
+	{
+		Window::set_cull_face(false);
+
+		if (fixed)
+			window->setView(fixed_camera2D.get_view());
+
 		window->draw(drawable);
+
+		if (fixed)
+			window->setView(camera2D.get_view());
+	}
+
+	void Window::draw(const Object& object, DrawType draw_type)
+	{
+		Window::set_cull_face(true);
+
+		if (!binded && post_processing)
+			frame_buffer.bind();
+
+		if (draw_type == DrawType::Default)
+			object.draw(camera, lights, object.mesh.draw_type, unique_shader);
+
+		else
+			object.draw(camera, lights, draw_type, unique_shader);
+
+		if (!binded && post_processing)
+			frame_buffer.unbind();
+	}
+
+	void Window::draw(const VertexBuffer& vertex_buffer, DrawType draw_type)
+	{
+		Window::set_cull_face(true);
+
+		if (!binded && post_processing)
+			frame_buffer.bind();
+
+		vertex_buffer.draw(draw_type);
+
+		if (!binded && post_processing)
+			frame_buffer.unbind();
 	}
 
 	void Window::display()
 	{
+		if (binded)
+		{
+			if (post_processing)
+				frame_buffer.unbind();
+
+			if (unique_shader)
+				shader.unbind();
+		}
+
+		if (post_processing)
+		{
+			post_processing_shader.bind();
+			frame_buffer.get_texture().bind();
+			screen.bind();
+
+			post_processing_shader.send_uniform("u_texture", frame_buffer.get_texture());
+
+			screen.draw();
+
+			screen.unbind();
+			frame_buffer.get_texture().unbind();
+			post_processing_shader.unbind();
+		}
+
 		ImGui::SFML::Render(*window);
 		window->display();
 		elapsed_time = clock.restart().asSeconds();
+
+		if (binded)
+		{
+			if (post_processing)
+				frame_buffer.bind();
+
+			if (unique_shader)
+				shader.bind();
+		}
 	}
 
 	void Window::close()
@@ -173,20 +425,71 @@ namespace dim
 		{
 			window->close();
 			delete window;
+			window = nullptr;
+		}
+
+		delete controller;
+		controller = nullptr;
+		delete camera;
+		camera = nullptr;
+
+		running = false;
+	}
+
+	int Window::hd_to_window(int position)
+	{
+		return static_cast<int>(round(position * screen_coef));
+	}
+
+	Vector2int Window::hd_to_window(int x, int y)
+	{
+		return Vector2int(x, y) * screen_coef;
+	}
+
+	Vector2int Window::hd_to_window(const Vector2int& position)
+	{
+		return position * screen_coef;
+	}
+
+	void Window::set_thickness(float thickness)
+	{
+		if (thickness >= 0.f && thickness != Window::thickness)
+		{
+			glPointSize(thickness);
+			glLineWidth(thickness);
+			Window::thickness = thickness;
 		}
 	}
 
-	uint16_t Window::to_relative(uint16_t position)
+	void Window::set_cull_face(bool enable)
 	{
-		return static_cast<uint16_t>(round(position * screen_coef));
+		if (!cull_face && enable)
+		{
+			glEnable(GL_CULL_FACE);
+			cull_face = true;
+		}
+
+		else if (cull_face && !enable)
+		{
+			glDisable(GL_CULL_FACE);
+			cull_face = false;
+		}
 	}
 
-	void Window::check_events(const sf::Event& sf_event)
+	float Window::get_elapsed_time()
 	{
-		ImGui::SFML::ProcessEvent(sf_event);
+		return elapsed_time;
+	}
 
-		if (sf_event.type == sf::Event::Closed)
-			running = false;
+	bool Window::is_in(const Vector2& position)
+	{
+		return position.x >= 0 && position.x <= Window::get_width() && position.y >= 0 && position.y <= Window::get_height();
+	}
+
+	bool Window::is_on_border(const Vector2& position)
+	{
+		return (position.x >= -2 && position.x <= 2) || (position.x >= Window::get_width() - 2 && position.x <= Window::get_width() + 2) ||
+			(position.y >= -2 && position.y <= 2) || (position.y >= Window::get_height() - 2 && position.y <= Window::get_height() + 2);
 	}
 
 	sf::RenderWindow& get_window()
@@ -194,19 +497,18 @@ namespace dim
 		return Window::get_window();
 	}
 
-	uint16_t to_relative(uint16_t position)
+	int hd_to_window(int position)
 	{
-		return Window::to_relative(position);
+		return Window::hd_to_window(position);
 	}
 
-	bool is_in_window(const Vector2& position)
+	Vector2int hd_to_window(int x, int y)
 	{
-		return position.x >= 0 && position.x <= Window::get_width() && position.y >= 0 && position.y <= Window::get_height();
+		return Window::hd_to_window(x, y);
 	}
 
-	bool is_on_border_window(const Vector2& position)
+	Vector2int hd_to_window(const Vector2int& position)
 	{
-		return (position.x >= -2 && position.x <= 2) || (position.x >= Window::get_width() - 2 && position.x <= Window::get_width() + 2) ||
-			(position.y >= -2 && position.y <= 2) || (position.y >= Window::get_height() - 2 && position.y <= Window::get_height() + 2);
+		return Window::hd_to_window(position);
 	}
 }

@@ -1,6 +1,5 @@
 #include "dim/dimension3D.hpp"
 
-// Construit un vecteur
 namespace dim
 {
 	const Vector4 Vector4::null = Vector4();
@@ -14,15 +13,6 @@ namespace dim
 		w = 0.f;
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector4::Vector4(const Vector4& vector)
-	{
-		*this = vector;
-	}
-
-	// Construit un vecteur � partir de ses coordonn�es cart�siennes
-
 	Vector4::Vector4(float x, float y, float z, float w)
 	{
 		this->x = x;
@@ -31,54 +21,109 @@ namespace dim
 		this->w = w;
 	}
 
-	Vector4::Vector4(const Vector2& vector, float z, float w)
+	Vector4::Vector4(const Vector2& other, float z, float w)
 	{
-		x = vector.x;
-		y = vector.y;
+		x = other.x;
+		y = other.y;
 		this->z = z;
 		this->w = w;
 	}
 
-	Vector4::Vector4(float x, const Vector2& vector, float w)
+	Vector4::Vector4(float x, const Vector2& other, float w)
 	{
 		this->x = x;
-		y = vector.x;
-		z = vector.y;
+		y = other.x;
+		z = other.y;
 		this->w = w;
 	}
 
-	Vector4::Vector4(float x, float y, const Vector2& vector)
+	Vector4::Vector4(float x, float y, const Vector2& other)
 	{
 		this->x = x;
 		this->y = y;
-		z = vector.x;
-		w = vector.y;
+		z = other.x;
+		w = other.y;
 	}
 
-	Vector4::Vector4(const Vector3& vector, float w)
+	Vector4::Vector4(const Vector3& other, float w)
 	{
-		x = vector.x;
-		y = vector.y;
-		z = vector.z;
+		x = other.x;
+		y = other.y;
+		z = other.z;
 		this->w = w;
 	}
 
-	Vector4::Vector4(float x, const Vector3& vector)
+	Vector4::Vector4(float x, const Vector3& other)
 	{
 		this->x = x;
-		y = vector.x;
-		z = vector.y;
-		w = vector.z;
+		y = other.x;
+		z = other.y;
+		w = other.z;
 	}
 
-	Vector4::Vector4(const std::array<float, 4>& vector)
+	Vector4::Vector4(const Vector2int& other, float z, float w)
 	{
-		*this = vector;
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
+		this->z = z;
+		this->w = w;
 	}
 
-	Vector4::Vector4(const glm::vec4& vector)
+	Vector4::Vector4(float x, const Vector2int& other, float w)
 	{
-		*this = vector;
+		this->x = x;
+		y = static_cast<float>(other.x);
+		z = static_cast<float>(other.y);
+		this->w = w;
+	}
+
+	Vector4::Vector4(float x, float y, const Vector2int& other)
+	{
+		this->x = x;
+		this->y = y;
+		z = static_cast<float>(other.x);
+		w = static_cast<float>(other.y);
+	}
+
+	Vector4::Vector4(const Vector3int& other, float w)
+	{
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
+		z = static_cast<float>(other.z);
+		this->w = w;
+	}
+
+	Vector4::Vector4(float x, const Vector3int& other)
+	{
+		this->x = x;
+		y = static_cast<float>(other.x);
+		z = static_cast<float>(other.y);
+		w = static_cast<float>(other.z);
+	}
+
+	Vector4::Vector4(const Vector4int& other)
+	{
+		*this = other;
+	}
+
+	Vector4::Vector4(const std::array<float, 4>& other)
+	{
+		*this = other;
+	}
+
+	Vector4::Vector4(const std::array<int, 4>& other)
+	{
+		*this = other;
+	}
+
+	Vector4::Vector4(const glm::vec4& other)
+	{
+		*this = other;
+	}
+
+	Vector4::Vector4(const ImVec4& other)
+	{
+		*this = other;
 	}
 
 	Vector4::Vector4(const Color& color)
@@ -86,44 +131,52 @@ namespace dim
 		*this = color;
 	}
 
-	// Assignations
-
-	Vector4& Vector4::operator=(const Vector4& vector)
+	Vector4& Vector4::operator=(const Vector4int& other)
 	{
-		x = vector.x;
-		y = vector.y;
-		z = vector.z;
-		w = vector.w;
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
+		z = static_cast<float>(other.z);
+		w = static_cast<float>(other.w);
 
 		return *this;
 	}
 
-	Vector4& Vector4::operator=(float number)
+	Vector4& Vector4::operator=(const std::array<float, 4>& other)
 	{
-		x = number;
-		y = number;
-		z = number;
-		w = number;
+		x = other[0];
+		y = other[1];
+		z = other[2];
+		w = other[3];
 
 		return *this;
 	}
 
-	Vector4& Vector4::operator=(const std::array<float, 4>& vector)
+	Vector4& Vector4::operator=(const std::array<int, 4>& other)
 	{
-		x = vector[0];
-		y = vector[1];
-		z = vector[2];
-		w = vector[3];
+		x = static_cast<float>(other[0]);
+		y = static_cast<float>(other[1]);
+		z = static_cast<float>(other[2]);
+		w = static_cast<float>(other[3]);
 
 		return *this;
 	}
 
-	Vector4& Vector4::operator=(const glm::vec4& vector)
+	Vector4& Vector4::operator=(const glm::vec4& other)
 	{
-		x = vector.x;
-		y = vector.y;
-		z = vector.z;
-		w = vector.w;
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		w = other.w;
+
+		return *this;
+	}
+
+	Vector4& Vector4::operator=(const ImVec4& other)
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		w = other.w;
 
 		return *this;
 	}
@@ -138,21 +191,21 @@ namespace dim
 		return *this;
 	}
 
-	Vector4& Vector4::operator+=(const Vector4& vector)
+	Vector4& Vector4::operator+=(const Vector4& other)
 	{
-		*this = *this + vector;
+		*this = *this + other;
 		return *this;
 	}
 
-	Vector4& Vector4::operator-=(const Vector4& vector)
+	Vector4& Vector4::operator-=(const Vector4& other)
 	{
-		*this = *this - vector;
+		*this = *this - other;
 		return *this;
 	}
 
-	Vector4& Vector4::operator*=(const Vector4& vector)
+	Vector4& Vector4::operator*=(const Vector4& other)
 	{
-		*this = *this * vector;
+		*this = *this * other;
 		return *this;
 	}
 
@@ -162,13 +215,31 @@ namespace dim
 		return *this;
 	}
 
-	Vector4& Vector4::operator/=(const Vector4& vector)
+	Vector4& Vector4::operator*=(int number)
 	{
-		*this = *this / vector;
+		*this = *this * number;
+		return *this;
+	}
+
+	Vector4& Vector4::operator*=(const glm::mat4& matrix)
+	{
+		*this = *this * matrix;
+		return *this;
+	}
+
+	Vector4& Vector4::operator/=(const Vector4& other)
+	{
+		*this = *this / other;
 		return *this;
 	}
 
 	Vector4& Vector4::operator/=(float number)
+	{
+		*this = *this / number;
+		return *this;
+	}
+
+	Vector4& Vector4::operator/=(int number)
 	{
 		*this = *this / number;
 		return *this;
@@ -184,31 +255,14 @@ namespace dim
 		return null - *this;
 	}
 
-	float Vector4::dot(const Vector4& vector) const
-	{
-		return x * vector.x + y * vector.y + z * vector.z + w * vector.w;
-	}
-
-	// Donne la norme du vecteur
-
 	float Vector4::get_norm() const
 	{
 		return sqrt(x * x + y * y + z * z + w * w);
 	}
 
-	// Donne la norme du vecteur au carré
-
 	float Vector4::get_norm_2() const
 	{
 		return x * x + y * y + z * z + w * w;
-	}
-
-	Vector4 Vector4::get_normalized() const
-	{
-		if (get_norm() != 0.f)
-			return *this / get_norm();
-
-		return unit;
 	}
 
 	const float* Vector4::get_ptr() const
@@ -216,44 +270,29 @@ namespace dim
 		return &x;
 	}
 
-	float Vector4::get_distance(const Vector4& point) const
-	{
-		return (point - *this).get_norm();
-	}
-
-	float Vector4::get_distance_2(const Vector4& point) const
-	{
-		return (point - *this).get_norm_2();
-	}
-
-	// Modifie la norme du vecteur
-
 	void Vector4::set_norm(float norm)
 	{
-		*this = get_normalized() * norm;
+		*this = dim::normalize(*this) * norm;
 	}
-
-	// Normalise le vecteur
 
 	void Vector4::normalize()
 	{
-		if (get_norm() != 0.f)
-			*this /= get_norm();
-
-		else
-			*this = unit;
+		*this = dim::normalize(*this);
 	}
-
-	// Met toutes les composantes � z�ro
 
 	void Vector4::clear()
 	{
 		*this = null;
 	}
 
-	std::array<float, 4> Vector4::to_array() const
+	std::array<float, 4> Vector4::to_array_float() const
 	{
 		return { x, y, z, w };
+	}
+
+	std::array<int, 4> Vector4::to_array_int() const
+	{
+		return { static_cast<int>(round(x)), static_cast<int>(round(y)), static_cast<int>(round(z)), static_cast<int>(round(w)) };
 	}
 
 	glm::vec4 Vector4::to_glm() const
@@ -261,21 +300,20 @@ namespace dim
 		return glm::vec4(x, y, z, w);
 	}
 
-	// Addition
+	ImVec4 Vector4::to_imgui() const
+	{
+		return ImVec4(x, y, z, w);
+	}
 
 	Vector4 operator+(const Vector4& vector_1, const Vector4& vector_2)
 	{
 		return Vector4(vector_1.x + vector_2.x, vector_1.y + vector_2.y, vector_1.z + vector_2.z, vector_1.w + vector_2.w);
 	}
 
-	// Soustraction
-
 	Vector4 operator-(const Vector4& vector_1, const Vector4& vector_2)
 	{
 		return Vector4(vector_1.x - vector_2.x, vector_1.y - vector_2.y, vector_1.z - vector_2.z, vector_1.w - vector_2.w);
 	}
-
-	// Produits
 
 	Vector4 operator*(float number, const Vector4& vector)
 	{
@@ -284,7 +322,18 @@ namespace dim
 
 	Vector4 operator*(const Vector4& vector, float number)
 	{
-		return Vector4(vector.x * number, vector.y * number, vector.z * number, vector.w + number);
+		return number * vector;
+	}
+
+	Vector4 operator*(int number, const Vector4& vector)
+	{
+		return Vector4(static_cast<float>(number) * vector.x, static_cast<float>(number) * vector.y,
+			static_cast<float>(number) * vector.z, static_cast<float>(number) * vector.w);
+	}
+
+	Vector4 operator*(const Vector4& vector, int number)
+	{
+		return number * vector;
 	}
 
 	Vector4 operator*(const Vector4& vector_1, const Vector4& vector_2)
@@ -292,11 +341,20 @@ namespace dim
 		return Vector4(vector_1.x * vector_2.x, vector_1.y * vector_2.y, vector_1.z * vector_2.z, vector_1.w * vector_2.w);
 	}
 
-	// Division
+	Vector4 operator*(const glm::mat4& matrix, const Vector4& vector)
+	{
+		return Vector4(matrix * vector.to_glm());
+	}
+
+	Vector4 operator*(const Vector4& vector, const glm::mat4& matrix)
+	{
+		return matrix * vector;
+	}
 
 	Vector4 operator/(float number, const Vector4& vector)
 	{
-		return Vector4((vector.x != 0.f ? number / vector.x : 0.f), (vector.y != 0.f ? number / vector.y : 0.f), (vector.z != 0.f ? number / vector.z : 0.f), (vector.w != 0.f ? number / vector.w : 0.f));
+		return Vector4((vector.x != 0.f ? number / vector.x : 0.f), (vector.y != 0.f ? number / vector.y : 0.f),
+			(vector.z != 0.f ? number / vector.z : 0.f), (vector.w != 0.f ? number / vector.w : 0.f));
 	}
 
 	Vector4 operator/(const Vector4& vector, float number)
@@ -307,17 +365,31 @@ namespace dim
 		return Vector4(vector.x / number, vector.y / number, vector.z / number, vector.w / number);
 	}
 
+	Vector4 operator/(int number, const Vector4& vector)
+	{
+		return Vector4((vector.x != 0.f ? static_cast<float>(number) / vector.x : 0.f), (vector.y != 0.f ? static_cast<float>(number) / vector.y : 0.f),
+			(vector.z != 0.f ? static_cast<float>(number) / vector.z : 0.f), (vector.w != 0.f ? static_cast<float>(number) / vector.w : 0.f));
+	}
+
+	Vector4 operator/(const Vector4& vector, int number)
+	{
+		if (number == 0)
+			return Vector4::null;
+
+		return Vector4(vector.x / static_cast<float>(number), vector.y / static_cast<float>(number),
+			vector.z / static_cast<float>(number), vector.w / static_cast<float>(number));
+	}
+
 	Vector4 operator/(const Vector4& vector_1, const Vector4& vector_2)
 	{
-		return Vector4((vector_2.x != 0.f ? vector_1.x / vector_2.x : 0.f), (vector_2.y != 0.f ? vector_1.y / vector_2.y : 0.f), (vector_2.z != 0.f ? vector_1.z / vector_2.z : 0.f), (vector_2.w != 0.f ? vector_1.w / vector_2.w : 0.f));
+		return Vector4((vector_2.x != 0.f ? vector_1.x / vector_2.x : 0.f), (vector_2.y != 0.f ? vector_1.y / vector_2.y : 0.f),
+			(vector_2.z != 0.f ? vector_1.z / vector_2.z : 0.f), (vector_2.w != 0.f ? vector_1.w / vector_2.w : 0.f));
 	}
 
 	float dot(const Vector4& vector_1, const Vector4& vector_2)
 	{
-		return vector_1.dot(vector_2);
+		return vector_1.x * vector_2.x + vector_1.y * vector_2.y + vector_1.z * vector_2.z + vector_1.w * vector_2.w;
 	}
-
-	// Egalit�s
 
 	bool operator==(const Vector4& vector_1, const Vector4& vector_2)
 	{
@@ -329,8 +401,6 @@ namespace dim
 		return (!(vector_1 == vector_2));
 	}
 
-	// Affichage
-
 	std::ostream& operator<<(std::ostream& os, const Vector4& vector)
 	{
 		os << "(" << vector.x << ", " << vector.y << ", " << vector.z << ", " << vector.w << ")";
@@ -339,26 +409,21 @@ namespace dim
 
 	float distance(const Vector4& point_1, const Vector4& point_2)
 	{
-		return point_1.get_distance(point_2);
+		return (point_2 - point_1).get_norm();
 	}
 
 	float distance_2(const Vector4& point_1, const Vector4& point_2)
 	{
-		return point_1.get_distance_2(point_2);
+		return (point_2 - point_1).get_norm_2();
 	}
 
-	Vector4 normalized(const Vector4& vector)
+	Vector4 normalize(const Vector4& vector)
 	{
-		return vector.get_normalized();
-	}
+		float norm = vector.get_norm();
 
-	std::array<float, 4> to_array(const Vector4& vector)
-	{
-		return vector.to_array();
-	}
+		if (norm != 0.f)
+			return vector / norm;
 
-	glm::vec4 to_glm(const Vector4& vector)
-	{
-		return vector.to_glm();
+		return Vector4::unit;
 	}
 }

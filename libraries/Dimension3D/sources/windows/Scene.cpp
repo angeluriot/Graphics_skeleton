@@ -2,24 +2,35 @@
 
 namespace dim
 {
-	Scene::Scene(std::string name)
+	std::map<std::string, Scene*> Scene::scenes = {};
+
+	Scene::Scene()
 	{
-		frame_buffer.create(100, 100);
-		render_texture.create(100, 100);
+		name = "";
 		controller = nullptr;
 		camera = nullptr;
-		this->name = name;
-		size = sf::Vector2i(100, 100);
-		min  = sf::Vector2i(0, 0);
-		max = sf::Vector2i(100, 100);
-		resized = false;
+		size = Window::initial_size;
+		min  = Vector2int::null;
+		max = Window::initial_size;
 		active = false;
 		moving = false;
-		first_frame = true;
-		is_window = false;
+		resized = false;
+		frame_id = 0;
 		unique_shader = false;
 		binded = false;
+		lights.clear();
 		post_processing = false;
+		to_delete = false;
+	}
+
+	Scene::Scene(const Scene& scene)
+	{
+		*this = scene;
+	}
+
+	Scene::Scene(const std::string& name)
+	{
+		create(name);
 	}
 
 	Scene::~Scene()
@@ -31,26 +42,89 @@ namespace dim
 		camera = nullptr;
 	}
 
+	Scene& Scene::operator=(const Scene& other)
+	{
+		name = other.name + " (copy)";
+		frame_buffer.create(other.frame_buffer.get_size());
+		render_texture.create(other.render_texture.getSize().x, other.render_texture.getSize().y);
+		controller = other.controller->clone();
+		camera = other.camera->clone();
+		size = other.size;
+		min = other.min;
+		max = other.max;
+		active = false;
+		moving = false;
+		resized = false;
+		frame_id = 0;
+		unique_shader = other.unique_shader;
+		shader = other.shader;
+		binded = false;
+		fixed_camera2D = other.fixed_camera2D;
+		lights = other.lights;
+		post_processing_shader = other.post_processing_shader;
+		post_processing = other.post_processing;
+
+		if (post_processing)
+			screen.send_data(post_processing_shader, Mesh::screen, DataType::Positions | DataType::TexCoords);
+
+		clear_texture.create(other.clear_texture.getSize().x, other.clear_texture.getSize().y);
+		to_delete = other.to_delete;
+		camera2D = other.camera2D;
+
+		return *this;
+	}
+
+	void Scene::create(const std::string& name)
+	{
+		this->name = name;
+		frame_buffer.create(Window::initial_size);
+		render_texture.create(Window::initial_size.x, Window::initial_size.y);
+		controller = nullptr;
+		camera = nullptr;
+		size = Window::initial_size;
+		min  = Vector2int::null;
+		max = Window::initial_size;
+		active = false;
+		moving = false;
+		resized = false;
+		frame_id = 0;
+		unique_shader = false;
+		binded = false;
+		lights.clear();
+		post_processing = false;
+		clear_texture.create(Window::initial_size.x, Window::initial_size.y);
+		to_delete = false;
+	}
+
 	void Scene::check_events(const sf::Event& sf_event)
 	{
 		if (controller != nullptr && camera != nullptr)
 			controller->check_events(sf_event, *this, *camera);
+
+		if (sf_event.type == sf::Event::MouseButtonReleased && resized)
+		{
+			frame_buffer.set_size(size);
+			resized = false;
+		}
 	}
 
 	void Scene::update()
 	{
-		if (resized)
+		if (frame_id < 5)
+			frame_buffer.set_size(size);
+
+		if (frame_id < 5 || resized)
 		{
-			frame_buffer.set_size(size.x, size.y);
 			render_texture.create(size.x, size.y);
+			clear_texture.create(size.x, size.y);
 
 			if (camera != nullptr)
-				camera->set_resolution(size.x, size.y);
+				camera->set_resolution(size);
 
-			camera2D.set_resolution(size.x, size.y);
+			camera2D.set_resolution(size);
 			render_texture.setView(camera2D.get_view());
 
-			fixed_camera2D.set_resolution(size.x, size.y);
+			fixed_camera2D.set_resolution(size);
 		}
 
 		if (controller != nullptr && camera != nullptr)
@@ -58,7 +132,8 @@ namespace dim
 
 		if (unique_shader)
 		{
-			shader.bind();
+			if (!binded)
+				shader.bind();
 
 			if (camera != nullptr)
 				shader.send_uniform("u_camera", camera->get_position());
@@ -67,20 +142,40 @@ namespace dim
 				shader.send_uniform("u_camera", Vector3(0.f, 0.f, -1.f));
 
 			shader.send_uniform("u_light", lights);
-			shader.unbind();
+
+			if (!binded)
+				shader.unbind();
 		}
 	}
 
 	void Scene::bind() const
 	{
 		frame_buffer.bind();
+
+		if (unique_shader)
+			shader.bind();
+
 		binded = true;
 	}
 
 	void Scene::unbind() const
 	{
 		frame_buffer.unbind();
+
+		if (unique_shader)
+			shader.unbind();
+
 		binded = false;
+	}
+
+	std::string Scene::get_name() const
+	{
+		return name;
+	}
+
+	void Scene::set_name(const std::string& name)
+	{
+		this->name = name;
 	}
 
 	void Scene::set_camera(const Camera& camera)
@@ -88,9 +183,25 @@ namespace dim
 		this->camera = camera.clone();
 	}
 
+	Camera& Scene::get_camera()
+	{
+		if (camera == nullptr)
+			throw std::runtime_error("There is no camera");
+
+		return *camera;
+	}
+
 	void Scene::set_controller(const Controller& controller)
 	{
 		this->controller = controller.clone();
+	}
+
+	Controller& Scene::get_controller()
+	{
+		if (controller == nullptr)
+			throw std::runtime_error("There is no controller");
+
+		return *controller;
 	}
 
 	unsigned int Scene::get_width() const
@@ -103,9 +214,24 @@ namespace dim
 		return size.y;
 	}
 
+	Vector2int Scene::get_size() const
+	{
+		return size;
+	}
+
+	Vector2int Scene::get_center() const
+	{
+		return Vector2int((min.x + max.x) / 2, (min.y + max.y) / 2);
+	}
+
 	FrameBuffer Scene::get_frame_buffer() const
 	{
 		return frame_buffer;
+	}
+
+	const sf::RenderTexture& Scene::get_render_texture() const
+	{
+		return render_texture;
 	}
 
 	bool Scene::is_active() const
@@ -129,6 +255,11 @@ namespace dim
 		unique_shader = true;
 	}
 
+	Shader Scene::get_shader() const
+	{
+		return shader;
+	}
+
 	void Scene::set_post_processing_shader(const Shader& shader)
 	{
 		post_processing_shader = shader;
@@ -136,14 +267,38 @@ namespace dim
 		post_processing = true;
 	}
 
+	Shader Scene::get_post_processing_shader() const
+	{
+		return post_processing_shader;
+	}
+
 	bool Scene::is_in(const Vector2& position) const
 	{
 		return position.x >= min.x && position.x <= max.x && position.y >= min.y && position.y <= max.y;
 	}
 
-	sf::Vector2i Scene::get_center() const
+	Vector2 Scene::get_2d_world_mouse_position()
 	{
-		return sf::Vector2i((min.x + max.x) / 2, (min.y + max.y) / 2);
+		Vector2 pos;
+		pos.x = (sf::Mouse::getPosition(Window::get_window()).x - get_center().x) * camera2D.get_zoom() + camera2D.get_view().getCenter().x;
+		pos.y = (sf::Mouse::getPosition(Window::get_window()).y - get_center().y) * camera2D.get_zoom() + camera2D.get_view().getCenter().y;
+		return pos;
+	}
+
+	void Scene::add_light(const Light& light)
+	{
+		lights.push_back(light.clone());
+	}
+
+	void Scene::clear_lights()
+	{
+		for (auto& light : lights)
+		{
+			delete light;
+			light = nullptr;
+		}
+
+		lights.clear();
 	}
 
 	void Scene::clear(const Color& color)
@@ -155,6 +310,7 @@ namespace dim
 		frame_buffer.unbind();
 
 		render_texture.clear(color.to_sf());
+		clear_texture.clear();
 
 		if (binded)
 			frame_buffer.bind();
@@ -162,6 +318,8 @@ namespace dim
 
 	void Scene::draw(const sf::Drawable& drawable, bool fixed)
 	{
+		Window::set_cull_face(false);
+
 		if (fixed)
 			render_texture.setView(fixed_camera2D.get_view());
 
@@ -173,10 +331,16 @@ namespace dim
 
 	void Scene::draw(const Object& object, DrawType draw_type)
 	{
+		Window::set_cull_face(true);
+
 		if (!binded)
 			frame_buffer.bind();
 
-		object.draw(camera, lights, draw_type, unique_shader);
+		if (draw_type == DrawType::Default)
+			object.draw(camera, lights, object.mesh.draw_type, unique_shader);
+
+		else
+			object.draw(camera, lights, draw_type, unique_shader);
 
 		if (!binded)
 			frame_buffer.unbind();
@@ -184,6 +348,8 @@ namespace dim
 
 	void Scene::draw(const VertexBuffer& vertex_buffer, DrawType draw_type)
 	{
+		Window::set_cull_face(true);
+
 		if (!binded)
 			frame_buffer.bind();
 
@@ -193,15 +359,13 @@ namespace dim
 			frame_buffer.unbind();
 	}
 
-	void Scene::add_light(const Light& light)
-	{
-		lights.push_back(light.clone());
-	}
-
 	void Scene::display()
 	{
 		if (post_processing)
 		{
+			if (binded && unique_shader)
+				shader.unbind();
+
 			if (!binded)
 				frame_buffer.bind();
 
@@ -230,54 +394,123 @@ namespace dim
 
 		// ImGui
 
-		ImGui::SetNextWindowSizeConstraints(ImVec2(50, 50), ImVec2(10000, 10000));
-		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse;
+		ImGui::SetNextWindowSizeConstraints(ImVec2(50.f, 50.f), ImVec2(100000.f, 100000.f));
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse;
 
-		ImGui::Begin(name.data(), NULL, windowFlags);
+		ImGui::Begin(name.data(), NULL, window_flags);
 
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		Vector2int viewport_panel_size = ImGui::GetContentRegionAvail();
+		Vector2int temp = size;
 
-		sf::Vector2i temp = size;
-
-		if (first_frame || size.x != viewportPanelSize.x || size.y != viewportPanelSize.y)
+		if (frame_id == 0 || size.x != viewport_panel_size.x || size.y != viewport_panel_size.y)
 		{
-			size.x = static_cast<int>(viewportPanelSize.x);
-			size.y = static_cast<int>(viewportPanelSize.y);
+			size.x = viewport_panel_size.x;
+			size.y = viewport_panel_size.y;
 
 			resized = true;
 		}
 
-		else
-			resized = false;
+		Vector2int v_min = ImGui::GetWindowContentRegionMin();
+		Vector2int v_max = ImGui::GetWindowContentRegionMax();
+		Vector2int v_pos = ImGui::GetWindowPos();
 
-		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
-		ImVec2 vPos = ImGui::GetWindowPos();
+		moving = min != (v_min + v_pos) || max != (v_max + v_pos);
 
-		moving = min.x != vMin.x + vPos.x || min.y != vMin.y + vPos.y || max.x != vMax.x + vPos.x || max.y != vMax.y + vPos.y;
-
-		min.x = static_cast<int>(vMin.x + vPos.x);
-		min.y = static_cast<int>(vMin.y + vPos.y);
-		max.x = static_cast<int>(vMax.x + vPos.x);
-		max.y = static_cast<int>(vMax.y + vPos.y);
+		min = v_min + v_pos;
+		max = v_max + v_pos;
 
 		active = ImGui::IsWindowFocused();
 
-		ImGui::SetCursorPos(ImVec2(8, 27));
-
-		unsigned int textureID = frame_buffer.get_texture().get_id();
-		ImGui::Image(textureID, ImVec2{ (float)temp.x, (float)temp.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-
-		ImGui::SetCursorPos(ImVec2(8, 27));
-
+		ImGui::SetCursorPos(ImVec2(8.f, 27.f));
+		ImGui::Image(frame_buffer.get_texture().get_id(), ImVec2(static_cast<float>(temp.x), static_cast<float>(temp.y)), ImVec2(0.f, 1.f), ImVec2(1.f, 0.f));
+		ImGui::SetCursorPos(ImVec2(8.f, 27.f));
 		ImGui::Image(render_texture.getTexture().getNativeHandle(),
-			ImVec2{ (float)render_texture.getTexture().getSize().x, (float)render_texture.getTexture().getSize().y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+			ImVec2(static_cast<float>(render_texture.getTexture().getSize().x),
+			static_cast<float>(render_texture.getTexture().getSize().y)), ImVec2(0.f, 1.f), ImVec2(1.f, 0.f));
 
 		ImGui::End();
 
-		first_frame = false;
-
 		if (binded)
+		{
 			frame_buffer.bind();
+
+			if (unique_shader)
+				shader.bind();
+		}
+
+		frame_id++;
+	}
+
+	void Scene::add(Scene& scene)
+	{
+		if (!scenes.insert(std::make_pair(scene.name, &scene)).second)
+			throw std::invalid_argument("This name is already used");
+	}
+
+	void Scene::add(const std::string& name)
+	{
+		if (!scenes.insert(std::make_pair(name, new Scene(name))).second)
+			throw std::invalid_argument("This name is already used");
+
+		get(name).to_delete = true;
+	}
+
+	void Scene::remove(const std::string& name)
+	{
+		try
+		{
+			Scene*& scene = scenes.at(name);
+
+			if (scene->to_delete)
+			{
+				delete scene;
+				scene = nullptr;
+			}
+		}
+
+		catch (const std::out_of_range&)
+		{
+			throw std::invalid_argument("This name does not exit");
+		}
+
+		if (!scenes.erase(name))
+			throw std::invalid_argument("This name does not exit");
+	}
+
+	Scene& Scene::get(const std::string& name)
+	{
+		try
+		{
+			return *scenes.at(name);
+		}
+
+		catch (const std::out_of_range&)
+		{
+			throw std::invalid_argument("This name does not exit");
+		}
+	}
+
+	void Scene::check_all_events(const sf::Event& sf_event)
+	{
+		for (auto& scene : scenes)
+			scene.second->check_events(sf_event);
+	}
+
+	void Scene::update_all()
+	{
+		for (auto& scene : scenes)
+			scene.second->update();
+	}
+
+	void Scene::clear_all()
+	{
+		for (auto& scene : scenes)
+			scene.second->clear();
+	}
+
+	void Scene::display_all()
+	{
+		for (auto& scene : scenes)
+			scene.second->display();
 	}
 }

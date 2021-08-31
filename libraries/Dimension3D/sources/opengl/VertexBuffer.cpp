@@ -4,7 +4,7 @@ namespace dim
 {
 	VertexBuffer::VertexBuffer()
 	{
-		shader = Shader::get("default");
+		shader = Shader::default_shader;
 		vbo = std::make_shared<GLuint>();
 		vao = std::make_shared<GLuint>();
 		nb_vertices = std::make_shared<unsigned int>(0);
@@ -24,6 +24,24 @@ namespace dim
 		vbo = std::make_shared<GLuint>();
 		vao = std::make_shared<GLuint>();
 		nb_vertices = std::make_shared<unsigned int>(0);
+	}
+
+	VertexBuffer::VertexBuffer(const std::string& shader_name, const Mesh& mesh, DataType data_sent)
+	{
+		set_shader(shader_name);
+		vbo = std::make_shared<GLuint>();
+		vao = std::make_shared<GLuint>();
+		nb_vertices = std::make_shared<unsigned int>(0);
+		send_data(mesh, data_sent);
+	}
+
+	VertexBuffer::VertexBuffer(const Shader& shader, const Mesh& mesh, DataType data_sent)
+	{
+		set_shader(shader);
+		vbo = std::make_shared<GLuint>();
+		vao = std::make_shared<GLuint>();
+		nb_vertices = std::make_shared<unsigned int>(0);
+		send_data(mesh, data_sent);
 	}
 
 	VertexBuffer::~VertexBuffer()
@@ -150,7 +168,7 @@ namespace dim
 	void VertexBuffer::draw(DrawType draw_type) const
 	{
 		if (*nb_vertices)
-			glDrawArrays((GLenum)draw_type, 0, *nb_vertices);
+			glDrawArrays(static_cast<GLenum>(draw_type == DrawType::Default ? DrawType::Triangles : draw_type), 0, *nb_vertices);
 	}
 
 	DataType operator&(DataType type_1, DataType type_2)

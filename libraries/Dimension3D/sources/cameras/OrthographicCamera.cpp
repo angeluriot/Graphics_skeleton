@@ -9,11 +9,10 @@ namespace dim
 
 	OrthographicCamera::OrthographicCamera(float zoom, float near, float far) : Camera()
 	{
-		zoom_level = zoom;
-		this->near = near;
-		this->far = far;
+		zoom_level = (zoom > 0.f ? zoom : default_zoom);
+		this->near = (near > 0.f ? near : default_near);
+		this->far = (far > near ? far : near);
 		ratio = 1.f;
-
 		projection = glm::ortho(-ratio * zoom_level, ratio * zoom_level, -zoom_level, zoom_level, near, far);
 	}
 
@@ -24,22 +23,39 @@ namespace dim
 
 	void OrthographicCamera::zoom(float zoom)
 	{
-		zoom_level *= 1.f - (zoom - 1.f);
-		projection = glm::ortho(-ratio * zoom_level, ratio * zoom_level, -zoom_level, zoom_level, near, far);
+		if (zoom > 0.f)
+		{
+			zoom_level *= 1.f - (zoom - 1.f);
+			projection = glm::ortho(-ratio * zoom_level, ratio * zoom_level, -zoom_level, zoom_level, near, far);
+		}
 	}
 
-	void OrthographicCamera::set_zoom(float new_zoom)
+	void OrthographicCamera::set_zoom(float zoom)
 	{
-		zoom_level = 1.f - (new_zoom - 1.f);
-		projection = glm::ortho(-ratio * zoom_level, ratio * zoom_level, -zoom_level, zoom_level, near, far);
+		if (zoom > 0.f)
+		{
+			zoom_level = 1.f - (zoom - 1.f);
+			projection = glm::ortho(-ratio * zoom_level, ratio * zoom_level, -zoom_level, zoom_level, near, far);
+		}
+	}
+
+	float OrthographicCamera::get_zoom() const
+	{
+		return zoom_level;
 	}
 
 	void OrthographicCamera::set_resolution(unsigned int width, unsigned int height)
 	{
-		if (width > 0.f && height > 0.f)
+		if (width > 0 && height > 0)
 		{
-			ratio = (float)width / (float)height;
+			ratio = static_cast<float>(width) / static_cast<float>(height);
 			projection = glm::ortho(-ratio * zoom_level, ratio * zoom_level, -zoom_level, zoom_level, near, far);
 		}
+	}
+
+	void OrthographicCamera::set_resolution(const Vector2int& resolution)
+	{
+		if (resolution.x > 0 && resolution.y > 0)
+			set_resolution(resolution.x, resolution.y);
 	}
 }

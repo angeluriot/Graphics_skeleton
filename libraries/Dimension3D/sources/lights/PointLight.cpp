@@ -14,6 +14,11 @@ namespace dim
 		set_intensity(intensity);
 	}
 
+	void PointLight::set_position(float x, float y, float z)
+	{
+		set_position(Vector3(x, y, z));
+	}
+
 	void PointLight::set_position(const Vector3& position)
 	{
 		vector = position;

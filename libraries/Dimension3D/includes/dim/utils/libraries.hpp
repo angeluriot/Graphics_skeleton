@@ -1,8 +1,7 @@
-#ifndef LIBRARIES_H
-#define LIBRARIES_H
+#ifndef DIM_LIBRARIES_HPP
+#define DIM_LIBRARIES_HPP
 
 // SFML
-//#include <SFML/OpenGL.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>

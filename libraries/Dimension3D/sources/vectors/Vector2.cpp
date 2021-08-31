@@ -1,6 +1,5 @@
 #include "dim/dimension3D.hpp"
 
-// Construit un vecteur
 namespace dim
 {
 	const Vector2 Vector2::null = Vector2();
@@ -12,59 +11,110 @@ namespace dim
 		y = 0.f;
 	}
 
-	// Construit un vecteur à partir d'un autre vecteur
-
-	Vector2::Vector2(const Vector2& vector)
-	{
-		*this = vector;
-	}
-
-	// Construit un vecteur à partir de ses coordonnées cartésiennes
-
 	Vector2::Vector2(float x, float y)
 	{
 		this->x = x;
 		this->y = y;
 	}
 
-	Vector2::Vector2(const Vector3& vector)
+	Vector2::Vector2(const Vector3& other)
 	{
-		x = vector.x;
-		y = vector.y;
+		*this = other;
 	}
 
-	Vector2::Vector2(const Vector4& vector)
+	Vector2::Vector2(const Vector4& other)
 	{
-		x = vector.x;
-		y = vector.y;
+		*this = other;
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector2::Vector2(const std::array<float, 2>& vector)
+	Vector2::Vector2(const Vector2int& other)
 	{
-		*this = vector;
+		*this = other;
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector2::Vector2(const glm::vec2& vector)
+	Vector2::Vector2(const Vector3int& other)
 	{
-		*this = vector;
+		*this = other;
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector2::Vector2(const sf::Vector2f& vector)
+	Vector2::Vector2(const Vector4int& other)
 	{
-		*this = vector;
+		*this = other;
 	}
 
-	// Construit un vecteur � partir d'un autre vecteur
-
-	Vector2::Vector2(const sf::Vector2i& vector)
+	Vector2::Vector2(const std::array<float, 2>& other)
 	{
-		*this = vector;
+		*this = other;
+	}
+
+	Vector2::Vector2(const std::array<float, 3>& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const std::array<float, 4>& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const std::array<int, 2>& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const std::array<int, 3>& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const std::array<int, 4>& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const glm::vec2& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const glm::vec3& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const glm::vec4& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const sf::Vector2f& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const sf::Vector3f& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const sf::Vector2i& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const sf::Vector3i& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const ImVec2& other)
+	{
+		*this = other;
+	}
+
+	Vector2::Vector2(const ImVec4& other)
+	{
+		*this = other;
 	}
 
 	Vector2 Vector2::Cartesian(float x, float y)
@@ -77,71 +127,181 @@ namespace dim
 		return Vector2(cos(angle) * norm, sin(angle) * norm);
 	}
 
-	// Assignations
-
-	Vector2& Vector2::operator=(const Vector2& vector)
+	Vector2& Vector2::operator=(const Vector3& other)
 	{
-		x = vector.x;
-		y = vector.y;
+		x = other.x;
+		y = other.y;
 
 		return *this;
 	}
 
-	Vector2& Vector2::operator=(float number)
+	Vector2& Vector2::operator=(const Vector4& other)
 	{
-		x = number;
-		y = number;
+		x = other.x;
+		y = other.y;
 
 		return *this;
 	}
 
-	Vector2& Vector2::operator=(const std::array<float, 2>& vector)
+	Vector2& Vector2::operator=(const Vector2int& other)
 	{
-		x = vector[0];
-		y = vector[1];
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
 
 		return *this;
 	}
 
-	Vector2& Vector2::operator=(const glm::vec2& vector)
+	Vector2& Vector2::operator=(const Vector3int& other)
 	{
-		x = vector.x;
-		y = vector.y;
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
 
 		return *this;
 	}
 
-	Vector2& Vector2::operator=(const sf::Vector2f& vector)
+	Vector2& Vector2::operator=(const Vector4int& other)
 	{
-		x = vector.x;
-		y = vector.y;
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
 
 		return *this;
 	}
 
-	Vector2& Vector2::operator=(const sf::Vector2i& vector)
+	Vector2& Vector2::operator=(const std::array<float, 2>& other)
 	{
-		x = static_cast<float>(vector.x);
-		y = static_cast<float>(vector.y);
+		x = other[0];
+		y = other[1];
 
 		return *this;
 	}
 
-	Vector2& Vector2::operator+=(const Vector2& vector)
+	Vector2& Vector2::operator=(const std::array<float, 3>& other)
 	{
-		*this = *this + vector;
+		x = other[0];
+		y = other[1];
+
 		return *this;
 	}
 
-	Vector2& Vector2::operator-=(const Vector2& vector)
+	Vector2& Vector2::operator=(const std::array<float, 4>& other)
 	{
-		*this = *this - vector;
+		x = other[0];
+		y = other[1];
+
 		return *this;
 	}
 
-	Vector2& Vector2::operator*=(const Vector2& vector)
+	Vector2& Vector2::operator=(const std::array<int, 2>& other)
 	{
-		*this = *this * vector;
+		x = static_cast<float>(other[0]);
+		y = static_cast<float>(other[1]);
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const std::array<int, 3>& other)
+	{
+		x = static_cast<float>(other[0]);
+		y = static_cast<float>(other[1]);
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const std::array<int, 4>& other)
+	{
+		x = static_cast<float>(other[0]);
+		y = static_cast<float>(other[1]);
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const glm::vec2& other)
+	{
+		x = other.x;
+		y = other.y;
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const glm::vec3& other)
+	{
+		x = other.x;
+		y = other.y;
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const glm::vec4& other)
+	{
+		x = other.x;
+		y = other.y;
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const sf::Vector2f& other)
+	{
+		x = other.x;
+		y = other.y;
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const sf::Vector3f& other)
+	{
+		x = other.x;
+		y = other.y;
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const sf::Vector2i& other)
+	{
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const sf::Vector3i& other)
+	{
+		x = static_cast<float>(other.x);
+		y = static_cast<float>(other.y);
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const ImVec2& other)
+	{
+		x = other.x;
+		y = other.y;
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator=(const ImVec4& other)
+	{
+		x = other.x;
+		y = other.y;
+
+		return *this;
+	}
+
+	Vector2& Vector2::operator+=(const Vector2& other)
+	{
+		*this = *this + other;
+		return *this;
+	}
+
+	Vector2& Vector2::operator-=(const Vector2& other)
+	{
+		*this = *this - other;
+		return *this;
+	}
+
+	Vector2& Vector2::operator*=(const Vector2& other)
+	{
+		*this = *this * other;
 		return *this;
 	}
 
@@ -151,13 +311,37 @@ namespace dim
 		return *this;
 	}
 
-	Vector2& Vector2::operator/=(const Vector2& vector)
+	Vector2& Vector2::operator*=(int number)
 	{
-		*this = *this / vector;
+		*this = *this * number;
+		return *this;
+	}
+
+	Vector2& Vector2::operator*=(const glm::mat2& matrix)
+	{
+		*this = *this * matrix;
+		return *this;
+	}
+
+	Vector2& Vector2::operator*=(const glm::mat3& matrix)
+	{
+		*this = *this * matrix;
+		return *this;
+	}
+
+	Vector2& Vector2::operator/=(const Vector2& other)
+	{
+		*this = *this / other;
 		return *this;
 	}
 
 	Vector2& Vector2::operator/=(float number)
+	{
+		*this = *this / number;
+		return *this;
+	}
+
+	Vector2& Vector2::operator/=(int number)
 	{
 		*this = *this / number;
 		return *this;
@@ -173,26 +357,15 @@ namespace dim
 		return null - *this;
 	}
 
-	float Vector2::dot(const Vector2& vector) const
-	{
-		return x * vector.x + y * vector.y;
-	}
-
-	// Donne la norme du vecteur
-
 	float Vector2::get_norm() const
 	{
 		return sqrt(x * x + y * y);
 	}
 
-	// Donne la norme du vecteur au carr�
-
 	float Vector2::get_norm_2() const
 	{
 		return x * x + y * y;
 	}
-
-	// Donne l'angle phi du vecteur
 
 	float Vector2::get_angle() const
 	{
@@ -206,69 +379,39 @@ namespace dim
 			return 2.f * pi - acos(x / get_norm());
 	}
 
-	Vector2 Vector2::get_normalized() const
-	{
-		if (get_norm() != 0.f)
-			return *this / get_norm();
-
-		return unit;
-	}
-
 	const float* Vector2::get_ptr() const
 	{
 		return &x;
 	}
 
-	float Vector2::get_distance(const Vector2& point) const
-	{
-		return (point - *this).get_norm();
-	}
-
-	float Vector2::get_distance_2(const Vector2& point) const
-	{
-		return (point - *this).get_norm_2();
-	}
-
-	float Vector2::get_angle(const Vector2& point) const
-	{
-		return (point - *this).get_angle();
-	}
-
-	// Modifie la norme du vecteur
-
 	void Vector2::set_norm(float norm)
 	{
-		*this = get_normalized() * norm;
+		*this = dim::normalize(*this) * norm;
 	}
-
-	// Modifie l'angle theta du vecteur
 
 	void Vector2::set_angle(float angle)
 	{
 		*this = Polar(get_norm(), angle);
 	}
 
-	// Normalise le vecteur
-
 	void Vector2::normalize()
 	{
-		if (get_norm() != 0.f)
-			*this /= get_norm();
-
-		else
-			*this = unit;
+		*this = dim::normalize(*this);
 	}
-
-	// Met toutes les composantes � z�ro
 
 	void Vector2::clear()
 	{
 		*this = null;
 	}
 
-	std::array<float, 2> Vector2::to_array() const
+	std::array<float, 2> Vector2::to_array_float() const
 	{
 		return { x, y };
+	}
+
+	std::array<int, 2> Vector2::to_array_int() const
+	{
+		return { static_cast<int>(round(x)), static_cast<int>(round(y)) };
 	}
 
 	glm::vec2 Vector2::to_glm() const
@@ -283,24 +426,23 @@ namespace dim
 
 	sf::Vector2i Vector2::to_sf_int() const
 	{
-		return sf::Vector2i(static_cast<int>(x), static_cast<int>(y));
+		return sf::Vector2i(static_cast<int>(round(x)), static_cast<int>(round(y)));
 	}
 
-	// Addition
+	ImVec2 Vector2::to_imgui() const
+	{
+		return ImVec2(x, y);
+	}
 
 	Vector2 operator+(const Vector2& vector_1, const Vector2& vector_2)
 	{
 		return Vector2(vector_1.x + vector_2.x, vector_1.y + vector_2.y);
 	}
 
-	// Soustraction
-
 	Vector2 operator-(const Vector2& vector_1, const Vector2& vector_2)
 	{
 		return Vector2(vector_1.x - vector_2.x, vector_1.y - vector_2.y);
 	}
-
-	// Produits
 
 	Vector2 operator*(float number, const Vector2& vector)
 	{
@@ -309,7 +451,17 @@ namespace dim
 
 	Vector2 operator*(const Vector2& vector, float number)
 	{
-		return Vector2(vector.x * number, vector.y * number);
+		return number * vector;
+	}
+
+	Vector2 operator*(int number, const Vector2& vector)
+	{
+		return Vector2(static_cast<float>(number) * vector.x, static_cast<float>(number) * vector.y);
+	}
+
+	Vector2 operator*(const Vector2& vector, int number)
+	{
+		return number * vector;
 	}
 
 	Vector2 operator*(const Vector2& vector_1, const Vector2& vector_2)
@@ -317,7 +469,25 @@ namespace dim
 		return Vector2(vector_1.x * vector_2.x, vector_1.y * vector_2.y);
 	}
 
-	// Division
+	Vector2 operator*(const glm::mat2& matrix, const Vector2& vector)
+	{
+		return Vector2(matrix * vector.to_glm());
+	}
+
+	Vector2 operator*(const Vector2& vector, const glm::mat2& matrix)
+	{
+		return matrix * vector;
+	}
+
+	Vector2 operator*(const glm::mat3& matrix, const Vector2& vector)
+	{
+		return Vector2(matrix * Vector3(vector, 1.f));
+	}
+
+	Vector2 operator*(const Vector2& vector, const glm::mat3& matrix)
+	{
+		return matrix * vector;
+	}
 
 	Vector2 operator/(float number, const Vector2& vector)
 	{
@@ -332,6 +502,19 @@ namespace dim
 		return Vector2(vector.x / number, vector.y / number);
 	}
 
+	Vector2 operator/(int number, const Vector2& vector)
+	{
+		return Vector2((vector.x != 0.f ? static_cast<float>(number) / vector.x : 0.f), (vector.y != 0.f ? static_cast<float>(number) / vector.y : 0.f));
+	}
+
+	Vector2 operator/(const Vector2& vector, int number)
+	{
+		if (number == 0)
+			return Vector2::null;
+
+		return Vector2(vector.x / static_cast<float>(number), vector.y / static_cast<float>(number));
+	}
+
 	Vector2 operator/(const Vector2& vector_1, const Vector2& vector_2)
 	{
 		return Vector2((vector_2.x != 0.f ? vector_1.x / vector_2.x : 0.f), (vector_2.y != 0.f ? vector_1.y / vector_2.y : 0.f));
@@ -339,10 +522,8 @@ namespace dim
 
 	float dot(const Vector2& vector_1, const Vector2& vector_2)
 	{
-		return vector_1.dot(vector_2);
+		return vector_1.x * vector_2.x + vector_1.y * vector_2.y;
 	}
-
-	// Egalit�s
 
 	bool operator==(const Vector2& vector_1, const Vector2& vector_2)
 	{
@@ -354,8 +535,6 @@ namespace dim
 		return (!(vector_1 == vector_2));
 	}
 
-	// Affichage
-
 	std::ostream& operator<<(std::ostream& os, const Vector2& vector)
 	{
 		os << "(" << vector.x << ", " << vector.y << ")";
@@ -364,41 +543,26 @@ namespace dim
 
 	float distance(const Vector2& point_1, const Vector2& point_2)
 	{
-		return point_1.get_distance(point_2);
+		return (point_2 - point_1).get_norm();
 	}
 
 	float distance_2(const Vector2& point_1, const Vector2& point_2)
 	{
-		return point_1.get_distance_2(point_2);
+		return (point_2 - point_1).get_norm_2();
 	}
 
 	float angle(const Vector2& point_1, const Vector2& point_2)
 	{
-		return point_1.get_angle(point_2);
+		return (point_2 - point_1).get_angle();
 	}
 
-	Vector2 normalized(const Vector2& vector)
+	Vector2 normalize(const Vector2& vector)
 	{
-		return vector.get_normalized();
-	}
+		float norm = vector.get_norm();
 
-	std::array<float, 2> to_array(const Vector2& vector)
-	{
-		return vector.to_array();
-	}
+		if (norm != 0.f)
+			return vector / norm;
 
-	glm::vec2 to_glm(const Vector2& vector)
-	{
-		return vector.to_glm();
-	}
-
-	sf::Vector2f to_sf_float(const Vector2& vector)
-	{
-		return vector.to_sf_float();
-	}
-
-	sf::Vector2i to_sf_int(const Vector2& vector)
-	{
-		return vector.to_sf_int();
+		return Vector2::unit;
 	}
 }
