@@ -60,34 +60,31 @@ namespace dim
 
 	void DragController::update(Scene& scene, Camera& camera)
 	{
-		if (active)
+		if ((!prev_mouse_click && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && (!scene.is_in(sf::Mouse::getPosition(Window::get_window())) ||
+			!scene.is_active())) || scene.is_moving())
+			move_forbidden = true;
+
+		else if (!scene.is_moving() && prev_mouse_click && !sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+			move_forbidden = false;
+
+		if (!scene.is_moving() && scene.is_active() && scene.is_in(sf::Mouse::getPosition(Window::get_window())))
+			move_forbidden = false;
+
+		if (!scene.is_active())
+			move_forbidden = true;
+
+		if (active && !move_forbidden && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 		{
-			if ((!prev_mouse_click && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && (!scene.is_in(sf::Mouse::getPosition(Window::get_window())) ||
-				!scene.is_active())) || scene.is_moving())
-				move_forbidden = true;
+			Vector2 move = Vector2(sf::Mouse::getPosition()) - prev_mouse_pos;
 
-			else if (!scene.is_moving() && prev_mouse_click && !sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-				move_forbidden = false;
+			glm::vec3 right = glm::normalize(glm::cross(camera.direction.to_glm(), glm::vec3(0.f, 1.f, 0.f)));
 
-			if (!scene.is_moving() && scene.is_active() && scene.is_in(sf::Mouse::getPosition(Window::get_window())))
-				move_forbidden = false;
+			camera.position -= right * sensitivity * move.x * (4.f / scene.size.y);
+			camera.position -= glm::normalize(glm::cross(camera.direction.to_glm(), right)) * sensitivity * move.y * (4.f / scene.size.y);
+			camera.view = glm::lookAt(camera.position.to_glm(), (camera.position + camera.direction).to_glm(), glm::vec3(0.f, 1.f, 0.f));
 
-			if (!scene.is_active())
-				move_forbidden = true;
-
-			if (!move_forbidden && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-			{
-				Vector2 move = Vector2(sf::Mouse::getPosition()) - prev_mouse_pos;
-
-				glm::vec3 right = glm::normalize(glm::cross(camera.direction.to_glm(), glm::vec3(0.f, 1.f, 0.f)));
-
-				camera.position -= right * sensitivity * move.x * (4.f / scene.size.y);
-				camera.position -= glm::normalize(glm::cross(camera.direction.to_glm(), right)) * sensitivity * move.y * (4.f / scene.size.y);
-				camera.view = glm::lookAt(camera.position.to_glm(), (camera.position + camera.direction).to_glm(), glm::vec3(0.f, 1.f, 0.f));
-
-				scene.camera2D.move(-move * sensitivity * scene.camera2D.get_zoom());
-				scene.render_texture.setView(scene.camera2D.get_view());
-			}
+			scene.camera2D.move(-move * sensitivity * scene.camera2D.get_zoom());
+			scene.render_texture.setView(scene.camera2D.get_view());
 		}
 
 		prev_mouse_pos = sf::Mouse::getPosition();
@@ -96,27 +93,24 @@ namespace dim
 
 	void DragController::update(Camera& camera)
 	{
-		if (active)
+		if (!prev_mouse_click && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !Window::is_in(sf::Mouse::getPosition(Window::get_window())))
+			move_forbidden = true;
+
+		else if (prev_mouse_click && !sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+			move_forbidden = false;
+
+		if (active && !move_forbidden && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 		{
-			if (!prev_mouse_click && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !Window::is_in(sf::Mouse::getPosition(Window::get_window())))
-				move_forbidden = true;
+			Vector2 move = Vector2(sf::Mouse::getPosition()) - prev_mouse_pos;
 
-			else if (prev_mouse_click && !sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-				move_forbidden = false;
+			glm::vec3 right = glm::normalize(glm::cross(camera.direction.to_glm(), glm::vec3(0.f, 1.f, 0.f)));
 
-			if (!move_forbidden && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-			{
-				Vector2 move = Vector2(sf::Mouse::getPosition()) - prev_mouse_pos;
+			camera.position -= right * sensitivity * move.x * (4.f / Window::get_size().y);
+			camera.position -= glm::normalize(glm::cross(camera.direction.to_glm(), right)) * sensitivity * move.y * (4.f / Window::get_size().y);
+			camera.view = glm::lookAt(camera.position.to_glm(), (camera.position + camera.direction).to_glm(), glm::vec3(0.f, 1.f, 0.f));
 
-				glm::vec3 right = glm::normalize(glm::cross(camera.direction.to_glm(), glm::vec3(0.f, 1.f, 0.f)));
-
-				camera.position -= right * sensitivity * move.x * (4.f / Window::get_size().y);
-				camera.position -= glm::normalize(glm::cross(camera.direction.to_glm(), right)) * sensitivity * move.y * (4.f / Window::get_size().y);
-				camera.view = glm::lookAt(camera.position.to_glm(), (camera.position + camera.direction).to_glm(), glm::vec3(0.f, 1.f, 0.f));
-
-				Window::camera2D.move(-move * sensitivity * Window::camera2D.get_zoom());
-				Window::get_window().setView(Window::camera2D.get_view());
-			}
+			Window::camera2D.move(-move * sensitivity * Window::camera2D.get_zoom());
+			Window::get_window().setView(Window::camera2D.get_view());
 		}
 
 		prev_mouse_pos = sf::Mouse::getPosition();

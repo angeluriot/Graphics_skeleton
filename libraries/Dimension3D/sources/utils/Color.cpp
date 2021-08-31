@@ -35,18 +35,18 @@ namespace dim
 
 	Color::Color(float red, float green, float blue, float alpha)
 	{
-		r = clamp(red, 0.f, 1.f);
-		g = clamp(green, 0.f, 1.f);
-		b = clamp(blue, 0.f, 1.f);
-		a = clamp(alpha, 0.f, 1.f);
+		r = red;
+		g = green;
+		b = blue;
+		a = alpha;
 	}
 
 	Color& Color::operator=(const Vector4& vector)
 	{
-		r = clamp(vector.x, 0.f, 1.f);
-		g = clamp(vector.y, 0.f, 1.f);
-		b = clamp(vector.z, 0.f, 1.f);
-		a = clamp(vector.w, 0.f, 1.f);
+		r = vector.x;
+		g = vector.y;
+		b = vector.z;
+		a = vector.w;
 
 		return *this;
 	}

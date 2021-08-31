@@ -13,10 +13,10 @@ namespace dim
 		return std::min(std::max(number, min), max);
 	}
 
-	int						random_int(int min, int max);
-	float					random_float(float min, float max);
-	bool					random_probability(float probability);
-	bool					sleep_every(int milliseconds);
+	int		random_int(int min, int max);
+	float	random_float(float min, float max);
+	bool	random_probability(float probability);
+	bool	sleep_every(unsigned int milliseconds);
 }
 
 #endif

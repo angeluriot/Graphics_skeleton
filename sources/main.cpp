@@ -20,7 +20,7 @@ int main()
 
 	//scene_1.set_controller(dim::DragController());
 	//scene_2.set_controller(dim::OrbitController());
-	dim::Window::set_controller(dim::DragController());
+	dim::Window::set_controller(dim::FlyController());
 
 	dim::PerspectiveCamera cam;
 	cam.set_position(dim::Vector3(0.f, 0.f, 1.5f));
@@ -61,6 +61,7 @@ int main()
 	sf::Clock clock;
 	clock.restart();
 	int fps = 0;
+	bool menu_active = false;
 
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dim::DrawType type = dim::DrawType::Triangles;
@@ -78,6 +79,7 @@ int main()
 		//dim::Scene::clear_all();
 		//dim::Scene::update_all();
 
+		dim::Window::get_controller().enable(!menu_active);
 		dim::Window::update();
 
 		// Dimension3D
@@ -142,6 +144,8 @@ int main()
 			fps = int(1.f / dim::Window::get_elapsed_time());
 			clock.restart();
 		}
+
+		menu_active = ImGui::IsWindowFocused();
 
 		ImGui::Text(std::to_string(fps).data());
 		//ImGui::Text(("(" + std::to_string(scene_1.get_width()) + " " + std::to_string(scene_1.get_height()) + ")").data());

@@ -23,7 +23,7 @@ namespace dim
 		return true;
 	}
 
-	bool sleep_every(int milliseconds)
+	bool sleep_every(unsigned int milliseconds)
 	{
 		static sf::Clock clock;
 
