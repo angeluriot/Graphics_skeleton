@@ -230,6 +230,12 @@ namespace dim
 		glCullFace(GL_FRONT);
 		glFrontFace(GL_CW);
 
+		if (cull_face)
+			glEnable(GL_CULL_FACE);
+
+		else
+			glDisable(GL_CULL_FACE);
+
 		glPointSize(thickness);
 		glLineWidth(thickness);
 		glEnable(GL_POINT_SMOOTH);

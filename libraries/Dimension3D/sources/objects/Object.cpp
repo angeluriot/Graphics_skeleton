@@ -85,6 +85,7 @@ namespace dim
 		translation_matrix = glm::mat4(1.f);
 		origin_matrix = glm::mat4(1.f);
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
+		thickness = 1.f;
 		textured = false;
 		binded = false;
 	}
@@ -129,6 +130,7 @@ namespace dim
 		translation_matrix = glm::mat4(1.f);
 		origin_matrix = glm::mat4(1.f);
 		model = translation_matrix * rotation_matrix * scaling_matrix * origin_matrix;
+		thickness = 1.f;
 		textured = false;
 		binded = false;
 	}
