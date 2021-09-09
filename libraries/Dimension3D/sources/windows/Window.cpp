@@ -284,6 +284,11 @@ namespace dim
 		}
 	}
 
+	bool Window::poll_event(sf::Event& sf_event)
+	{
+		return window->pollEvent(sf_event);
+	}
+
 	void Window::check_events(const sf::Event& sf_event)
 	{
 		static int frame_id = 0;
@@ -451,6 +456,7 @@ namespace dim
 		delete camera;
 		camera = nullptr;
 
+		shut_down();
 		running = false;
 	}
 
