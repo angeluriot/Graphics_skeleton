@@ -17,7 +17,6 @@ This repository is a **skeleton C++ project** containing several graphics librar
 
 <br>
 
-
 # Summary
 
 * **[Summary](#summary)**
