@@ -17,6 +17,25 @@ This repository is a **skeleton C++ project** containing several graphics librar
 
 <br>
 
+
+# Summary
+
+* **[Summary](#summary)**
+* **[Install](#install)**
+	* [Windows](#windows)
+		* [What you need](#what-you-need)
+		* [How to compile it?](#how-to-compile-it)
+	* [Unix](#unix)
+		* [What you need](#what-you-need-1)
+		* [How to compile it?](#how-to-compile-it-1)
+	* [Using VS Code](#using-vs-code-recommended) *(recommended)*
+		* [What you need](#what-you-need-2)
+		* [How to compile it?](#how-to-compile-it-2)
+* **[Releases](#releases)**
+* **[Credits](#credits)**
+
+<br>
+
 # Install
 
 ## Windows
@@ -32,7 +51,7 @@ This repository is a **skeleton C++ project** containing several graphics librar
 
 ### How to compile it?
 
-* **Visual Studio** (recommended) :
+* **Visual Studio** *(recommended)* :
 
 	* Run the **[vs32_launch.bat](https://github.com/angeluriot/Graphics_skeleton/blob/master/vs32_launch.bat)** *(for 32 bits)* or the **[vs64_launch.bat](https://github.com/angeluriot/Graphics_skeleton/blob/master/vs64_launch.bat)** *(for 64 bits)* to create the project
 	* Then run the file in **.sln** in the build folder
@@ -73,7 +92,7 @@ The easiest way is to open a terminal and type : `sudo apt update` and `sudo apt
 
 ## Using VS Code *(recommended)*
 
-### What you need :
+### What you need
 
 * The **"What you need"** part of your OS *(above)*
 * The **[C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack)**
@@ -107,7 +126,7 @@ The easiest way is to open a terminal and type : `sudo apt update` and `sudo apt
 
 <br>
 
-# Release
+# Releases
 
 If you want to test the demo without compiling it, you can see the **[releases](https://github.com/angeluriot/Graphics_skeleton/releases)**.
 
