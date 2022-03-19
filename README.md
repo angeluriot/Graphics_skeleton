@@ -9,6 +9,10 @@
 
 This repository is a **skeleton C++ project** containing several graphics libraries : **[GLM](http://glm.g-truc.net/0.9.6/api/index.html)**, **[GLEW](http://glew.sourceforge.net/)**, **[SFML](https://www.sfml-dev.org/)**, **[ImGui](https://github.com/ocornut/imgui)**, **[ImGui-SFML](https://github.com/eliasdaler/imgui-sfml)** and **[Dimension3D](https://github.com/angeluriot/Dimension3D)**. It is perfect for 2D and 3D graphics applications with windows and menus.
 
+<br/>
+
+⚠️ This repository contains **submodules**, add `--recurse-submodules` when cloning ⚠️
+
 <br>
 
 <p align="center">
