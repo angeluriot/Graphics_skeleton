@@ -31,7 +31,7 @@ if(MSVC)
 	set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 endif()
 
-#libraries
+# libraries
 add_subdirectory(libraries)
 target_link_libraries(${PROJECT_NAME} PUBLIC Libraries)
 
