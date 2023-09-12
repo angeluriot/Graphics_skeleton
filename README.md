@@ -50,6 +50,7 @@ This repository is a **skeleton C++ project** containing several graphics librar
 * A compiler :
 
 	* **[Visual Studio](https://visualstudio.microsoft.com/)** (the software or the compiler only) *(recommended)*
+
 	* **[MinGW](https://www.mingw-w64.org/)** *(not recommended)*
 
 ### How to compile it?
@@ -57,6 +58,7 @@ This repository is a **skeleton C++ project** containing several graphics librar
 * **Visual Studio** *(recommended)* :
 
 	* Run the **[vs32_launch.bat](https://github.com/angeluriot/Graphics_skeleton/blob/master/vs32_launch.bat)** *(for 32 bits)* or the **[vs64_launch.bat](https://github.com/angeluriot/Graphics_skeleton/blob/master/vs64_launch.bat)** *(for 64 bits)* to create the project
+
 	* Then run the file in **.sln** in the build folder
 
 *(Run the launch file again each time you add or remove a file)*
@@ -64,6 +66,7 @@ This repository is a **skeleton C++ project** containing several graphics librar
 * **MinGW** *(not recommended)* :
 
 	* Open a terminal in the project root and type : `.\mingw32_launch.bat` *(for 32 bits)* or `.\mingw64_launch.bat` *(for 64 bits)* to create and compile the project
+
 	* Then type : `.\build\App.exe` to run the program *(or something else if you changed the name)*
 
 *(Type the first command when you want to compile and the second when you want to run the program)*
@@ -77,6 +80,7 @@ This repository is a **skeleton C++ project** containing several graphics librar
 * **A compiler :**
 
 	* **[GCC](https://gcc.gnu.org/)** for **Linux**
+
 	* **[Clang](https://clang.llvm.org/)** for **MacOS**
 
 * **[GLEW](http://glew.sourceforge.net/)**
@@ -84,11 +88,13 @@ This repository is a **skeleton C++ project** containing several graphics librar
 The easiest way is to open a terminal and type : `sudo apt update` and `sudo apt upgrade`, then type :
 
 * For **Linux** : `sudo apt install gcc g++ make cmake gdb freeglut3 libglew`
+
 * For **MacOS** : `sudo apt install clang clang++ make cmake lldb freeglut3 libglew`
 
 ### How to compile it?
 
 * Open a terminal in the project root and type : `bash unix_launch.sh` to create and compile the project
+
 * Then type : `./build/App` to run the program *(or something else if you changed the name)*
 
 *(Type the first command when you want to compile and the second when you want to run the program)*
@@ -98,31 +104,26 @@ The easiest way is to open a terminal and type : `sudo apt update` and `sudo apt
 ### What you need
 
 * The **"What you need"** part of your OS *(above)*
+
 * The **[C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack)**
 
 ### How to compile it?
 
 * `Ctrl` + `Shift` + `P` and type *"scan for kits"*, then choose you compiler *(I recommend the Visual Studio compiler for Windows)*
-* Choose *"debug"* or *"release"* at the bottom
-* **Only for Windows :**
 
-	* `Ctrl` + `Shift` + `P`, type *"kits"* and choose *"CMake: Edit User-Local CMake Kits"*, that will open the **cmake-tools-kits.json** file
-	* For each configuration, add this at this end *(don't forget the comma on the previous element)* :
-		```json
-		"cmakeSettings": {
-			"X64_BITS": <true or false>
-		}
-		```
-	* Put `true` if the configuration is made for 64 bits and `false` otherwise
+* Choose *"debug"* or *"release"* at the bottom
 
 * Go to *"Preferences"*, then *"Settings"* and type *"cmake debug"*, then clic on *"Edit in settings.json"* that will open the **settings.json** file
+
 * Add this at this end *(don't forget the comma on the previous element)* :
 	```json
 	"cmake.debugConfig": {
 		"cwd": "${workspaceFolder}"
 	}
 	```
+
 * If there is a **build** folder, delete it and reload VS Code
+
 * Wait until the **CMakeLists.txt** runs or choose again *"debug"* or *"release"* at the bottom
 
 *(Choose "debug" or "release" again each time you add or remove a file and clic on the play button at the bottom to compile and run the program)*
