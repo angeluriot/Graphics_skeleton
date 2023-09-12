@@ -41,6 +41,8 @@ This repository is a **skeleton C++ project** containing several graphics librar
 
 # Install
 
+I recommend using **[VS Code](#using-vs-code-recommended)**.
+
 ## Windows
 
 ### What you need
@@ -57,15 +59,15 @@ This repository is a **skeleton C++ project** containing several graphics librar
 
 * **Visual Studio** *(recommended)* :
 
-	* Run the **[vs32_launch.bat](https://github.com/angeluriot/Graphics_skeleton/blob/master/vs32_launch.bat)** *(for 32 bits)* or the **[vs64_launch.bat](https://github.com/angeluriot/Graphics_skeleton/blob/master/vs64_launch.bat)** *(for 64 bits)* to create the project
+	* Run the **[vs32_run.bat](https://github.com/angeluriot/Graphics_skeleton/blob/master/vs32_run.bat)** *(for 32 bits)* or the **[vs64_run.bat](https://github.com/angeluriot/Graphics_skeleton/blob/master/vs64_run.bat)** *(for 64 bits)* to create the project
 
 	* Then run the file in **.sln** in the build folder
 
-*(Run the launch file again each time you add or remove a file)*
+*(Run the .bat file again each time you add or remove a file)*
 
 * **MinGW** *(not recommended)* :
 
-	* Open a terminal in the project root and type : `.\mingw32_launch.bat` *(for 32 bits)* or `.\mingw64_launch.bat` *(for 64 bits)* to create and compile the project
+	* Open a terminal in the project root and type : `.\mingw_run.bat` to create and compile the project
 
 	* Then type : `.\build\App.exe` to run the program *(or something else if you changed the name)*
 
@@ -93,7 +95,7 @@ The easiest way is to open a terminal and type : `sudo apt update` and `sudo apt
 
 ### How to compile it?
 
-* Open a terminal in the project root and type : `bash unix_launch.sh` to create and compile the project
+* Open a terminal in the project root and type : `bash unix_run.sh` to create and compile the project
 
 * Then type : `./build/App` to run the program *(or something else if you changed the name)*
 
