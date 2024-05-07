@@ -37,6 +37,8 @@ This repository is a **skeleton C++ project** containing several graphics librar
 
 I recommend using **[VS Code](#-using-vs-code-recommended)**.
 
+<br>
+
 ## 🪟 Windows
 
 ### What you need
@@ -67,6 +69,8 @@ I recommend using **[VS Code](#-using-vs-code-recommended)**.
 
 *(Type the first command when you want to compile and the second when you want to run the program)*
 
+<br>
+
 ## 🐧 Unix
 
 ### What you need
@@ -94,6 +98,8 @@ The easiest way is to open a terminal and type : `sudo apt update` and `sudo apt
 * Then type : `./build/App` to run the program *(or something else if you changed the name)*
 
 *(Type the first command when you want to compile and the second when you want to run the program)*
+
+<br>
 
 ## 💎 Using VS Code *(recommended)*
 
