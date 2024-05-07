@@ -1,4 +1,4 @@
-# Graphics skeleton
+# 🦴 Graphics skeleton
 
 ![Release](https://img.shields.io/badge/Release-v1.0-blueviolet)
 ![Language](https://img.shields.io/badge/Language-C%2B%2B-0052cf)
@@ -21,29 +21,23 @@ This repository is a **skeleton C++ project** containing several graphics librar
 
 <br>
 
-# Summary
+# 📋 Summary
 
-* **[Summary](#summary)**
-* **[Install](#install)**
-	* [Windows](#windows)
-		* [What you need](#what-you-need)
-		* [How to compile it?](#how-to-compile-it)
-	* [Unix](#unix)
-		* [What you need](#what-you-need-1)
-		* [How to compile it?](#how-to-compile-it-1)
-	* [Using VS Code](#using-vs-code-recommended) *(recommended)*
-		* [What you need](#what-you-need-2)
-		* [How to compile it?](#how-to-compile-it-2)
-* **[Releases](#releases)**
-* **[Credits](#credits)**
+* **[📋 Summary](#-summary)**
+* **[🛠️ Install](#%EF%B8%8F-install)**
+	* [🪟 Windows](#-windows)
+	* [🐧 Unix](#-unix)
+	* [💎 Using VS Code](#-using-vs-code-recommended) *(recommended)*
+* **[🗓️ Releases](#%EF%B8%8F-releases)**
+* **[🙏 Credits](#-credits)**
 
 <br>
 
-# Install
+# 🛠️ Install
 
-I recommend using **[VS Code](#using-vs-code-recommended)**.
+I recommend using **[VS Code](#-using-vs-code-recommended)**.
 
-## Windows
+## 🪟 Windows
 
 ### What you need
 
@@ -73,7 +67,7 @@ I recommend using **[VS Code](#using-vs-code-recommended)**.
 
 *(Type the first command when you want to compile and the second when you want to run the program)*
 
-## Unix
+## 🐧 Unix
 
 ### What you need
 
@@ -101,7 +95,7 @@ The easiest way is to open a terminal and type : `sudo apt update` and `sudo apt
 
 *(Type the first command when you want to compile and the second when you want to run the program)*
 
-## Using VS Code *(recommended)*
+## 💎 Using VS Code *(recommended)*
 
 ### What you need
 
@@ -132,12 +126,12 @@ The easiest way is to open a terminal and type : `sudo apt update` and `sudo apt
 
 <br>
 
-# Releases
+# 🗓️ Releases
 
 If you want to test the demo without compiling it, you can see the **[releases](https://github.com/angeluriot/Graphics_skeleton/releases)**.
 
 <br>
 
-# Credits
+# 🙏 Credits
 
 * **[Angel Uriot](https://github.com/angeluriot) :** Creator of the skeleton project.
